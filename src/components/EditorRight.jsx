@@ -130,35 +130,102 @@ class EditorRight extends Component {
   }
 }
 
+const handleContentOnDragStart = e => {
+  console.log(e);
+  console.log(e.target.children[1].innerHTML);
+  e.dataTransfer.setData(
+    "text/html",
+    "<div>" + e.target.children[1].innerHTML + "</div>"
+  );
+  // e.dataTransfer.drop.effect = "move";
+  // e.dataTransfer.SetData("text/plain", v);
+};
+
+const handleOnDragEnd = e => {
+  e.preventDefault();
+  console.log("ondragend: " + e);
+};
+
+const handleRowOnDragStart = e => {
+  const columnArray = [];
+  let i = 0;
+  while (e.target.children[i]) {
+    columnArray.push(e.target.children[i].innerHTML);
+    i++;
+  }
+  console.log(e);
+  console.log(columnArray);
+  console.log(columnArray.map((ratio, index) => <li key={index}>{ratio}</li>));
+  e.dataTransfer.setData(
+    "text/html",
+    `<ul style="
+      border: 1px solid black 
+      width: 200px 
+      height: 100px 
+      display: grid
+      grid-tamplate-columns: ${columnArray.map(ratio => ratio + "fr")}
+    ">` +
+      columnArray
+        .map((ratio, index) => `<div key={index}>{ratio}</div>`)
+        .reduce(",") +
+      "</ul>"
+  );
+};
+
 const Content = () => {
   return (
     <div className={styles.contentBody}>
       <ul className={styles.contentColumn}>
-        <li className={styles.item}>
+        <li
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleContentOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
           <div className={styles.icon}>
             <i class="fas fa-square" />
           </div>
           <div className={styles.title}>BUTTON</div>
         </li>
-        <li className={styles.item}>
+        <li
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleContentOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
           <div className={styles.icon}>
             <i class="fas fa-divide" />
           </div>
           <div className={styles.title}>DIVIDER</div>
         </li>
-        <li className={styles.item}>
+        <li
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleContentOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
           <div className={styles.icon}>
             <i class="fas fa-code" />
           </div>
           <div className={styles.title}>HTML</div>
         </li>
-        <li className={styles.item}>
+        <li
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleContentOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
           <div className={styles.icon}>
             <i class="far fa-image" />
           </div>
           <div className={styles.title}>IMGAE</div>
         </li>
-        <li className={styles.item}>
+        <li
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleContentOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
           <div className={styles.icon}>
             <i class="fas fa-font" />
           </div>
@@ -173,37 +240,72 @@ const Row = () => {
   return (
     <div className={styles.rowBody}>
       <div className={styles.rowRow}>
-        <div className={styles.item}>
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleRowOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>1</div>
         </div>
-        <div className={styles.item}>
-          <div className={styles.box} />
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleRowOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>1</div>
         </div>
-        <div className={styles.item}>
-          <div className={styles.box} />
-          <div className={styles.box} />
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleRowOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>1</div>
         </div>
-        <div className={styles.item}>
-          <div className={styles.box} />
-          <div className={styles.box} />
-          <div className={styles.box} />
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleRowOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>1</div>
         </div>
-        <div className={styles.item}>
-          <div className={styles.box} />
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleRowOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>2</div>
         </div>
-        <div className={styles.item}>
-          <div className={styles.box} />
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleRowOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>2</div>
+          <div className={styles.box}>1</div>
         </div>
-        <div className={styles.item}>
-          <div className={styles.box} />
-          <div className={styles.box} />
-          <div className={styles.box} />
-          <div className={styles.box} />
+        <div
+          className={styles.item}
+          draggable="true"
+          onDragStart={handleContentOnDragStart}
+          onDragEnd={handleOnDragEnd}
+        >
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>2</div>
+          <div className={styles.box}>1</div>
+          <div className={styles.box}>2</div>
         </div>
       </div>
     </div>
