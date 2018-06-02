@@ -28,6 +28,7 @@
   }
   .content-body {
     padding: 15px;
+    overflow-y: scroll;
     .content-column {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -97,6 +98,49 @@
         }
         &:hover {
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+        }
+      }
+    }
+  }
+  .body-body {
+    padding-top: 2px;
+    .nav {
+      .nav-bar {
+        padding: 0 20px;
+        height: 35px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        font-size: 12px;
+        color: rgb(81, 97, 103);
+        background-color: rgb(234, 234, 234);
+        .title {
+        }
+        .arrow {
+        }
+      }
+      .column {
+        height: 210px;
+        padding: 0 20px;
+        .color-picker {
+          max-height: 0px;
+          position: fixed;
+          right: 20px;
+          margin-top: 65px;
+          transition: height 0.2s ease;
+        }
+        .item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 70px;
+          font-weight: 600;
+          color: #8f9699;
+          .subtitle {
+          }
+          .func {
+          }
         }
       }
     }

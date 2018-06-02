@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import styles from "./EditorRight.scss";
+import reactCSS from "reactcss";
+
+import { SketchPicker } from "react-color";
 
 class EditorRight extends Component {
   state = {
@@ -49,6 +52,11 @@ class EditorRight extends Component {
     return "";
   };
 
+  myCallback = dataFromChild => {
+    console.log(dataFromChild);
+    this.props.callbackfromparent(dataFromChild);
+  };
+
   showSection = () => {
     switch (this.state.active) {
       case 0:
@@ -58,7 +66,7 @@ class EditorRight extends Component {
         return <Row />;
         break;
       case 2:
-        return <Body />;
+        return <Body callbackfromparent={this.myCallback.bind(this)} />;
         break;
       default:
         break;
@@ -130,190 +138,323 @@ class EditorRight extends Component {
   }
 }
 
-const handleContentOnDragStart = e => {
-  console.log(e);
-  console.log(e.target.children[1].innerHTML);
-  e.dataTransfer.setData(
-    "text/html",
-    "<div>" + e.target.children[1].innerHTML + "</div>"
-  );
-  // e.dataTransfer.drop.effect = "move";
-  // e.dataTransfer.SetData("text/plain", v);
-};
+class Content extends Component {
+  handleContentOnDragStart = e => {
+    console.log(e);
+    console.log(e.target.children[1].innerHTML);
+    e.dataTransfer.setData(
+      "text/html",
+      "<div>" + e.target.children[1].innerHTML + "</div>"
+    );
+    // e.dataTransfer.drop.effect = "move";
+    // e.dataTransfer.SetData("text/plain", v);
+  };
 
-const handleOnDragEnd = e => {
-  e.preventDefault();
-  console.log("ondragend: " + e);
-};
+  handleOnDragEnd = e => {
+    e.preventDefault();
+    console.log("ondragend: " + e);
+  };
 
-const handleRowOnDragStart = e => {
-  const columnArray = [];
-  let i = 0;
-  while (e.target.children[i]) {
-    columnArray.push(e.target.children[i].innerHTML);
-    i++;
+  render() {
+    return (
+      <div className={styles.contentBody}>
+        <ul className={styles.contentColumn}>
+          <li
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleContentOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.icon}>
+              <i class="fas fa-square" />
+            </div>
+            <div className={styles.title}>BUTTON</div>
+          </li>
+          <li
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleContentOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.icon}>
+              <i class="fas fa-divide" />
+            </div>
+            <div className={styles.title}>DIVIDER</div>
+          </li>
+          <li
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleContentOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.icon}>
+              <i class="fas fa-code" />
+            </div>
+            <div className={styles.title}>HTML</div>
+          </li>
+          <li
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleContentOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.icon}>
+              <i class="far fa-image" />
+            </div>
+            <div className={styles.title}>IMGAE</div>
+          </li>
+          <li
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleContentOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.icon}>
+              <i class="fas fa-font" />
+            </div>
+            <div className={styles.title}>TEXT</div>
+          </li>
+        </ul>
+      </div>
+    );
   }
-  console.log(e);
-  console.log(columnArray);
-  console.log(columnArray.map((ratio, index) => <li key={index}>{ratio}</li>));
-  e.dataTransfer.setData(
-    "text/html",
-    `<ul style="
-      border: 1px solid black 
-      width: 200px 
-      height: 100px 
-      display: grid
-      grid-tamplate-columns: ${columnArray.map(ratio => ratio + "fr")}
+}
+
+class Row extends Component {
+  handleRowOnDragStart = e => {
+    const columnArray = [];
+    let i = 0;
+    while (e.target.children[i]) {
+      columnArray.push(e.target.children[i].innerHTML);
+      i++;
+    }
+    console.log(e);
+    console.log(columnArray);
+    e.dataTransfer.setData(
+      "text/html",
+      `<div style="
+      width: 100%;
+      height: 100px; 
+      display: grid;
+      grid-template-columns: ${columnArray
+        .map(ratio => ratio + "fr")
+        .reduce((prev, curr) => prev + " " + curr)};
     ">` +
-      columnArray
-        .map((ratio, index) => `<div key={index}>{ratio}</div>`)
-        .reduce(",") +
-      "</ul>"
-  );
-};
+        columnArray
+          .map(
+            (ratio, index) => `<div style="
+      border: 1px solid black; ">${ratio}</div>`
+          )
+          .reduce((prev, curr) => prev + curr) +
+        "</div>"
+    );
+  };
 
-const Content = () => {
-  return (
-    <div className={styles.contentBody}>
-      <ul className={styles.contentColumn}>
-        <li
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleContentOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.icon}>
-            <i class="fas fa-square" />
-          </div>
-          <div className={styles.title}>BUTTON</div>
-        </li>
-        <li
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleContentOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.icon}>
-            <i class="fas fa-divide" />
-          </div>
-          <div className={styles.title}>DIVIDER</div>
-        </li>
-        <li
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleContentOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.icon}>
-            <i class="fas fa-code" />
-          </div>
-          <div className={styles.title}>HTML</div>
-        </li>
-        <li
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleContentOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.icon}>
-            <i class="far fa-image" />
-          </div>
-          <div className={styles.title}>IMGAE</div>
-        </li>
-        <li
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleContentOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.icon}>
-            <i class="fas fa-font" />
-          </div>
-          <div className={styles.title}>TEXT</div>
-        </li>
-      </ul>
-    </div>
-  );
-};
+  handleOnDragEnd = e => {
+    e.preventDefault();
+    console.log("ondragend: " + e);
+  };
 
-const Row = () => {
-  return (
-    <div className={styles.rowBody}>
-      <div className={styles.rowRow}>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleRowOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>1</div>
-        </div>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleRowOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>1</div>
-        </div>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleRowOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>1</div>
-        </div>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleRowOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>1</div>
-        </div>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleRowOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>2</div>
-        </div>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleRowOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>2</div>
-          <div className={styles.box}>1</div>
-        </div>
-        <div
-          className={styles.item}
-          draggable="true"
-          onDragStart={handleContentOnDragStart}
-          onDragEnd={handleOnDragEnd}
-        >
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>2</div>
-          <div className={styles.box}>1</div>
-          <div className={styles.box}>2</div>
+  render() {
+    return (
+      <div className={styles.rowBody}>
+        <div className={styles.rowRow}>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>1</div>
+          </div>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>1</div>
+          </div>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>1</div>
+          </div>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>1</div>
+          </div>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>2</div>
+          </div>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>2</div>
+            <div className={styles.box}>1</div>
+          </div>
+          <div
+            className={styles.item}
+            draggable="true"
+            onDragStart={this.handleRowOnDragStart}
+            onDragEnd={this.handleOnDragEnd}
+          >
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>2</div>
+            <div className={styles.box}>1</div>
+            <div className={styles.box}>2</div>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
-const Body = () => {
-  return <div className={styles.bodyBody} />;
-};
+class Body extends Component {
+  state = {
+    color: false
+  };
+
+  handleOnClick = e => {
+    this.setState({ color: !this.state.color });
+    console.log(this.state.color);
+  };
+
+  myCallback = dataFromChild => {
+    console.log(dataFromChild);
+    this.props.callbackfromparent(dataFromChild);
+  };
+
+  render() {
+    return (
+      <div className={styles.bodyBody}>
+        <div className={styles.nav}>
+          <div className={styles.navBar}>
+            <div className={styles.title}>GENERAL</div>
+            <div className={styles.arrow}>▲</div>
+          </div>
+          <ul className={styles.column}>
+            <li className={styles.item}>
+              <div className={styles.subtitle}>Background Color</div>
+              <div className={styles.func}>
+                <SketchExample
+                  callbackfromparent={this.myCallback.bind(this)}
+                />
+              </div>
+            </li>
+            <li className={styles.item}>
+              <div className={styles.subtitle}>Content Width</div>
+              <div className={styles.func}>ㅁ</div>
+            </li>
+            <li className={styles.item}>
+              <div className={styles.subtitle}>Font Family</div>
+              <div className={styles.func}>ㅁ</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+}
+
+class SketchExample extends Component {
+  state = {
+    displayColorPicker: false,
+    color: {
+      r: "255",
+      g: "255",
+      b: "255",
+      a: "1"
+    }
+  };
+
+  handleClick = () => {
+    this.setState({ displayColorPicker: !this.state.displayColorPicker });
+  };
+
+  handleClose = () => {
+    this.setState({ displayColorPicker: false });
+  };
+
+  handleChange = color => {
+    this.setState({ color: color.rgb });
+    this.props.callbackfromparent(this.state.color);
+  };
+
+  render() {
+    const styles = reactCSS({
+      default: {
+        color: {
+          width: "36px",
+          height: "14px",
+          borderRadius: "2px",
+          background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${
+            this.state.color.b
+          }, ${this.state.color.a})`
+        },
+        swatch: {
+          padding: "5px",
+          background: "#fff",
+          borderRadius: "1px",
+          boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
+          display: "inline-block",
+          cursor: "pointer"
+        },
+        popover: {
+          position: "absolute",
+          marginTop: "5px",
+          marginLeft: "-175px",
+          zIndex: "2"
+        },
+        cover: {
+          position: "relative",
+          top: "0px",
+          right: "100px",
+          bottom: "0px",
+          left: "0px"
+        }
+      }
+    });
+
+    return (
+      <div>
+        <div style={styles.swatch} onClick={this.handleClick}>
+          <div style={styles.color} />
+        </div>
+        {this.state.displayColorPicker ? (
+          <div style={styles.popover}>
+            <div style={styles.cover} onClick={this.handleClose} />
+            <SketchPicker
+              color={this.state.color}
+              onChange={this.handleChange}
+            />
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+}
 
 export default EditorRight;

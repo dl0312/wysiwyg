@@ -50,7 +50,7 @@ class EditorLeft extends Component {
     e.preventDefault();
     var data = e.dataTransfer.getData("text/html");
     console.log("data: " + data);
-    e.target.insertAdjacentHTML("beforeend", data);
+    e.target.children[0].insertAdjacentHTML("beforeend", data);
     // const data = event.dataTransfer.getData("text/plain");
   };
 
@@ -59,7 +59,7 @@ class EditorLeft extends Component {
     const raw = convertToRaw(this.state.editorState.getCurrentContent());
     return (
       <Fragment>
-        <div className={styles.editor}>
+        {/* <div className={styles.editor}>
           <Editor
             editorState={editorState}
             onEditorStateChange={this.onEditorStateChange}
@@ -79,13 +79,25 @@ class EditorLeft extends Component {
             onDragOver={this.allowDrop}
             localization={{ locale: "ko" }}
           />
-        </div>
+        </div> */}
         <div
-          className={styles.practice}
+          style={{
+            background: `rgba(${this.props.color.r}, ${this.props.color.g}, ${
+              this.props.color.b
+            }, ${this.props.color.a})`
+          }}
+          className={styles.editor}
           onDragOver={this.allowDrop}
           onDrop={this.handleOnDrop}
-        />
-        <div className={styles.string}>{JSON.stringify(raw)}</div>
+        >
+          <div
+            style={{
+              width: "600px"
+            }}
+            className={styles.practice}
+          />
+        </div>
+        {/* <div className={styles.string}>{JSON.stringify(raw)}</div> */}
       </Fragment>
     );
   }
