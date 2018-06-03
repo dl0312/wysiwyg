@@ -379,12 +379,16 @@ class Body extends Component {
                 <div className={styles.index}>
                   <button
                     onClick={() => {
-                      this.setState(
-                        {
-                          contentWidth: this.state.contentWidth - 100
-                        },
-                        () => this.handleOnChange()
-                      );
+                      {
+                        this.state.contentWidth > 400
+                          ? this.setState(
+                              {
+                                contentWidth: this.state.contentWidth - 50
+                              },
+                              () => this.handleOnChange()
+                            )
+                          : null;
+                      }
                     }}
                     className={styles.minusBtn}
                   >
@@ -397,12 +401,16 @@ class Body extends Component {
                   />
                   <button
                     onClick={() => {
-                      this.setState(
-                        {
-                          contentWidth: this.state.contentWidth + 100
-                        },
-                        () => this.handleOnChange()
-                      );
+                      {
+                        this.state.contentWidth < 1100
+                          ? this.setState(
+                              {
+                                contentWidth: this.state.contentWidth + 50
+                              },
+                              () => this.handleOnChange()
+                            )
+                          : null;
+                      }
                     }}
                     className={styles.plusBtn}
                   >
