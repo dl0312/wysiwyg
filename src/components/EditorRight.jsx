@@ -166,7 +166,7 @@ class Content extends Component {
     console.log(e.target.children[1].innerHTML);
     e.dataTransfer.setData(
       "text/html",
-      "<div>" + e.target.children[1].innerHTML + "</div>"
+      `<div className="content" >` + e.target.children[1].innerHTML + "</div>"
     );
     // e.dataTransfer.drop.effect = "move";
     // e.dataTransfer.SetData("text/plain", v);
@@ -254,7 +254,7 @@ class Row extends Component {
     console.log(columnArray);
     e.dataTransfer.setData(
       "text/html",
-      `<div style="
+      `<div class="columnList" style="
       width: 100%;
       height: 100px; 
       display: grid;
@@ -264,11 +264,12 @@ class Row extends Component {
     ">` +
         columnArray
           .map(
-            (ratio, index) => `<div class="column" style="
-      border: 1px solid black; ">${ratio}</div>`
+            () => `<div class="column" style="
+      border: 1px solid black; "><div class="smallbuilder" ></div></div>`
           )
           .reduce((prev, curr) => prev + curr) +
-        "</div>"
+        "</div>" +
+        `<div class="builder" />`
     );
   };
 
@@ -355,11 +356,14 @@ class Row extends Component {
 }
 
 class Body extends Component {
-  state = {
-    displayFontFamily: false,
-    contentWidth: 600,
-    font: "Segoe UI"
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      displayFontFamily: false,
+      contentWidth: 600,
+      font: "Segoe UI"
+    };
+  }
 
   myCallback = dataFromChild => {
     console.log(dataFromChild);
@@ -387,7 +391,6 @@ class Body extends Component {
         <div className={styles.nav}>
           <div className={styles.navBar}>
             <div className={styles.title}>GENERAL</div>
-            <div className={styles.arrow}>▲</div>
           </div>
           <ul className={styles.column}>
             <li className={styles.item}>
@@ -509,8 +512,9 @@ class SketchExample extends Component {
   };
 
   handleChange = color => {
-    this.setState({ color: color.rgb });
-    this.props.callbackfromparent(this.state.color);
+    this.setState({ color: color.rgb }, () =>
+      this.props.callbackfromparent(this.state.color)
+    );
   };
 
   render() {
