@@ -1,8 +1,16 @@
 import React, { Component } from "react";
 import styles from "./EditorRight.scss";
 import reactCSS from "reactcss";
-
 import { SketchPicker } from "react-color";
+
+const fontFamily = [
+  "Roboto",
+  "Oxygen",
+  "Times New Roman",
+  "Segoe UI",
+  "Open Sans",
+  "Helvetica Neue"
+];
 
 class EditorRight extends Component {
   state = {
@@ -61,6 +69,10 @@ class EditorRight extends Component {
     this.props.callbackfromparentwidth(dataFromChild);
   };
 
+  fontCallback = dataFromChild => {
+    this.props.callbackfromparentfont(dataFromChild);
+  };
+
   showSection = () => {
     switch (this.state.active) {
       case 0:
@@ -74,6 +86,7 @@ class EditorRight extends Component {
           <Body
             callbackfromparent={this.myCallback.bind(this)}
             callbackfromparentwidth={this.widthCallback.bind(this)}
+            callbackfromparentfont={this.fontCallback.bind(this)}
           />
         );
         break;
@@ -343,7 +356,9 @@ class Row extends Component {
 
 class Body extends Component {
   state = {
-    contentWidth: 600
+    displayFontFamily: false,
+    contentWidth: 600,
+    font: "Segoe UI"
   };
 
   myCallback = dataFromChild => {
@@ -354,6 +369,15 @@ class Body extends Component {
   handleOnChange = () => {
     console.log("in body comp width: " + this.state.contentWidth);
     this.props.callbackfromparentwidth(this.state.contentWidth);
+  };
+
+  handleOnClick = () => {
+    console.log("popup!!!");
+    this.setState({ displayFontFamily: !this.state.displayFontFamily });
+  };
+
+  handleOnClickFont = () => {
+    this.props.callbackfromparentfont(this.state.font);
   };
 
   render() {
@@ -421,7 +445,35 @@ class Body extends Component {
             </li>
             <li className={styles.item}>
               <div className={styles.subtitle}>Font Family</div>
-              <div className={styles.func}>ㅁ</div>
+              <div className={styles.func}>
+                <div>
+                  <div className={styles.swatch} onClick={this.handleOnClick}>
+                    <div className={styles.font}>{this.state.font}</div>
+                  </div>
+                  {this.state.displayFontFamily ? (
+                    <div className={styles.popover}>
+                      <div className={styles.fontColomn}>
+                        {fontFamily.map(font => (
+                          <div
+                            className={styles.title}
+                            onClick={() =>
+                              this.setState(
+                                {
+                                  font
+                                },
+                                () => this.handleOnClickFont()
+                              )
+                            }
+                            style={{ fontFamily: `${font}` }}
+                          >
+                            {font}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
             </li>
           </ul>
         </div>

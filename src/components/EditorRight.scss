@@ -139,6 +139,29 @@
           .subtitle {
           }
           .func {
+            .swatch {
+              padding: 5px;
+              background-color: #fff;
+              border-radius: 1px;
+              box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+              display: inline-block;
+              cursor: pointer;
+              .font {
+              }
+            }
+            .popover {
+              position: absolute;
+              margin-top: 5px;
+              margin-left: -100px;
+              z-index: 2;
+              .cover {
+                position: relative;
+                top: 0px;
+                right: 0px;
+                bottom: 0px;
+                left: 0px;
+              }
+            }
           }
         }
       }

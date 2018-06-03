@@ -8,7 +8,8 @@ class Editor extends Component {
     super(props);
     this.state = {
       color: { r: "255", g: "255", b: "255", a: "1" },
-      contentWidth: null
+      contentWidth: null,
+      font: null
     };
   }
 
@@ -21,6 +22,11 @@ class Editor extends Component {
     console.log("change width: " + dataFromChild);
     this.setState({ contentWidth: dataFromChild });
   };
+
+  fontCallback = dataFromChild => {
+    this.setState({ font: dataFromChild });
+  };
+
   render() {
     return (
       <Fragment>
@@ -29,12 +35,14 @@ class Editor extends Component {
             <EditorLeft
               color={this.state.color}
               contentWidth={this.state.contentWidth}
+              font={this.state.font}
             />
           </div>
           <div className={styles.right}>
             <EditorRight
               callbackfromparent={this.myCallback.bind(this)}
               callbackfromparentwidth={this.widthCallback.bind(this)}
+              callbackfromparentfont={this.fontCallback.bind(this)}
               contentWidth={this.contentWidth}
             />
           </div>

@@ -100,7 +100,8 @@ class EditorLeft extends Component {
         >
           <div
             style={{
-              width: `${this.props.contentWidth}px`
+              width: `${this.props.contentWidth}px`,
+              fontFamily: `${this.props.font}`
             }}
             id="body"
             className={styles.practice}
