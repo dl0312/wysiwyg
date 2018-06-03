@@ -100,7 +100,7 @@ class EditorLeft extends Component {
         >
           <div
             style={{
-              width: "600px"
+              width: `${this.props.contentWidth}px`
             }}
             id="body"
             className={styles.practice}

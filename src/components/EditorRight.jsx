@@ -57,6 +57,10 @@ class EditorRight extends Component {
     this.props.callbackfromparent(dataFromChild);
   };
 
+  widthCallback = dataFromChild => {
+    this.props.callbackfromparentwidth(dataFromChild);
+  };
+
   showSection = () => {
     switch (this.state.active) {
       case 0:
@@ -66,7 +70,12 @@ class EditorRight extends Component {
         return <Row />;
         break;
       case 2:
-        return <Body callbackfromparent={this.myCallback.bind(this)} />;
+        return (
+          <Body
+            callbackfromparent={this.myCallback.bind(this)}
+            callbackfromparentwidth={this.widthCallback.bind(this)}
+          />
+        );
         break;
       default:
         break;
@@ -334,17 +343,17 @@ class Row extends Component {
 
 class Body extends Component {
   state = {
-    color: false
-  };
-
-  handleOnClick = e => {
-    this.setState({ color: !this.state.color });
-    console.log(this.state.color);
+    contentWidth: 600
   };
 
   myCallback = dataFromChild => {
     console.log(dataFromChild);
     this.props.callbackfromparent(dataFromChild);
+  };
+
+  handleOnChange = () => {
+    console.log("in body comp width: " + this.state.contentWidth);
+    this.props.callbackfromparentwidth(this.state.contentWidth);
   };
 
   render() {
@@ -366,7 +375,41 @@ class Body extends Component {
             </li>
             <li className={styles.item}>
               <div className={styles.subtitle}>Content Width</div>
-              <div className={styles.func}>ㅁ</div>
+              <div className={styles.func}>
+                <div className={styles.index}>
+                  <button
+                    onClick={() => {
+                      this.setState(
+                        {
+                          contentWidth: this.state.contentWidth - 100
+                        },
+                        () => this.handleOnChange()
+                      );
+                    }}
+                    className={styles.minusBtn}
+                  >
+                    -
+                  </button>
+                  <input
+                    className={styles.num}
+                    value={this.state.contentWidth}
+                    readOnly="true"
+                  />
+                  <button
+                    onClick={() => {
+                      this.setState(
+                        {
+                          contentWidth: this.state.contentWidth + 100
+                        },
+                        () => this.handleOnChange()
+                      );
+                    }}
+                    className={styles.plusBtn}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             </li>
             <li className={styles.item}>
               <div className={styles.subtitle}>Font Family</div>
