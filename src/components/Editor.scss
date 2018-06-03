@@ -4,11 +4,11 @@
   flex-direction: row;
   min-width: $max-page-width;
   .left {
-    width: 70%;
+    width: 75%;
+    border-right: 0.05px solid rgb(172, 172, 172);
   }
   .right {
-    border-left: 0.05px solid rgb(172, 172, 172);
-    width: 30%;
+    width: 25%;
     height: 100%;
     min-height: 100%;
     min-width: 350px;

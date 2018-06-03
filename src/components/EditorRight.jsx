@@ -201,7 +201,7 @@ class Content extends Component {
             <div className={styles.icon}>
               <i class="far fa-image" />
             </div>
-            <div className={styles.title}>IMGAE</div>
+            <div className={styles.title}>IMAGE</div>
           </li>
           <li
             className={styles.item}
@@ -242,7 +242,7 @@ class Row extends Component {
     ">` +
         columnArray
           .map(
-            (ratio, index) => `<div style="
+            (ratio, index) => `<div class="column" style="
       border: 1px solid black; ">${ratio}</div>`
           )
           .reduce((prev, curr) => prev + curr) +

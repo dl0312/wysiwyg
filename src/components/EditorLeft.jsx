@@ -50,7 +50,14 @@ class EditorLeft extends Component {
     e.preventDefault();
     var data = e.dataTransfer.getData("text/html");
     console.log("data: " + data);
-    e.target.children[0].insertAdjacentHTML("beforeend", data);
+    console.log(e.target);
+    if (e.target.id === "container") {
+      e.target.children[0].insertAdjacentHTML("beforeend", data);
+    } else if (e.target.id === "body") {
+      e.target.insertAdjacentHTML("beforeend", data);
+    } else if (e.target.className === "column") {
+      e.target.insertAdjacentHTML("beforeend", data);
+    }
     // const data = event.dataTransfer.getData("text/plain");
   };
 
@@ -87,6 +94,7 @@ class EditorLeft extends Component {
             }, ${this.props.color.a})`
           }}
           className={styles.editor}
+          id="container"
           onDragOver={this.allowDrop}
           onDrop={this.handleOnDrop}
         >
@@ -94,6 +102,7 @@ class EditorLeft extends Component {
             style={{
               width: "600px"
             }}
+            id="body"
             className={styles.practice}
           />
         </div>
