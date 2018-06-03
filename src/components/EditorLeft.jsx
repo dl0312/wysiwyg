@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import styles from "./EditorLeft.scss";
+import "./EditorLeft.css";
 
 class EditorLeft extends Component {
   constructor(props) {
@@ -7,7 +8,8 @@ class EditorLeft extends Component {
     this.state = {
       curserX: null,
       curserY: null,
-      builder: []
+      builder: [],
+      builderTarget: null
     };
   }
 
@@ -40,18 +42,70 @@ class EditorLeft extends Component {
   allowDrop = e => {
     e.preventDefault();
     let i = 0;
+    let targetBuilder = -1;
+    let minGap = 1000;
+    let body;
+    let column;
+    var data = e.dataTransfer.getData("text/html");
+
     if (e.target.id === "container") {
-      const body = e.target.children[0];
+      body = e.target.children[0];
+    } else if (e.target.id === "body") {
+      body = e.target;
+    } else if (e.target.className === "column") {
+      column = e.target;
+    } else {
+      console.log(e.target);
+      return;
+    }
+
+    if (e.target.id === "container" || e.target.id === "body") {
       while (body.children[i]) {
-        if (body.children[i].className === "builder") {
-          if (body.children[i].getBoundingClientRect().top - e.clientY > 0) {
-            console.log(body.children[i]);
-            body.children[i].style = { height: "100px" };
-            return;
+        if (
+          body.children[i].className === "builder" ||
+          body.children[i].className === "builder target"
+        ) {
+          const gap = Math.abs(
+            body.children[i].getBoundingClientRect().top - e.clientY
+          );
+          if (gap < minGap) {
+            console.log(i + ", " + gap + ", " + minGap);
+            minGap = gap;
+            targetBuilder = i;
           }
         }
         i++;
       }
+    } else if (e.target.className === "column") {
+      if (data.className === "content") {
+        while (column.children[i]) {
+          if (
+            column.children[i].className === "smallbuilder" ||
+            column.children[i].className === "smallbuilder target"
+          ) {
+            const gap = Math.abs(
+              column.children[i].getBoundingClientRect().left - e.clientX
+            );
+            if (gap < minGap) {
+              console.log(i + ", " + gap + ", " + minGap);
+              minGap = gap;
+              targetBuilder = i;
+            }
+          }
+          i++;
+        }
+      }
+    }
+    console.log("targetbuilder: " + targetBuilder + "min Gap: " + minGap);
+    if (this.state.builderTarget === null) {
+      this.setState({ builderTarget: targetBuilder }, () =>
+        body.children[this.state.builderTarget].classList.add("target")
+      );
+    } else if (this.state.builderTarget !== targetBuilder) {
+      body.children[this.state.builderTarget].classList.remove("target");
+      this.setState({ builderTarget: targetBuilder }, () =>
+        body.children[targetBuilder].classList.add("target")
+      );
     }
     this.setState({ curserX: e.clientX, curserY: e.clientY });
   };
@@ -61,32 +115,27 @@ class EditorLeft extends Component {
     e.preventDefault();
     var data = e.dataTransfer.getData("text/html");
     console.log("data: " + data);
-    console.log("target: " + e.target);
-    let i = 0;
+    let body;
     if (e.target.id === "container") {
-      const body = e.target.children[0];
-      while (body.children[i]) {
-        if (body.children[i].className === "builder") {
-          console.log(
-            "builder top: " + body.children[i].getBoundingClientRect().top
-          );
-          if (
-            body.children[i].getBoundingClientRect().top - this.state.curserY
-          ) {
-            console.log("this is target builder: " + body.children[i]);
-            body.children[i].insertAdjacentHTML("beforeend", data);
-            return;
-          }
-        }
-        i++;
-      }
+      body = e.target.children[0];
     } else if (e.target.id === "body") {
-      e.target.insertAdjacentHTML("beforeend", data);
+      body = e.target;
     } else if (e.target.className === "column") {
       if (data.className === "content") {
         e.target.insertAdjacentHTML("beforeend", data);
+        this.setState({ builderTarget: null });
       }
+      return;
+    } else {
+      return;
     }
+    body.children[this.state.builderTarget].classList.remove("target");
+    body.children[this.state.builderTarget].insertAdjacentHTML(
+      "afterend",
+      data
+    );
+    this.setState({ builderTarget: null });
+    return;
   };
 
   render() {
@@ -111,6 +160,8 @@ class EditorLeft extends Component {
             id="body"
             className={styles.practice}
           >
+            <div className="builder" />
+            <img src={require("../images/claptitle2.png")} />
             <div className="builder" />
           </div>
         </div>

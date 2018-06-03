@@ -166,7 +166,7 @@ class Content extends Component {
     console.log(e.target.children[1].innerHTML);
     e.dataTransfer.setData(
       "text/html",
-      `<div className="content" >` + e.target.children[1].innerHTML + "</div>"
+      `<div class="content" >` + e.target.children[1].innerHTML + "</div>"
     );
     // e.dataTransfer.drop.effect = "move";
     // e.dataTransfer.SetData("text/plain", v);
@@ -265,7 +265,9 @@ class Row extends Component {
         columnArray
           .map(
             () => `<div class="column" style="
-      border: 1px solid black; "><div class="smallbuilder" ></div></div>`
+            border: 2px dashed darkblue; 
+            background-color: #9dc3d3;
+            text-align: center;"><div class="smallbuilder" ></div>Insert Content</div>`
           )
           .reduce((prev, curr) => prev + curr) +
         "</div>" +

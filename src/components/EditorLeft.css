@@ -1,0 +1,22 @@
+.builder {
+  position: relative;
+  height: 10px;
+}
+
+.target {
+  outline: darkblue solid 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.target::after {
+  text-align: center;
+  color: white;
+  position: absolute;
+  background-color: darkblue;
+  border-radius: 5px;
+  padding: 5px 15px;
+  content: "Drag it here";
+  font-size: 12px;
+}
