@@ -139,7 +139,40 @@
           .subtitle {
           }
           .func {
+            .index {
+              .minus-btn {
+                height: 30px;
+                width: 25px;
+                border: none;
+                background-color: #fff;
+                border-top-left-radius: 3px;
+                border-bottom-left-radius: 3px;
+                border: 0.4px solid #d8d8d8;
+                outline: none;
+              }
+              .num {
+                height: 30px;
+                text-align: center;
+                width: 45px;
+                border: none;
+                border-top: 0.4px solid #d8d8d8;
+                border-bottom: 0.4px solid #d8d8d8;
+              }
+              .plus-btn {
+                height: 30px;
+                width: 25px;
+
+                border: none;
+                background-color: #fff;
+                border: 0.4px solid #d8d8d8;
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+                outline: none;
+              }
+            }
             .swatch {
+              width: 150px;
+
               padding: 5px;
               background-color: #fff;
               border-radius: 1px;
@@ -147,19 +180,28 @@
               display: inline-block;
               cursor: pointer;
               .font {
+                padding: 5px 10px;
               }
             }
             .popover {
               position: absolute;
               margin-top: 5px;
-              margin-left: -100px;
               z-index: 2;
-              .cover {
+              .font-column {
                 position: relative;
                 top: 0px;
                 right: 0px;
                 bottom: 0px;
                 left: 0px;
+                border: none;
+                border-radius: 3px;
+                border: 0.4px solid #d8d8d8;
+                padding: 5px 0;
+                .title {
+                  cursor: pointer;
+                  width: 150px;
+                  padding: 5px 10px;
+                }
               }
             }
           }

@@ -364,6 +364,7 @@ class Body extends Component {
   myCallback = dataFromChild => {
     console.log(dataFromChild);
     this.props.callbackfromparent(dataFromChild);
+    this.setState({ displayFontFamily: false });
   };
 
   handleOnChange = () => {
@@ -448,11 +449,16 @@ class Body extends Component {
               <div className={styles.func}>
                 <div>
                   <div className={styles.swatch} onClick={this.handleOnClick}>
-                    <div className={styles.font}>{this.state.font}</div>
+                    <div
+                      style={{ fontFamily: `${this.state.font}` }}
+                      className={styles.font}
+                    >
+                      {this.state.font}
+                    </div>
                   </div>
                   {this.state.displayFontFamily ? (
                     <div className={styles.popover}>
-                      <div className={styles.fontColomn}>
+                      <div className={styles.fontColumn}>
                         {fontFamily.map(font => (
                           <div
                             className={styles.title}
@@ -493,8 +499,9 @@ class SketchExample extends Component {
     }
   };
 
-  handleClick = () => {
+  handleOnClick = () => {
     this.setState({ displayColorPicker: !this.state.displayColorPicker });
+    this.props.callbackfromparent(this.state.color);
   };
 
   handleClose = () => {
@@ -543,7 +550,7 @@ class SketchExample extends Component {
 
     return (
       <div>
-        <div style={styles.swatch} onClick={this.handleClick}>
+        <div style={styles.swatch} onClick={this.handleOnClick}>
           <div style={styles.color} />
         </div>
         {this.state.displayColorPicker ? (
