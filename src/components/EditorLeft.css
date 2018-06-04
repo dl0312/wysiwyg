@@ -3,6 +3,11 @@
   height: 10px;
 }
 
+.smallbuilder {
+  position: relative;
+  height: 10px;
+}
+
 .target {
   outline: darkblue solid 2px;
   display: flex;

@@ -73,13 +73,19 @@ class EditorRight extends Component {
     this.props.callbackfromparentfont(dataFromChild);
   };
 
+  dragCallback = dataFromChild => {
+    this.props.callbackfromparentdrag(dataFromChild);
+  };
+
   showSection = () => {
     switch (this.state.active) {
       case 0:
-        return <Content />;
+        return (
+          <Content callbackfromparentdrag={this.dragCallback.bind(this)} />
+        );
         break;
       case 1:
-        return <Row />;
+        return <Row callbackfromparentdrag={this.dragCallback.bind(this)} />;
         break;
       case 2:
         return (
@@ -162,8 +168,7 @@ class EditorRight extends Component {
 
 class Content extends Component {
   handleContentOnDragStart = e => {
-    console.log(e);
-    console.log(e.target.children[1].innerHTML);
+    this.props.callbackfromparentdrag("content");
     e.dataTransfer.setData(
       "text/html",
       `<div class="content" >` + e.target.children[1].innerHTML + "</div>"
@@ -174,7 +179,7 @@ class Content extends Component {
 
   handleOnDragEnd = e => {
     e.preventDefault();
-    console.log("ondragend: " + e);
+    this.props.callbackfromparentdrag(null);
   };
 
   render() {
@@ -246,12 +251,14 @@ class Row extends Component {
   handleRowOnDragStart = e => {
     const columnArray = [];
     let i = 0;
+
     while (e.target.children[i]) {
       columnArray.push(e.target.children[i].innerHTML);
       i++;
     }
-    console.log(e);
-    console.log(columnArray);
+
+    this.props.callbackfromparentdrag("columnList");
+
     e.dataTransfer.setData(
       "text/html",
       `<div class="columnList" style="
@@ -265,7 +272,7 @@ class Row extends Component {
         columnArray
           .map(
             () => `<div class="column" style="
-            border: 2px dashed darkblue; 
+            border: 0.5px dashed darkblue; 
             background-color: #9dc3d3;
             text-align: center;"><div class="smallbuilder" ></div>Insert Content</div>`
           )
@@ -277,7 +284,7 @@ class Row extends Component {
 
   handleOnDragEnd = e => {
     e.preventDefault();
-    console.log("ondragend: " + e);
+    this.props.callbackfromparentdrag(null);
   };
 
   render() {

@@ -8,7 +8,8 @@ class EditorLeft extends Component {
     this.state = {
       curserX: null,
       curserY: null,
-      builder: [],
+      prevBuilder: null,
+      currBuilder: null,
       builderTarget: null
     };
   }
@@ -44,98 +45,193 @@ class EditorLeft extends Component {
     let i = 0;
     let targetBuilder = -1;
     let minGap = 1000;
-    let body;
     let column;
     var data = e.dataTransfer.getData("text/html");
+    const body = document.getElementById("body");
 
-    if (e.target.id === "container") {
-      body = e.target.children[0];
-    } else if (e.target.id === "body") {
-      body = e.target;
-    } else if (e.target.className === "column") {
-      column = e.target;
-    } else {
-      console.log(e.target);
-      return;
-    }
+    if (this.props.OnDrag === "content") {
+      console.log(`this is content`);
 
-    if (e.target.id === "container" || e.target.id === "body") {
-      while (body.children[i]) {
-        if (
-          body.children[i].className === "builder" ||
-          body.children[i].className === "builder target"
-        ) {
-          const gap = Math.abs(
-            body.children[i].getBoundingClientRect().top - e.clientY
-          );
-          if (gap < minGap) {
-            console.log(i + ", " + gap + ", " + minGap);
-            minGap = gap;
-            targetBuilder = i;
-          }
+      // if data is content
+      if (e.target.className === "column") {
+        console.log("!column");
+        console.log(e.target);
+        console.log(
+          `${this.state.prevBuilder},${this.state.currBuilder},${
+            this.state.builderTarget
+          }`
+        );
+        column = e.target;
+      } else {
+        console.log(e.target);
+        return;
+        if (this.state.prevBuilder === "builder") {
+          body.children[this.state.builderTarget].classList.remove("target");
+        } else if (this.state.prevBuilder === "smallbuilder") {
+          column.children[this.state.builderTarget].classList.remove("target");
         }
-        i++;
+        this.setState({ prevBuilder: null });
       }
-    } else if (e.target.className === "column") {
-      if (data.className === "content") {
-        while (column.children[i]) {
+
+      if (e.target.id === "container" || e.target.id === "body") {
+        this.setState({ currBuilder: "builder" });
+        while (body.children[i]) {
           if (
-            column.children[i].className === "smallbuilder" ||
-            column.children[i].className === "smallbuilder target"
+            body.children[i].className === "builder" ||
+            body.children[i].className === "builder target"
           ) {
             const gap = Math.abs(
-              column.children[i].getBoundingClientRect().left - e.clientX
+              body.children[i].getBoundingClientRect().top - e.clientY
             );
             if (gap < minGap) {
-              console.log(i + ", " + gap + ", " + minGap);
               minGap = gap;
               targetBuilder = i;
             }
           }
           i++;
         }
+      } else if (e.target.className === "column") {
+        if (column.children[0]) {
+          if (
+            column.children[0].className === "smallbuilder" ||
+            column.children[0].className === "smallbuilder target"
+          ) {
+            this.setState({ currBuilder: "smallbuilder" });
+            targetBuilder = 0;
+          }
+        }
       }
-    }
-    console.log("targetbuilder: " + targetBuilder + "min Gap: " + minGap);
-    if (this.state.builderTarget === null) {
-      this.setState({ builderTarget: targetBuilder }, () =>
-        body.children[this.state.builderTarget].classList.add("target")
-      );
-    } else if (this.state.builderTarget !== targetBuilder) {
-      body.children[this.state.builderTarget].classList.remove("target");
-      this.setState({ builderTarget: targetBuilder }, () =>
-        body.children[targetBuilder].classList.add("target")
-      );
+
+      if (this.state.prevBuilder === null) {
+        // add curr builder
+        if (this.state.currBuilder === "builder") {
+          this.setState({ builderTarget: targetBuilder }, () => {
+            body.children[this.state.builderTarget].classList.add("target");
+            this.setState({ prevBuilder: this.state.currBuilder });
+          });
+        } else if (this.state.currBuilder === "smallbuilder") {
+          this.setState({ builderTarget: targetBuilder }, () => {
+            column.children[this.state.builderTarget].classList.add("target");
+            this.setState({ prevBuilder: this.state.currBuilder });
+          });
+        }
+      } else if (this.state.builderTarget !== targetBuilder) {
+        // remove prev builder
+        if (this.state.prevBuilder === "builder") {
+          body.children[this.state.builderTarget].classList.remove("target");
+        } else if (this.state.prevBuilder === "smallbuilder") {
+          column.children[this.state.builderTarget].classList.remove("target");
+        }
+
+        this.setState({ prevBuilder: null });
+
+        // add curr builder
+        if (this.state.currBuilder === "builder") {
+          this.setState({ builderTarget: targetBuilder }, () => {
+            body.children[this.state.builderTarget].classList.add("target");
+            this.setState({ prevBuilder: this.state.currBuilder });
+          });
+        } else if (this.state.currBuilder === "smallbuilder") {
+          this.setState({ builderTarget: targetBuilder }, () => {
+            column.children[this.state.builderTarget].classList.add("target");
+            this.setState({ prevBuilder: this.state.currBuilder });
+          });
+        }
+      }
+    } else if (this.props.OnDrag === "columnList") {
+      // if data is column
+
+      if (e.target.id === "container" || e.target.id === "body") {
+        this.setState({ currBuilder: "builder" });
+        while (body.children[i]) {
+          if (
+            body.children[i].className === "builder" ||
+            body.children[i].className === "builder target"
+          ) {
+            const gap = Math.abs(
+              body.children[i].getBoundingClientRect().top - e.clientY
+            );
+            if (gap < minGap) {
+              minGap = gap;
+              targetBuilder = i;
+            }
+          }
+          i++;
+        }
+      } else {
+        return;
+      }
+
+      if (this.state.builderTarget === null) {
+        // add curr builder
+        if (this.state.currBuilder === "builder") {
+          this.setState({ builderTarget: targetBuilder }, () => {
+            body.children[this.state.builderTarget].classList.add("target");
+            this.setState({
+              prevBuilder: this.state.currBuilder
+            });
+          });
+        }
+      } else if (this.state.builderTarget !== targetBuilder) {
+        // remove prev builder
+        if (this.state.prevBuilder === "builder") {
+          body.children[this.state.builderTarget].classList.remove("target");
+        }
+        this.setState({ prevBuilder: null });
+
+        // add curr builder
+        if (this.state.currBuilder === "builder") {
+          this.setState({ builderTarget: targetBuilder }, () => {
+            body.children[this.state.builderTarget].classList.add("target");
+            this.setState({
+              prevBuilder: this.state.currBuilder
+            });
+          });
+        }
+      }
     }
     this.setState({ curserX: e.clientX, curserY: e.clientY });
   };
 
   handleOnDrop = e => {
-    console.log("ondrop: " + e.object);
     e.preventDefault();
     var data = e.dataTransfer.getData("text/html");
-    console.log("data: " + data);
-    let body;
-    if (e.target.id === "container") {
-      body = e.target.children[0];
-    } else if (e.target.id === "body") {
-      body = e.target;
+    const body = document.getElementById("body");
+
+    if (e.target.id === "container" || e.target.id === "body") {
+      body.children[this.state.builderTarget].classList.remove("target");
+      body.children[this.state.builderTarget].insertAdjacentHTML(
+        "afterend",
+        data
+      );
+      // set state default
+      this.setState({
+        builderTarget: null,
+        prevBuilder: null,
+        currBuilder: null
+      });
+      return;
     } else if (e.target.className === "column") {
-      if (data.className === "content") {
-        e.target.insertAdjacentHTML("beforeend", data);
-        this.setState({ builderTarget: null });
+      if (this.props.OnDrag === "content") {
+        e.target.children[this.state.builderTarget].replaceWith(data);
+        // set state default
+
+        this.setState({
+          builderTarget: null,
+          prevBuilder: null,
+          currBuilder: null
+        });
       }
       return;
     } else {
+      // set state default
+      this.setState({
+        builderTarget: null,
+        prevBuilder: null,
+        currBuilder: null
+      });
       return;
     }
-    body.children[this.state.builderTarget].classList.remove("target");
-    body.children[this.state.builderTarget].insertAdjacentHTML(
-      "afterend",
-      data
-    );
-    this.setState({ builderTarget: null });
-    return;
   };
 
   render() {

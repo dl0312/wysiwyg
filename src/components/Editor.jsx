@@ -9,7 +9,8 @@ class Editor extends Component {
     this.state = {
       color: { r: "255", g: "255", b: "255", a: "1" },
       contentWidth: null,
-      font: null
+      font: null,
+      OnDrag: null
     };
   }
 
@@ -27,6 +28,10 @@ class Editor extends Component {
     this.setState({ font: dataFromChild });
   };
 
+  dragCallback = dataFromChild => {
+    this.setState({ OnDrag: dataFromChild });
+  };
+
   render() {
     return (
       <Fragment>
@@ -36,6 +41,7 @@ class Editor extends Component {
               color={this.state.color}
               contentWidth={this.state.contentWidth}
               font={this.state.font}
+              OnDrag={this.state.OnDrag}
             />
           </div>
           <div className={styles.right}>
@@ -43,6 +49,7 @@ class Editor extends Component {
               callbackfromparent={this.myCallback.bind(this)}
               callbackfromparentwidth={this.widthCallback.bind(this)}
               callbackfromparentfont={this.fontCallback.bind(this)}
+              callbackfromparentdrag={this.dragCallback.bind(this)}
               contentWidth={this.contentWidth}
             />
           </div>
