@@ -168,16 +168,113 @@ class EditorRight extends Component {
 
 class Content extends Component {
   handleContentOnDragStart = e => {
+    console.log(e.target.children[1].innerHTML);
     this.props.callbackfromparentdrag("content");
-    e.dataTransfer.setData(
-      "text/html",
-      `<div class="content" >` + e.target.children[1].innerHTML + "</div>"
-    );
-    // e.dataTransfer.drop.effect = "move";
-    // e.dataTransfer.SetData("text/plain", v);
+    if (e.target.children[1].innerHTML === "BUTTON") {
+      console.log("this is button");
+      e.dataTransfer.setData(
+        "text/html",
+        `<div class="content" 
+      style="
+      color: white;
+      background-color: #3AAEE0;
+      text-align: center;
+      line-height: 120%;
+      border-top: 0 solid transparent;
+      border-right: 0 solid transparent;
+      border-left: 0 solid transparent;
+      border-bottom: 0 solid transparent;
+      border-radius: 4px;
+      padding-top: 10px;
+      padding-right: 20px;
+      padding-left: 20px;
+      padding-bottom: 10px;
+
+      ">` +
+          e.target.children[1].innerHTML +
+          `</div>`
+      );
+    } else if (e.target.children[1].innerHTML === "DIVIDER") {
+      e.dataTransfer.setData(
+        "text/html",
+        `<div class="content" 
+      style="
+      width: 100%;
+      border-bottom: 1px solid #BBBBBB;
+      "></div>`
+      );
+    } else if (e.target.children[1].innerHTML === "HTML") {
+      e.dataTransfer.setData(
+        "text/html",
+        `<div class="content" 
+      style="
+      <strong>Hello, world!</strong>
+      color: #373A3C;
+      border-top: 0 solid transparent;
+      border-right: 0 solid transparent;
+      border-left: 0 solid transparent;
+      border-bottom: 0 solid transparent;
+      ">` +
+          `<strong>Hello, world!</strong>` +
+          `</div>`
+      );
+    } else if (e.target.children[1].innerHTML === "IMAGE") {
+      e.dataTransfer.setData(
+        "text/html",
+        `<div class="content" 
+      style="
+      border-top: 0 solid transparent;
+      border-right: 0 solid transparent;
+      border-left: 0 solid transparent;
+      border-bottom: 0 solid transparent;
+      
+      ">` +
+          `<img src="https://media.gettyimages.com/photos/president-donald-trump-speaks-at-a-make-america-great-again-rally-in-picture-id837567644?s=612x612" alt="logo"/>` +
+          `</div>`
+      );
+    } else if (e.target.children[1].innerHTML === "TEXT") {
+      e.dataTransfer.setData(
+        "text/html",
+        `<div class="content" 
+      style="
+      color: black;
+      text-align: left;
+      line-height: 140%;
+      padding-top: 10px;
+      padding-right: 10px;
+      padding-left: 10px;
+      padding-bottom: 10px;
+      ">` +
+          "This is a new Text block. Change the text." +
+          `</div>`
+      );
+    } else {
+      e.dataTransfer.setData(
+        "text/html",
+        `<div class="content" 
+      style="
+      color: white;
+      background-color: #3AAEE0;
+      line-height: 120%;
+      border-top: 0 solid transparent;
+      border-right: 0 solid transparent;
+      border-left: 0 solid transparent;
+      border-bottom: 0 solid transparent;
+      border-radius: 4px;
+      padding-top: 10px;
+      padding-right: 20px;
+      padding-left: 20px;
+      padding-bottom: 10px;
+      ">` +
+          e.target.children[1].innerHTML +
+          `</div>`
+      );
+    }
   };
 
   handleOnDragEnd = e => {
+    console.log(e.target);
+
     e.preventDefault();
     this.props.callbackfromparentdrag(null);
   };
@@ -249,6 +346,10 @@ class Content extends Component {
 
 class Row extends Component {
   handleRowOnDragStart = e => {
+    console.log(e.target);
+
+    this.props.callbackfromparentdrag("columnList");
+
     const columnArray = [];
     let i = 0;
 
@@ -256,8 +357,6 @@ class Row extends Component {
       columnArray.push(e.target.children[i].innerHTML);
       i++;
     }
-
-    this.props.callbackfromparentdrag("columnList");
 
     e.dataTransfer.setData(
       "text/html",
@@ -283,6 +382,8 @@ class Row extends Component {
   };
 
   handleOnDragEnd = e => {
+    console.log(e.target);
+
     e.preventDefault();
     this.props.callbackfromparentdrag(null);
   };

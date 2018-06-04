@@ -25,3 +25,7 @@
   content: "Drag it here";
   font-size: 12px;
 }
+
+.container:hover {
+  background-color: skyblue;
+}

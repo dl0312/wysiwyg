@@ -9,8 +9,8 @@ class EditorLeft extends Component {
       curserX: null,
       curserY: null,
       prevBuilder: null,
-      currBuilder: null,
-      builderTarget: null
+      builderTarget: null,
+      columnTarget: null
     };
   }
 
@@ -46,35 +46,13 @@ class EditorLeft extends Component {
     let targetBuilder = -1;
     let minGap = 1000;
     let column;
-    var data = e.dataTransfer.getData("text/html");
-    const body = document.getElementById("body");
+    let currBuilder;
+    let body = document.getElementById("body");
 
     if (this.props.OnDrag === "content") {
-      console.log(`this is content`);
-
       // if data is content
-      if (e.target.className === "column") {
-        console.log("!column");
-        console.log(e.target);
-        console.log(
-          `${this.state.prevBuilder},${this.state.currBuilder},${
-            this.state.builderTarget
-          }`
-        );
-        column = e.target;
-      } else {
-        console.log(e.target);
-        return;
-        if (this.state.prevBuilder === "builder") {
-          body.children[this.state.builderTarget].classList.remove("target");
-        } else if (this.state.prevBuilder === "smallbuilder") {
-          column.children[this.state.builderTarget].classList.remove("target");
-        }
-        this.setState({ prevBuilder: null });
-      }
-
       if (e.target.id === "container" || e.target.id === "body") {
-        this.setState({ currBuilder: "builder" });
+        currBuilder = "builder";
         while (body.children[i]) {
           if (
             body.children[i].className === "builder" ||
@@ -91,58 +69,71 @@ class EditorLeft extends Component {
           i++;
         }
       } else if (e.target.className === "column") {
+        column = e.target;
+        currBuilder = "smallbuilder";
+        this.setState({
+          columnTarget: e.target.children[0]
+        });
         if (column.children[0]) {
           if (
             column.children[0].className === "smallbuilder" ||
             column.children[0].className === "smallbuilder target"
           ) {
-            this.setState({ currBuilder: "smallbuilder" });
             targetBuilder = 0;
           }
         }
+      } else {
+        // console.log(e.target);
+        return;
       }
 
       if (this.state.prevBuilder === null) {
         // add curr builder
-        if (this.state.currBuilder === "builder") {
+        if (currBuilder === "builder") {
           this.setState({ builderTarget: targetBuilder }, () => {
             body.children[this.state.builderTarget].classList.add("target");
-            this.setState({ prevBuilder: this.state.currBuilder });
+            this.setState({ prevBuilder: currBuilder });
           });
-        } else if (this.state.currBuilder === "smallbuilder") {
+        } else if (currBuilder === "smallbuilder") {
           this.setState({ builderTarget: targetBuilder }, () => {
             column.children[this.state.builderTarget].classList.add("target");
-            this.setState({ prevBuilder: this.state.currBuilder });
+            this.setState({ prevBuilder: currBuilder });
           });
         }
-      } else if (this.state.builderTarget !== targetBuilder) {
+      } else if (
+        (this.state.builderTarget !== targetBuilder &&
+          currBuilder === "builder") ||
+        currBuilder === "smallbuilder"
+      ) {
         // remove prev builder
         if (this.state.prevBuilder === "builder") {
           body.children[this.state.builderTarget].classList.remove("target");
         } else if (this.state.prevBuilder === "smallbuilder") {
-          column.children[this.state.builderTarget].classList.remove("target");
+          this.state.columnTarget.classList.remove("target");
         }
 
         this.setState({ prevBuilder: null });
 
         // add curr builder
-        if (this.state.currBuilder === "builder") {
+        if (currBuilder === "builder") {
           this.setState({ builderTarget: targetBuilder }, () => {
             body.children[this.state.builderTarget].classList.add("target");
-            this.setState({ prevBuilder: this.state.currBuilder });
+            this.setState({ prevBuilder: currBuilder });
           });
-        } else if (this.state.currBuilder === "smallbuilder") {
+        } else if (currBuilder === "smallbuilder") {
           this.setState({ builderTarget: targetBuilder }, () => {
             column.children[this.state.builderTarget].classList.add("target");
-            this.setState({ prevBuilder: this.state.currBuilder });
+            this.setState({ prevBuilder: currBuilder });
           });
         }
       }
     } else if (this.props.OnDrag === "columnList") {
+      console.log(`this is column `);
+      console.log(e.target);
       // if data is column
 
       if (e.target.id === "container" || e.target.id === "body") {
-        this.setState({ currBuilder: "builder" });
+        currBuilder = "builder";
         while (body.children[i]) {
           if (
             body.children[i].className === "builder" ||
@@ -164,11 +155,11 @@ class EditorLeft extends Component {
 
       if (this.state.builderTarget === null) {
         // add curr builder
-        if (this.state.currBuilder === "builder") {
+        if (currBuilder === "builder") {
           this.setState({ builderTarget: targetBuilder }, () => {
             body.children[this.state.builderTarget].classList.add("target");
             this.setState({
-              prevBuilder: this.state.currBuilder
+              prevBuilder: currBuilder
             });
           });
         }
@@ -180,11 +171,11 @@ class EditorLeft extends Component {
         this.setState({ prevBuilder: null });
 
         // add curr builder
-        if (this.state.currBuilder === "builder") {
+        if (currBuilder === "builder") {
           this.setState({ builderTarget: targetBuilder }, () => {
             body.children[this.state.builderTarget].classList.add("target");
             this.setState({
-              prevBuilder: this.state.currBuilder
+              prevBuilder: currBuilder
             });
           });
         }
@@ -196,30 +187,55 @@ class EditorLeft extends Component {
   handleOnDrop = e => {
     e.preventDefault();
     var data = e.dataTransfer.getData("text/html");
-    const body = document.getElementById("body");
+    let body = document.getElementById("body");
+    const div = document.createElement("div");
+    div.classList.add("container");
+    div.style.display = "flex";
+    div.style.alignItems = "center";
+    div.style.justifyContent = "center";
+    div.style.padding = "10px";
+    div.style.border = "1px solid darkblue";
+    div.innerHTML = data;
 
     if (e.target.id === "container" || e.target.id === "body") {
       body.children[this.state.builderTarget].classList.remove("target");
-      body.children[this.state.builderTarget].insertAdjacentHTML(
-        "afterend",
-        data
-      );
+
+      if (this.state.prevBuilder === "builder") {
+        if (this.props.OnDrag === "content") {
+          body.children[this.state.builderTarget].replaceWith(div);
+          body.children[this.state.builderTarget].insertAdjacentHTML(
+            "afterend",
+            `<div class="builder"></div>`
+          );
+          body.children[this.state.builderTarget].insertAdjacentHTML(
+            "beforebegin",
+            `<div class="builder"></div>`
+          );
+        } else if (this.props.OnDrag === "columnList") {
+          body.children[this.state.builderTarget].insertAdjacentHTML(
+            "afterend",
+            data
+          );
+        }
+      } else if (this.state.prevBuilder === "smallbuilder") {
+        body.children[this.state.builderTarget].replaceWith(div);
+      }
       // set state default
       this.setState({
         builderTarget: null,
         prevBuilder: null,
-        currBuilder: null
+        columnTarget: null
       });
       return;
     } else if (e.target.className === "column") {
       if (this.props.OnDrag === "content") {
-        e.target.children[this.state.builderTarget].replaceWith(data);
+        e.target.replaceWith(div);
         // set state default
 
         this.setState({
           builderTarget: null,
           prevBuilder: null,
-          currBuilder: null
+          columnTarget: null
         });
       }
       return;
