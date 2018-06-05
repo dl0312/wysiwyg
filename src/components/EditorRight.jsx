@@ -371,7 +371,7 @@ class Row extends Component {
         columnArray
           .map(
             () => `<div class="column" style="
-            border: 0.5px dashed darkblue; 
+            outline: 0.5px dashed darkblue; 
             background-color: #9dc3d3;
             text-align: center;"><div class="smallbuilder" ></div>Insert Content</div>`
           )

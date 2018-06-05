@@ -15,7 +15,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      cursor: pointer;
+      cursor: -webkit-grab;
       .icon {
         font-size: 20px;
       }
@@ -33,7 +33,7 @@
       grid-template-columns: repeat(3, 1fr);
       grid-gap: 10px;
       .item {
-        cursor: pointer;
+        cursor: -webkit-grab;
         border: 0.4px solid #d8d8d8;
         border-radius: 5px;
         height: 115px;

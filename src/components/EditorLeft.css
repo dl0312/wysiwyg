@@ -1,5 +1,4 @@
 .builder {
-  position: relative;
   height: 10px;
 }
 
@@ -27,5 +26,6 @@
 }
 
 .container:hover {
-  background-color: skyblue;
+  /* background-color: black; */
+  outline: 2px solid rgb(105, 175, 158);
 }
