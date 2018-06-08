@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import styles from "./EditorRight.scss";
 import reactCSS from "reactcss";
 import { SketchPicker } from "react-color";
@@ -83,10 +83,8 @@ class EditorRight extends Component {
         return (
           <Content callbackfromparentdrag={this.dragCallback.bind(this)} />
         );
-        break;
       case 1:
         return <Row callbackfromparentdrag={this.dragCallback.bind(this)} />;
-        break;
       case 2:
         return (
           <Body
@@ -95,7 +93,6 @@ class EditorRight extends Component {
             callbackfromparentfont={this.fontCallback.bind(this)}
           />
         );
-        break;
       default:
         break;
     }
@@ -103,64 +100,140 @@ class EditorRight extends Component {
 
   render() {
     return (
-      <div className={styles.editorRight}>
-        <ul className={styles.menuColumn}>
-          <li
-            style={{ background: this.myColor(0), color: this.fontColor(0) }}
-            onClick={() => {
-              this.toggle(0);
-            }}
-            onMouseOver={() => {
-              this.hover(0);
-            }}
-            onMouseLeave={() => {
-              this.leave(0);
-            }}
-            className={styles.menuItem}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-th-large" />
+      <Fragment>
+        <div className={styles.editorRight}>
+          <ul className={styles.menuColumn}>
+            <li
+              style={{ background: this.myColor(0), color: this.fontColor(0) }}
+              onClick={() => {
+                this.toggle(0);
+              }}
+              onMouseOver={() => {
+                this.hover(0);
+              }}
+              onMouseLeave={() => {
+                this.leave(0);
+              }}
+              className={styles.menuItem}
+            >
+              <div className={styles.icon}>
+                <i class="fas fa-th-large" />
+              </div>
+              <div className={styles.title}>CONTENT</div>
+            </li>
+            <li
+              style={{ background: this.myColor(1), color: this.fontColor(1) }}
+              onClick={() => {
+                this.toggle(1);
+              }}
+              onMouseOver={() => {
+                this.hover(1);
+              }}
+              onMouseLeave={() => {
+                this.leave(1);
+              }}
+              className={styles.menuItem}
+            >
+              <div className={styles.icon}>
+                <i class="fas fa-bars" />
+              </div>
+              <div className={styles.title}>ROW</div>
+            </li>
+            <li
+              style={{ background: this.myColor(2), color: this.fontColor(2) }}
+              onClick={() => {
+                this.toggle(2);
+              }}
+              onMouseOver={() => {
+                this.hover(2);
+              }}
+              onMouseLeave={() => {
+                this.leave(2);
+              }}
+              className={styles.menuItem}
+            >
+              <div className={styles.icon}>
+                <i class="fas fa-columns" />
+              </div>
+              <div className={styles.title}>BODY</div>
+            </li>
+          </ul>
+          {this.showSection()}
+        </div>
+        <Blockoption />
+      </Fragment>
+    );
+  }
+}
+
+class Blockoption extends Component {
+  render() {
+    return (
+      <div className={styles.blockOption}>
+        <div className={styles.header}>
+          <div className={styles.blockName}>CONTENT</div>
+          <div className={styles.btnColumn}>
+            <button className={styles.btn}>
+              <i class="fas fa-trash-alt" />
+            </button>
+            <button className={styles.btn}>
+              <i class="fas fa-copy" />
+            </button>
+            <button className={styles.btn}>
+              <i class="fas fa-angle-down" />
+            </button>
+          </div>
+        </div>
+        <div className={styles.optionRows}>
+          <div className={styles.optionHeader}>
+            <div className={styles.optionTitle}>LINK</div>
+            <button className={styles.btn}>
+              <i class="fas fa-angle-up" />
+            </button>
+          </div>
+          <div className={styles.btnLinkColumn}>
+            <div className={styles.title}>Button Link</div>
+            <div className={styles.case}>Same Tag</div>
+          </div>
+          <div className={styles.urlColumn}>
+            <button className={styles.btn}>URL</button>
+            <input type="text" />
+          </div>
+          <div className={styles.header}>
+            <div className={styles.optionTitle}>COLORS</div>
+            <div className={styles.btn}>
+              <i class="fas fa-angle-up" />
             </div>
-            <div className={styles.title}>CONTENT</div>
-          </li>
-          <li
-            style={{ background: this.myColor(1), color: this.fontColor(1) }}
-            onClick={() => {
-              this.toggle(1);
-            }}
-            onMouseOver={() => {
-              this.hover(1);
-            }}
-            onMouseLeave={() => {
-              this.leave(1);
-            }}
-            className={styles.menuItem}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-bars" />
+            <div className={styles.colorColumn}>
+              <div className={styles.item}>
+                <div className={styles.title}>Text Color</div>
+                <div className={styles.color}>ㅁ</div>
+              </div>
+              <div className={styles.item}>
+                <div className={styles.title}>Background Color</div>
+                <div className={styles.color}>ㅁ</div>
+              </div>
+              <div className={styles.item}>
+                <div className={styles.title}>Hover Color</div>
+                <div className={styles.color}>ㅁ</div>
+              </div>{" "}
             </div>
-            <div className={styles.title}>ROW</div>
-          </li>
-          <li
-            style={{ background: this.myColor(2), color: this.fontColor(2) }}
-            onClick={() => {
-              this.toggle(2);
-            }}
-            onMouseOver={() => {
-              this.hover(2);
-            }}
-            onMouseLeave={() => {
-              this.leave(2);
-            }}
-            className={styles.menuItem}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-columns" />
+          </div>
+          <div className={styles.header}>
+            <div className={styles.optionTitle}>SPACING</div>
+            <div className={styles.btn}>
+              <i class="fas fa-angle-up" />
             </div>
-            <div className={styles.title}>BODY</div>
-          </li>
-        </ul>
-        {this.showSection()}
+            <div className={styles.btnLinkColumn}>
+              <div className={styles.title}>Button Link</div>
+              <div className={styles.case}>Same Tag</div>
+            </div>
+            <div className={styles.urlColumn}>
+              <button className={styles.btn}>URL</button>
+              <input type="text" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -170,111 +243,10 @@ class Content extends Component {
   handleContentOnDragStart = e => {
     console.log(e.target.children[1].innerHTML);
     this.props.callbackfromparentdrag("content");
-    if (e.target.children[1].innerHTML === "BUTTON") {
-      console.log("this is button");
-      e.dataTransfer.setData(
-        "text/html",
-        `<div class="content" 
-      style="
-      color: white;
-      background-color: #3AAEE0;
-      text-align: center;
-      line-height: 120%;
-      border-top: 0 solid transparent;
-      border-right: 0 solid transparent;
-      border-left: 0 solid transparent;
-      border-bottom: 0 solid transparent;
-      border-radius: 4px;
-      padding-top: 10px;
-      padding-right: 20px;
-      padding-left: 20px;
-      padding-bottom: 10px;
-
-      ">` +
-          e.target.children[1].innerHTML +
-          `</div>`
-      );
-    } else if (e.target.children[1].innerHTML === "DIVIDER") {
-      e.dataTransfer.setData(
-        "text/html",
-        `<div class="content" 
-      style="
-      width: 100%;
-      border-bottom: 1px solid #BBBBBB;
-      "></div>`
-      );
-    } else if (e.target.children[1].innerHTML === "HTML") {
-      e.dataTransfer.setData(
-        "text/html",
-        `<div class="content" 
-      style="
-      <strong>Hello, world!</strong>
-      color: #373A3C;
-      border-top: 0 solid transparent;
-      border-right: 0 solid transparent;
-      border-left: 0 solid transparent;
-      border-bottom: 0 solid transparent;
-      ">` +
-          `<strong>Hello, world!</strong>` +
-          `</div>`
-      );
-    } else if (e.target.children[1].innerHTML === "IMAGE") {
-      e.dataTransfer.setData(
-        "text/html",
-        `<div class="content" 
-      style="
-      border-top: 0 solid transparent;
-      border-right: 0 solid transparent;
-      border-left: 0 solid transparent;
-      border-bottom: 0 solid transparent;
-      
-      ">` +
-          `<img src="https://media.gettyimages.com/photos/president-donald-trump-speaks-at-a-make-america-great-again-rally-in-picture-id837567644?s=612x612" alt="logo"/>` +
-          `</div>`
-      );
-    } else if (e.target.children[1].innerHTML === "TEXT") {
-      e.dataTransfer.setData(
-        "text/html",
-        `<div class="content" 
-      style="
-      color: black;
-      text-align: left;
-      line-height: 140%;
-      padding-top: 10px;
-      padding-right: 10px;
-      padding-left: 10px;
-      padding-bottom: 10px;
-      ">` +
-          "This is a new Text block. Change the text." +
-          `</div>`
-      );
-    } else {
-      e.dataTransfer.setData(
-        "text/html",
-        `<div class="content" 
-      style="
-      color: white;
-      background-color: #3AAEE0;
-      line-height: 120%;
-      border-top: 0 solid transparent;
-      border-right: 0 solid transparent;
-      border-left: 0 solid transparent;
-      border-bottom: 0 solid transparent;
-      border-radius: 4px;
-      padding-top: 10px;
-      padding-right: 20px;
-      padding-left: 20px;
-      padding-bottom: 10px;
-      ">` +
-          e.target.children[1].innerHTML +
-          `</div>`
-      );
-    }
+    e.dataTransfer.setData("text", e.target.children[1].innerHTML);
   };
 
   handleOnDragEnd = e => {
-    console.log(e.target);
-
     e.preventDefault();
     this.props.callbackfromparentdrag(null);
   };
@@ -359,25 +331,10 @@ class Row extends Component {
     }
 
     e.dataTransfer.setData(
-      "text/html",
-      `<div class="columnList" style="
-      width: 100%;
-      height: 100px; 
-      display: grid;
-      grid-template-columns: ${columnArray
+      "text",
+      columnArray
         .map(ratio => ratio + "fr")
-        .reduce((prev, curr) => prev + " " + curr)};
-    ">` +
-        columnArray
-          .map(
-            () => `<div class="column" style="
-            outline: 0.5px dashed darkblue; 
-            background-color: #9dc3d3;
-            text-align: center;"><div class="smallbuilder" ></div>Insert Content</div>`
-          )
-          .reduce((prev, curr) => prev + curr) +
-        "</div>" +
-        `<div class="builder" />`
+        .reduce((prev, curr) => prev + " " + curr)
     );
   };
 

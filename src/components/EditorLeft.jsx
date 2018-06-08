@@ -1,16 +1,24 @@
 import React, { Component, Fragment } from "react";
+import ReactDOM from "react-dom";
+import ReactDOMServer from "react-dom/server";
+import { Editor } from "slate-react";
+import { Value } from "slate";
 import styles from "./EditorLeft.scss";
 import "./EditorLeft.css";
 
 class EditorLeft extends Component {
   constructor(props) {
     super(props);
+    this.myRef = React.createRef();
     this.state = {
       curserX: null,
       curserY: null,
       prevBuilder: null,
       builderTarget: null,
-      columnTarget: null
+      columnTarget: null,
+      blocks: [<div className="builder" />],
+      hoverTarget: null,
+      selectedTarget: null
     };
   }
 
@@ -52,6 +60,7 @@ class EditorLeft extends Component {
 
     if (this.props.OnDrag === "content") {
       // if data is content
+
       if (e.target.id === "container" || e.target.id === "body") {
         // currBuilder = "builder";
         while (body.children[i]) {
@@ -178,17 +187,10 @@ class EditorLeft extends Component {
 
   handleOnDrop = e => {
     e.preventDefault();
-    var data = e.dataTransfer.getData("text/html");
-    let body = document.getElementById("body");
+    const data = e.dataTransfer.getData("text");
     const div = document.createElement("div");
-    div.classList.add("container");
-    div.style.display = "flex";
-    div.style.alignItems = "center";
-    div.style.justifyContent = "center";
-    div.style.padding = "10px";
-    // div.style.border = "1px solid red";
-    div.innerHTML = data;
-    console.log(this.state.prevBuilder);
+    const target = this.state.prevBuilder;
+    console.log(this.myRef.current);
     if (this.state.prevBuilder.className === "builder target") {
       this.state.prevBuilder.classList.remove("target");
       if (this.props.OnDrag === "content") {
@@ -200,9 +202,24 @@ class EditorLeft extends Component {
           "beforebegin",
           `<div class="builder"></div>`
         );
+        div.innerHTML = ReactDOMServer.renderToStaticMarkup(
+          <Container OnDrag={this.props.OnDrag} content={data} />
+        );
         this.state.prevBuilder.replaceWith(div);
       } else if (this.props.OnDrag === "columnList") {
-        this.state.prevBuilder.insertAdjacentHTML("afterend", data);
+        this.state.prevBuilder.insertAdjacentHTML(
+          "afterend",
+          `<div class="builder"></div>`
+        );
+        this.state.prevBuilder.insertAdjacentHTML(
+          "beforebegin",
+          `<div class="builder"></div>`
+        );
+        console.log(data);
+        div.innerHTML = ReactDOMServer.renderToStaticMarkup(
+          <Container OnDrag={this.props.OnDrag} columnArray={data} />
+        );
+        this.state.prevBuilder.replaceWith(div);
       }
       // set state default
       this.setState({
@@ -223,7 +240,9 @@ class EditorLeft extends Component {
           "beforebegin",
           `<div class="smallbuilder"></div>`
         );
-        this.state.prevBuilder.replaceWith(div);
+        this.state.prevBuilder.replaceWith(
+          <Container OnDrag={this.props.OnDrag} content={data} />
+        );
 
         // set state default
         this.setState({
@@ -234,86 +253,26 @@ class EditorLeft extends Component {
         return;
       }
     }
+  };
 
-    // if (e.target.id === "container" || e.target.id === "body") {
-    //   this.state.prevBuilder.classList.remove("target");
+  handleOnMouseOver = position => {
+    if (this.state.selectedTarget !== position) {
+      this.setState({ hoverTarget: position });
+    }
+  };
 
-    //   if (this.props.OnDrag === "content") {
-    //     this.state.prevBuilder.insertAdjacentHTML(
-    //       "afterend",
-    //       `<div class="builder"></div>`
-    //     );
-    //     this.state.prevBuilder.insertAdjacentHTML(
-    //       "beforebegin",
-    //       `<div class="builder"></div>`
-    //     );
-    //     this.state.prevBuilder.replaceWith(div);
-    //   } else if (this.props.OnDrag === "columnList") {
-    //     this.state.prevBuilder.insertAdjacentHTML("afterend", data);
-    //   }
+  handleOnMouseLeave = position => {
+    if (this.state.hoverTarget) {
+      this.setState({ hoverTarget: null });
+    }
+  };
 
-    //   // set state default
-    //   this.setState({
-    //     builderTarget: null,
-    //     prevBuilder: null,
-    //     columnTarget: null
-    //   });
-    //   return;
-    // } else if (e.target.className === "column") {
-    //   if (this.props.OnDrag === "content") {
-    //     this.state.prevBuilder.insertAdjacentHTML(
-    //       "afterend",
-    //       `<div class="smallbuilder"></div>`
-    //     );
-    //     this.state.prevBuilder.insertAdjacentHTML(
-    //       "beforebegin",
-    //       `<div class="smallbuilder"></div>`
-    //     );
-    //     this.state.prevBuilder.replaceWith(div);
-
-    //     // set state default
-    //     this.setState({
-    //       builderTarget: null,
-    //       prevBuilder: null,
-    //       columnTarget: null
-    //     });
-    //   }
-    //   return;
-    // } else if (
-    //   e.target.className === "smallbuilder" ||
-    //   e.target.className === "smallbuilder target"
-    // ) {
-    //   if (this.props.OnDrag === "content") {
-    //     this.state.prevBuilder.insertAdjacentHTML(
-    //       "afterend",
-    //       `<div class="smallbuilder"></div>`
-    //     );
-    //     this.state.prevBuilder.insertAdjacentHTML(
-    //       "beforebegin",
-    //       `<div class="smallbuilder"></div>`
-    //     );
-    //     this.state.prevBuilder.replaceWith(div);
-
-    //     // set state default
-    //     this.setState({
-    //       builderTarget: null,
-    //       prevBuilder: null,
-    //       columnTarget: null
-    //     });
-    //   }
-    //   return;
-    // } else {
-    //   // set state default
-    //   this.setState({
-    //     builderTarget: null,
-    //     prevBuilder: null,
-    //     currBuilder: null
-    //   });
-    //   return;
-    // }
+  handleOnMouseDown = position => {
+    this.setState({ hoverTarget: null, selectedTarget: position });
   };
 
   render() {
+    // 기본상태의 에디터화면 id=container, id=body, builder 1개
     return (
       <Fragment>
         <div
@@ -335,11 +294,514 @@ class EditorLeft extends Component {
             id="body"
             className={styles.practice}
           >
-            <div className="builder" />
+            {/* {this.state.blocks.map(block => {
+              return block;
+            })} */}
+            <Builder />
+            <Container
+              OnDrag="content"
+              content="BUTTON"
+              position="1"
+              hover={this.state.hoverTarget === "1" ? true : false}
+              selected={this.state.selectedTarget === "1" ? true : false}
+              MouseOver={this.handleOnMouseOver.bind(this)}
+              MouseLeave={this.handleOnMouseLeave.bind(this)}
+              MouseDown={this.handleOnMouseDown.bind(this)}
+            />
+            <Builder />
+            <Container
+              OnDrag="content"
+              content="DIVIDER"
+              position="2"
+              hover={this.state.hoverTarget === "2" ? true : false}
+              selected={this.state.selectedTarget === "2" ? true : false}
+              MouseOver={this.handleOnMouseOver.bind(this)}
+              MouseLeave={this.handleOnMouseLeave.bind(this)}
+              MouseDown={this.handleOnMouseDown.bind(this)}
+            />
+            <Builder />
+            <Container
+              OnDrag="content"
+              content="HTML"
+              position="3"
+              hover={this.state.hoverTarget === "3" ? true : false}
+              selected={this.state.selectedTarget === "3" ? true : false}
+              MouseOver={this.handleOnMouseOver.bind(this)}
+              MouseLeave={this.handleOnMouseLeave.bind(this)}
+              MouseDown={this.handleOnMouseDown.bind(this)}
+            />
+            <Builder />
+            <Container
+              OnDrag="content"
+              content="IMAGE"
+              position="4"
+              hover={this.state.hoverTarget === "4" ? true : false}
+              selected={this.state.selectedTarget === "4" ? true : false}
+              MouseOver={this.handleOnMouseOver.bind(this)}
+              MouseLeave={this.handleOnMouseLeave.bind(this)}
+              MouseDown={this.handleOnMouseDown.bind(this)}
+            />
+            <Builder />
+            <Container
+              OnDrag="content"
+              content="TEXT"
+              position="5"
+              hover={this.state.hoverTarget === "5" ? true : false}
+              selected={this.state.selectedTarget === "5" ? true : false}
+              MouseOver={this.handleOnMouseOver.bind(this)}
+              MouseLeave={this.handleOnMouseLeave.bind(this)}
+              MouseDown={this.handleOnMouseDown.bind(this)}
+            />
+            <Builder />
             {/* <img src={require("../images/claptitle2.png")} />
             <div className="builder" /> */}
           </div>
         </div>
+      </Fragment>
+    );
+  }
+}
+
+class Builder extends Component {
+  constructor(props) {
+    super(props);
+    this.myRef = React.createRef();
+    this.state = {
+      active: false
+    };
+  }
+
+  render() {
+    return (
+      <Fragment>
+        <div className="builder" />
+      </Fragment>
+    );
+  }
+}
+
+class Container extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      exist: true
+    };
+  }
+
+  showInner = () => {
+    if (this.props.OnDrag === "content") {
+      switch (this.props.content) {
+        case "BUTTON":
+          return <Button selected={this.props.selected} />;
+        case "DIVIDER":
+          return <Divider selected={this.props.selected} />;
+        case "HTML":
+          return <Html selected={this.props.selected} />;
+        case "IMAGE":
+          return <Image selected={this.props.selected} />;
+        case "TEXT":
+          return <Text selected={this.props.selected} />;
+        default:
+          break;
+      }
+    } else if (this.props.OnDrag === "columnList") {
+      return (
+        <Column
+          selected={this.props.selected}
+          columnArray={this.props.columnArray}
+        />
+      );
+    }
+  };
+
+  handleOnMouseOver = () => {
+    this.props.MouseOver(this.props.position);
+    if (!this.props.selected) {
+      this.setState({ hover: true });
+    }
+  };
+
+  handleOnMouseDown = () => {
+    this.props.MouseDown(this.props.position);
+  };
+
+  handleOnMouseLeave = () => {
+    this.props.MouseLeave(this.props.position);
+  };
+
+  handleOutline = () => {
+    if (this.props.selected) {
+      return "2px solid #4CB9EA";
+    } else if (this.props.hover) {
+      return "2px solid #7aabc0";
+    } else {
+      return null;
+    }
+  };
+
+  handleOnClickDelBtn = () => {
+    this.setState({ exist: false });
+  };
+
+  handleOnClickDupBtn = () => {};
+
+  render() {
+    return this.state.exist ? (
+      <div
+        className="container"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px",
+          position: "relative",
+          outline: this.handleOutline()
+        }}
+        onMouseOver={this.handleOnMouseOver}
+        onMouseDown={this.handleOnMouseDown}
+        onMouseLeave={this.handleOnMouseLeave}
+      >
+        <div className="layout">
+          {this.props.selected ? <div className="editor" /> : null}
+          {this.props.hover ? <div className="object">content</div> : null}
+          {this.props.hover || this.props.selected ? (
+            <div
+              style={{
+                backgroundColor: this.props.selected ? "#4cb9ea" : null
+              }}
+              className="position"
+            >
+              <i class="fas fa-arrows-alt" />
+            </div>
+          ) : null}
+          {this.props.selected ? (
+            <div className="utilBtn">
+              <button
+                onClick={() => this.handleOnClickDelBtn()}
+                className="btn"
+              >
+                <i class="fas fa-trash-alt" />
+              </button>
+              <button className="btn">
+                <i class="fas fa-copy" />
+              </button>
+            </div>
+          ) : null}
+        </div>
+        {this.showInner()}
+      </div>
+    ) : null;
+  }
+}
+
+class Button extends Component {
+  constructor(props) {
+    super(props);
+    const initialValue = Value.fromJSON({
+      document: {
+        nodes: [
+          {
+            object: "block",
+            type: "paragraph",
+            nodes: [
+              {
+                object: "text",
+                leaves: [
+                  {
+                    text: "CLICK ME!"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+    this.state = { value: initialValue };
+  }
+
+  onChange = ({ value }) => {
+    this.setState({ value });
+  };
+
+  render() {
+    return !this.props.selected ? (
+      <div
+        className="content"
+        style={{
+          color: "white",
+          backgroundColor: "#3AAEE0",
+          textAlign: "center",
+          lineHeight: "120%",
+          borderTop: "0 solid transparent",
+          borderRight: "0 solid transparent",
+          borderLeft: "0 solid transparent",
+          borderBottom: "0 solid transparent",
+          borderRadius: "4px",
+          paddingTop: "10px",
+          paddingRight: "20px",
+          paddingLeft: "20px",
+          paddingBottom: "10px"
+        }}
+      >
+        <Editor
+          value={this.state.value}
+          readOnly={true}
+          onChange={this.onChange}
+        />
+      </div>
+    ) : (
+      <div
+        className="content"
+        style={{
+          color: "white",
+          backgroundColor: "#3AAEE0",
+          textAlign: "center",
+          lineHeight: "120%",
+          borderTop: "0 solid transparent",
+          borderRight: "0 solid transparent",
+          borderLeft: "0 solid transparent",
+          borderBottom: "0 solid transparent",
+          borderRadius: "4px",
+          paddingTop: "10px",
+          paddingRight: "20px",
+          paddingLeft: "20px",
+          paddingBottom: "10px"
+        }}
+      >
+        <Editor
+          value={this.state.value}
+          readOnly={false}
+          onChange={this.onChange}
+        />
+      </div>
+    );
+  }
+}
+
+class Divider extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    return (
+      <div
+        className="content"
+        style={{
+          width: "100%",
+          borderBottom: "1px solid #BBBBBB"
+        }}
+      />
+    );
+  }
+}
+
+class Html extends Component {
+  constructor(props) {
+    super(props);
+    const initialValue = Value.fromJSON({
+      document: {
+        nodes: [
+          {
+            object: "block",
+            marks: {
+              b: "bold"
+            },
+            type: "paragraph",
+            nodes: [
+              {
+                object: "text",
+                leaves: [
+                  {
+                    text: "Hello, world!"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+    this.state = { value: initialValue };
+  }
+
+  onChange = ({ value }) => {
+    this.setState({ value });
+  };
+
+  render() {
+    return !this.props.selected ? (
+      <div
+        className="content"
+        style={{
+          color: "#373A3C",
+          borderTop: "0 solid transparent",
+          borderRight: "0 solid transparent",
+          borderLeft: "0 solid transparent",
+          borderBottom: "0 solid transparent"
+        }}
+      >
+        <Editor
+          value={this.state.value}
+          readOnly={true}
+          onChange={this.onChange}
+        />
+      </div>
+    ) : (
+      <div
+        className="content"
+        style={{
+          color: "#373A3C",
+          borderTop: "0 solid transparent",
+          borderRight: "0 solid transparent",
+          borderLeft: "0 solid transparent",
+          borderBottom: "0 solid transparent"
+        }}
+      >
+        <Editor
+          value={this.state.value}
+          readOnly={false}
+          onChange={this.onChange}
+        />
+      </div>
+    );
+  }
+}
+
+class Image extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+  render() {
+    return (
+      <div
+        className="content"
+        style={{
+          borderTop: "0 solid transparent",
+          borderRight: "0 solid transparent",
+          borderLeft: "0 solid transparent",
+          borderBottom: "0 solid transparent"
+        }}
+      >
+        <img
+          src="https://media.giphy.com/media/Ov7lAOUsu4Yo0/giphy.gif"
+          alt="logo"
+        />
+      </div>
+    );
+  }
+}
+
+class Text extends Component {
+  constructor(props) {
+    super(props);
+    this.props = {
+      selected: false
+    };
+    const initialValue = Value.fromJSON({
+      document: {
+        nodes: [
+          {
+            object: "block",
+            type: "paragraph",
+            nodes: [
+              {
+                object: "text",
+                leaves: [
+                  {
+                    text: "A line of text in a paragraph."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+    this.state = { value: initialValue };
+  }
+
+  onChange = ({ value }) => {
+    this.setState({ value });
+  };
+
+  render() {
+    return !this.props.selected ? (
+      <div
+        className="content"
+        style={{
+          color: "black",
+          textAlign: "left",
+          lineHeight: "140%",
+          paddingTop: "10px",
+          paddingRight: "10px",
+          paddingLeft: "10px",
+          paddingBottom: "10px"
+        }}
+      >
+        <Editor
+          value={this.state.value}
+          readOnly={true}
+          onChange={this.onChange}
+        />
+      </div>
+    ) : (
+      <div
+        className="content"
+        style={{
+          color: "black",
+          textAlign: "left",
+          lineHeight: "140%",
+          paddingTop: "10px",
+          paddingRight: "10px",
+          paddingLeft: "10px",
+          paddingBottom: "10px"
+        }}
+      >
+        <Editor value={this.state.value} onChange={this.onChange} />
+      </div>
+    );
+  }
+}
+
+class Column extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    return (
+      <Fragment>
+        <div
+          className="columnList"
+          style={{
+            width: "100%",
+            height: "100px",
+            display: "grid",
+            gridTemplateColumns: this.props.columnArray
+          }}
+        >
+          {this.props.columnArray
+            .split(" ")
+            .map(() => (
+              <div
+                className="column"
+                style={{
+                  outline: "0.5px dashed darkblue",
+                  backgroundColor: "#9dc3d3",
+                  textAlign: "center"
+                }}
+              >
+                <div className="smallbuilder" />Insert Content
+              </div>
+            ))
+            .reduce((prev, curr) => prev + curr)}
+        </div>
+        <div className="builder" />
       </Fragment>
     );
   }

@@ -4,7 +4,7 @@ import App from "./App";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import registerServiceWorker from "./registerServiceWorker";
 
-ReactDOM.render(
+ReactDOM.hydrate(
   <Router>
     <Route path="/" component={App} />
   </Router>,
