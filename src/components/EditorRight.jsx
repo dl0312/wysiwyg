@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from "react";
 import styles from "./EditorRight.scss";
 import reactCSS from "reactcss";
+import ContentItem from "./ContentItem";
+import RowItem from "./RowItem";
 import { SketchPicker } from "react-color";
 
 const fontFamily = [
@@ -80,11 +82,9 @@ class EditorRight extends Component {
   showSection = () => {
     switch (this.state.active) {
       case 0:
-        return (
-          <Content callbackfromparentdrag={this.dragCallback.bind(this)} />
-        );
+        return <Content />;
       case 1:
-        return <Row callbackfromparentdrag={this.dragCallback.bind(this)} />;
+        return <Row />;
       case 2:
         return (
           <Body
@@ -159,157 +159,43 @@ class EditorRight extends Component {
             </li>
           </ul>
           {this.showSection()}
+          {this.props.selectedContent ? (
+            <Blockoption selectedContent={this.props.selectedContent} />
+          ) : null}
         </div>
-        <Blockoption />
       </Fragment>
     );
   }
 }
 
-class Blockoption extends Component {
-  render() {
-    return (
-      <div className={styles.blockOption}>
-        <div className={styles.header}>
-          <div className={styles.blockName}>CONTENT</div>
-          <div className={styles.btnColumn}>
-            <button className={styles.btn}>
-              <i class="fas fa-trash-alt" />
-            </button>
-            <button className={styles.btn}>
-              <i class="fas fa-copy" />
-            </button>
-            <button className={styles.btn}>
-              <i class="fas fa-angle-down" />
-            </button>
-          </div>
-        </div>
-        <div className={styles.optionRows}>
-          <div className={styles.optionHeader}>
-            <div className={styles.optionTitle}>LINK</div>
-            <button className={styles.btn}>
-              <i class="fas fa-angle-up" />
-            </button>
-          </div>
-          <div className={styles.btnLinkColumn}>
-            <div className={styles.title}>Button Link</div>
-            <div className={styles.case}>Same Tag</div>
-          </div>
-          <div className={styles.urlColumn}>
-            <button className={styles.btn}>URL</button>
-            <input type="text" />
-          </div>
-          <div className={styles.header}>
-            <div className={styles.optionTitle}>COLORS</div>
-            <div className={styles.btn}>
-              <i class="fas fa-angle-up" />
-            </div>
-            <div className={styles.colorColumn}>
-              <div className={styles.item}>
-                <div className={styles.title}>Text Color</div>
-                <div className={styles.color}>ㅁ</div>
-              </div>
-              <div className={styles.item}>
-                <div className={styles.title}>Background Color</div>
-                <div className={styles.color}>ㅁ</div>
-              </div>
-              <div className={styles.item}>
-                <div className={styles.title}>Hover Color</div>
-                <div className={styles.color}>ㅁ</div>
-              </div>{" "}
-            </div>
-          </div>
-          <div className={styles.header}>
-            <div className={styles.optionTitle}>SPACING</div>
-            <div className={styles.btn}>
-              <i class="fas fa-angle-up" />
-            </div>
-            <div className={styles.btnLinkColumn}>
-              <div className={styles.title}>Button Link</div>
-              <div className={styles.case}>Same Tag</div>
-            </div>
-            <div className={styles.urlColumn}>
-              <button className={styles.btn}>URL</button>
-              <input type="text" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
 class Content extends Component {
-  handleContentOnDragStart = e => {
-    console.log(e.target.children[1].innerHTML);
-    this.props.callbackfromparentdrag("content");
-    e.dataTransfer.setData("text", e.target.children[1].innerHTML);
+  state = {
+    contentItems: [
+      { icon: "fas fa-square", name: "BUTTON" },
+      { icon: "fas fa-divide", name: "DIVIDER" },
+      { icon: "fas fa-code", name: "HTML" },
+      { icon: "fas fa-image", name: "IMAGE" },
+      { icon: "fas fa-font", name: "TEXT" }
+    ]
   };
 
-  handleOnDragEnd = e => {
-    e.preventDefault();
-    this.props.callbackfromparentdrag(null);
+  addItem = name => {
+    console.log(`adding name: ` + name);
   };
 
   render() {
     return (
       <div className={styles.contentBody}>
         <ul className={styles.contentColumn}>
-          <li
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleContentOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-square" />
-            </div>
-            <div className={styles.title}>BUTTON</div>
-          </li>
-          <li
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleContentOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-divide" />
-            </div>
-            <div className={styles.title}>DIVIDER</div>
-          </li>
-          <li
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleContentOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-code" />
-            </div>
-            <div className={styles.title}>HTML</div>
-          </li>
-          <li
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleContentOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.icon}>
-              <i class="far fa-image" />
-            </div>
-            <div className={styles.title}>IMAGE</div>
-          </li>
-          <li
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleContentOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.icon}>
-              <i class="fas fa-font" />
-            </div>
-            <div className={styles.title}>TEXT</div>
-          </li>
+          {this.state.contentItems.map((item, index) => (
+            <ContentItem
+              key={index}
+              item={item}
+              icon={item.icon}
+              name={item.name}
+              handleDrop={name => this.addItem(name)}
+            />
+          ))}
         </ul>
       </div>
     );
@@ -317,105 +203,34 @@ class Content extends Component {
 }
 
 class Row extends Component {
-  handleRowOnDragStart = e => {
-    console.log(e.target);
-
-    this.props.callbackfromparentdrag("columnList");
-
-    const columnArray = [];
-    let i = 0;
-
-    while (e.target.children[i]) {
-      columnArray.push(e.target.children[i].innerHTML);
-      i++;
-    }
-
-    e.dataTransfer.setData(
-      "text",
-      columnArray
-        .map(ratio => ratio + "fr")
-        .reduce((prev, curr) => prev + " " + curr)
-    );
+  state = {
+    rowItems: [
+      { array: [1] },
+      { array: [1, 1] },
+      { array: [1, 1, 1] },
+      { array: [1, 1, 1, 1] },
+      { array: [1, 2] },
+      { array: [2, 1] },
+      { array: [1, 2, 1, 2] }
+    ]
   };
 
-  handleOnDragEnd = e => {
-    console.log(e.target);
-
-    e.preventDefault();
-    this.props.callbackfromparentdrag(null);
+  addItem = name => {
+    console.log(`adding name: ` + name);
   };
 
   render() {
     return (
       <div className={styles.rowBody}>
         <div className={styles.rowRow}>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>1</div>
-          </div>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>1</div>
-          </div>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>1</div>
-          </div>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>1</div>
-          </div>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>2</div>
-          </div>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>2</div>
-            <div className={styles.box}>1</div>
-          </div>
-          <div
-            className={styles.item}
-            draggable="true"
-            onDragStart={this.handleRowOnDragStart}
-            onDragEnd={this.handleOnDragEnd}
-          >
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>2</div>
-            <div className={styles.box}>1</div>
-            <div className={styles.box}>2</div>
-          </div>
+          {this.state.rowItems.map((item, index) => (
+            <RowItem
+              key={index}
+              item={item}
+              array={item.array}
+              handleDrop={name => this.addItem(name)}
+            />
+          ))}
         </div>
       </div>
     );
@@ -633,6 +448,140 @@ class SketchExample extends Component {
             />
           </div>
         ) : null}
+      </div>
+    );
+  }
+}
+
+class Blockoption extends Component {
+  showOptions = () => {
+    switch (this.props.selectedContent) {
+      case "BUTTON":
+        return (
+          <div className={styles.optionRows}>
+            <div className={styles.option}>
+              <div className={styles.optionHeader}>
+                <div className={styles.optionTitle}>LINK</div>
+                <button className={styles.btn}>
+                  <i class="fas fa-angle-up" />
+                </button>
+              </div>
+              <div className={styles.featureColumn}>
+                <div className={styles.btnLinkColumn}>
+                  <div className={styles.title}>Button Link</div>
+                  <div className={styles.case}>Same Tag</div>
+                </div>
+                <div className={styles.urlColumn}>
+                  <button className={styles.btn}>URL</button>
+                  <input className={styles.input} type="text" />
+                </div>
+              </div>
+            </div>
+            <div className={styles.option}>
+              <div className={styles.optionHeader}>
+                <div className={styles.optionTitle}>COLORS</div>
+                <button className={styles.btn}>
+                  <i class="fas fa-angle-up" />
+                </button>
+              </div>
+              <div className={styles.featureColumn}>
+                <div className={styles.colorsColumn}>
+                  <div className={styles.item}>
+                    <div className={styles.title}>Text Color</div>
+                    <div className={styles.color}>ㅁ</div>
+                  </div>
+                  <div className={styles.item}>
+                    <div className={styles.title}>Background Color</div>
+                    <div className={styles.color}>ㅁ</div>
+                  </div>
+                  <div className={styles.item}>
+                    <div className={styles.title}>Hover Color</div>
+                    <div className={styles.color}>ㅁ</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.option}>
+              <div className={styles.optionHeader}>
+                <div className={styles.optionTitle}>SPACING</div>
+                <button className={styles.btn}>
+                  <i class="fas fa-angle-up" />
+                </button>
+              </div>
+              <div className={styles.featureColumn}>
+                <div className={styles.alignmentsColumn}>
+                  <div className={styles.title}>Alignments</div>
+                  <div className={styles.alignColumn}>
+                    <button className={styles.align}>
+                      <i class="fas fa-align-left" />
+                    </button>
+                    <button className={styles.align}>
+                      <i class="fas fa-align-center" />
+                    </button>
+                    <button className={styles.align}>
+                      <i class="fas fa-align-right" />
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.lineHeightColumn}>
+                  <div className={styles.title}>Line Height</div>
+                  <div className={styles.alignColumn}>
+                    <button className={styles.align}>
+                      <i class="fas fa-align-left" />
+                    </button>
+                    <button className={styles.align}>
+                      <i class="fas fa-align-center" />
+                    </button>
+                    <button className={styles.align}>
+                      <i class="fas fa-align-right" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.option}>
+              <div className={styles.optionHeader}>
+                <div className={styles.optionTitle}>GENERAL</div>
+                <button className={styles.btn}>
+                  <i class="fas fa-angle-up" />
+                </button>
+              </div>
+              <div className={styles.featureColumn}>
+                <div className={styles.btnLinkColumn}>
+                  <div className={styles.title}>Button Link</div>
+                  <div className={styles.case}>Same Tag</div>
+                </div>
+                <div className={styles.urlColumn}>
+                  <button className={styles.btn}>URL</button>
+                  <input type="text" />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  render() {
+    return (
+      <div className={styles.blockOption}>
+        <div className={styles.header}>
+          <div className={styles.blockName}>CONTENT</div>
+          <div className={styles.btnColumn}>
+            <button className={styles.btn}>
+              <i class="fas fa-trash-alt" />
+            </button>
+            <button className={styles.btn}>
+              <i class="fas fa-copy" />
+            </button>
+            <button className={styles.btn}>
+              <i class="fas fa-angle-down" />
+            </button>
+          </div>
+        </div>
+        {this.showOptions()}
       </div>
     );
   }

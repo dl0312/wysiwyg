@@ -2,6 +2,7 @@ import React from "react";
 import { Route, withRouter } from "react-router-dom";
 import styles from "./App.scss";
 import Navigation from "./components/Navigation";
+import Home from "./components/Home";
 import Guide from "./components/Guide";
 import Wiki from "./components/Wiki";
 import Store from "./components/Store";
@@ -13,7 +14,7 @@ const App = () => {
     <div className={styles.app}>
       <Navigation />
       <div className={styles.content}>
-        <Route path="/" component={""} />
+        <Route path="/ " component={Home} />
         <Route path="/guide" component={Guide} />
         <Route path="/wiki" component={Wiki} />
         <Route path="/store" component={Store} />

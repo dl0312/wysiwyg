@@ -2,6 +2,8 @@ import React, { Component, Fragment } from "react";
 import styles from "./Editor.scss";
 import EditorLeft from "./EditorLeft";
 import EditorRight from "./EditorRight";
+import { DragDropContext } from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
 
 class Editor extends Component {
   constructor(props) {
@@ -41,7 +43,7 @@ class Editor extends Component {
               color={this.state.color}
               contentWidth={this.state.contentWidth}
               font={this.state.font}
-              OnDrag={this.state.OnDrag}
+              greedy={true}
             />
           </div>
           <div className={styles.right}>
@@ -49,8 +51,6 @@ class Editor extends Component {
               callbackfromparent={this.myCallback.bind(this)}
               callbackfromparentwidth={this.widthCallback.bind(this)}
               callbackfromparentfont={this.fontCallback.bind(this)}
-              callbackfromparentdrag={this.dragCallback.bind(this)}
-              contentWidth={this.contentWidth}
             />
           </div>
         </div>
@@ -59,4 +59,4 @@ class Editor extends Component {
   }
 }
 
-export default Editor;
+export default DragDropContext(HTML5Backend)(Editor);

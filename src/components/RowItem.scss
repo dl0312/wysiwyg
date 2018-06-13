@@ -1,0 +1,20 @@
+.item {
+  cursor: pointer;
+  border-radius: 5px;
+  height: 65px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #cccccc;
+  margin-bottom: 15px;
+  display: grid;
+  transition: box-shadow 0.2s ease;
+  color: transparent;
+
+  .box {
+    outline: 1px solid #c4c4c4;
+    background-color: #eeeeee;
+  }
+  &:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  }
+}
