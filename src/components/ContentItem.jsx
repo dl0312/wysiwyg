@@ -2,6 +2,7 @@ import React, { Component, ThemeContext } from "react";
 import PropTypes from "prop-types";
 
 import styles from "./ContentItem.scss";
+
 import ItemTypes from "./ItemTypes";
 import { DragSource, ConnectDragSource } from "react-dnd";
 
@@ -11,13 +12,13 @@ import { Value } from "slate";
 const itemSource = {
   beginDrag(props) {
     console.log("dragging");
-    return { isNew: true, OnDrag: "content", content: props.item.name };
+    return { OnDrag: "content", content: props.item.name };
   },
   endDrag(props, monitor, component) {
+    console.log(`monitor.didDrop(): ${monitor.didDrop()}`);
     if (!monitor.didDrop()) {
       return;
     }
-    // return props.handleDrop(props.item.name);
   }
 };
 

@@ -1,32 +1,45 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+
 import styles from "./RowItem.scss";
+
 import ItemTypes from "./ItemTypes";
 import { DragSource } from "react-dnd";
 
 const itemSource = {
   beginDrag(props) {
     console.log("dragging");
-    return { OnDrag: "columnList", content: props.item.array };
+    return {
+      isNew: true,
+      OnDrag: "columnList",
+      content: props.item.array,
+      columnListArray: [[], [], [], []]
+    };
   },
   endDrag(props, monitor, component) {
     if (!monitor.didDrop()) {
       return;
     }
-    return props.handleDrop(props.item.array);
   }
 };
 
 class RowItem extends Component {
+  static propTypes = {
+    connectDragSource: PropTypes.func.isRequired
+  };
   render() {
     const { array, connectDragSource, isDragging } = this.props;
     const opacity = isDragging ? 0.5 : 1;
     const gridTemplateColumns = array.join("fr ") + "fr";
-    return connectDragSource(
-      <div style={{ opacity, gridTemplateColumns }} className={styles.item}>
-        {array.map(element => {
-          return <div className={styles.box} />;
-        })}
-      </div>
+    return (
+      connectDragSource &&
+      connectDragSource(
+        <div style={{ opacity, gridTemplateColumns }} className={styles.item}>
+          {array.map((element, index) => {
+            return <div key={index} className={styles.box} />;
+          })}
+        </div>
+      )
     );
   }
 }

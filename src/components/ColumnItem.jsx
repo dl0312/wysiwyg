@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import styles from "./EditorLeft.scss";
-import "./EditorLeft.css";
+import styles from "./ColumnItem.scss";
 
 import Card from "./Card";
 import flow from "lodash.flow";
@@ -14,8 +13,8 @@ import {
   DragDropContext,
   DropTargetMonitor
 } from "react-dnd";
-
 const update = require("immutability-helper");
+
 const boxTarget = {
   hover(props, monitor, component) {
     const isJustOverThisOne = monitor.isOver({ shallow: true });
@@ -40,7 +39,7 @@ const boxTarget = {
   }
 };
 
-class EditorLeft extends Component {
+class ColumnItem extends Component {
   static propTypes = {
     connectDropTarget: PropTypes.func.isRequired,
     isOver: PropTypes.bool.isRequired,
@@ -55,37 +54,19 @@ class EditorLeft extends Component {
       hasDropped: false,
       hasDroppedOnChild: false,
       contentHover: false,
-      cards: [
-        {
-          id: 1,
-          OnDrag: "columnList",
-          content: [1, 1, 1, 1],
-          columnListArray: [
-            [{ id: 1, OnDrag: "content", content: "BUTTON" }],
-            [],
-            [],
-            []
-          ]
-        },
-        { id: 2, OnDrag: "content", content: "BUTTON" },
-        { id: 3, OnDrag: "content", content: "DIVIDER" },
-        { id: 4, OnDrag: "content", content: "HTML" },
-        { id: 5, OnDrag: "content", content: "IMAGE" },
-        { id: 6, OnDrag: "content", content: "TEXT" },
-        { id: 7, OnDrag: "content", content: "TEXT" }
-      ]
+      cards: this.props.columnList
     };
   }
 
-  handleDrop = hoverItem => {
+  handleDrop = orderItem => {
     // var joined = this.state.cards.concat(orderItem);
     // this.setState({ cards: joined });
-    if (!!hoverItem) {
-      hoverItem = { id: this.state.cards.length + 1, ...hoverItem };
-      this.setState({ hoverItem });
-      console.log([hoverItem]);
+    if (!!orderItem) {
+      console.log(orderItem);
+      orderItem = { id: this.state.cards.length + 1, ...orderItem };
+      console.log([orderItem]);
       this.setState({
-        cards: update(this.state.cards, { $push: [hoverItem] })
+        cards: update(this.state.cards, { $push: [orderItem] })
       });
       console.log(this.state.cards);
     }
@@ -126,43 +107,36 @@ class EditorLeft extends Component {
       children
     } = this.props;
     const { cards, hasDropped, hasDroppedOnChild } = this.state;
-    let backgroundColor = `rgba(${this.props.color.r}, ${this.props.color.g}, ${
-      this.props.color.b
-    }, ${this.props.color.a})`;
-    console.log(`${isOverCurrent} + ${isOver}`);
+    let backgroundColor = "white";
+    const columnStyle = {
+      outline: "0.5px dashed darkblue",
+      textAlign: "center",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor
+    };
     if (isOverCurrent || (isOver && greedy)) {
       backgroundColor = "darkgreen";
     }
+    console.log(cards);
     return (
       connectDropTarget &&
       connectDropTarget(
-        <div
-          style={{ backgroundColor }}
-          className={styles.editor}
-          id="container"
-        >
-          <div
-            style={{
-              width: `${this.props.contentWidth}px`,
-              fontFamily: `${this.props.font}`
-            }}
-            id="body"
-            className={styles.practice}
-          >
-            {cards.map((card, index) => (
-              <Card
-                addCard={this.addCard}
-                columnListArray={card.columnListArray}
-                cards={this.state.cards.length}
-                key={card.id}
-                index={index}
-                id={card.id}
-                OnDrag={card.OnDrag}
-                content={card.content}
-                moveCard={this.moveCard}
-              />
-            ))}
-          </div>
+        <div className="column" style={columnStyle}>
+          {cards.length !== 0 ? null : "Insert Content"}
+          {cards.map((card, index) => (
+            <Card
+              addCard={this.addCard}
+              cards={this.state.cards.length}
+              key={card.id}
+              index={index}
+              id={card.id}
+              OnDrag={card.OnDrag}
+              content={card.content}
+              moveCard={this.moveCard}
+            />
+          ))}
         </div>
       )
     );
@@ -173,4 +147,4 @@ export default DropTarget(ItemTypes.CONTENT, boxTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   isOverCurrent: monitor.isOver({ shallow: true })
-}))(EditorLeft);
+}))(ColumnItem);
