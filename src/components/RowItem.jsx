@@ -5,15 +5,20 @@ import styles from "./RowItem.scss";
 
 import ItemTypes from "./ItemTypes";
 import { DragSource } from "react-dnd";
+const update = require("immutability-helper");
 
 const itemSource = {
-  beginDrag(props) {
+  beginDrag(props, monitor, component) {
     console.log("dragging");
+    const columnListArray = [];
+    component.props.array.map(element => {
+      columnListArray.push([]);
+    });
+    console.log(`columnListArray: ${columnListArray}`);
     return {
-      isNew: true,
       OnDrag: "columnList",
       content: props.item.array,
-      columnListArray: [[], [], [], []]
+      columnListArray
     };
   },
   endDrag(props, monitor, component) {
@@ -44,6 +49,6 @@ class RowItem extends Component {
   }
 }
 
-export default DragSource(ItemTypes.CONTENT, itemSource, connect => ({
+export default DragSource(ItemTypes.ROW, itemSource, connect => ({
   connectDragSource: connect.dragSource()
 }))(RowItem);

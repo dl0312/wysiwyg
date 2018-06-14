@@ -14,29 +14,22 @@ import {
   DragDropContext,
   DropTargetMonitor
 } from "react-dnd";
+import { Motion, spring } from "react-motion";
 
 const update = require("immutability-helper");
 const boxTarget = {
-  hover(props, monitor, component) {
-    const isJustOverThisOne = monitor.isOver({ shallow: true });
-    if (!component.state.contentHover && isJustOverThisOne) {
-      console.log(`hover on the editleft!`);
-      component.handleDrop(monitor.getItem());
-      component.setState({ contentHover: !component.state.contentHover });
-    }
-  },
   drop(props, monitor, component) {
-    component.setState({ contentHover: !component.state.contentHover });
+    // component.setState({ contentHover: !component.state.contentHover });
+    const hasDroppedOnChild = monitor.didDrop();
+    if (hasDroppedOnChild && !props.greedy) {
+      return;
+    }
 
-    // component.handleDrop(monitor.getItem());
-    // const hasDroppedOnChild = monitor.didDrop();
-    // if (hasDroppedOnChild && !props.greedy) {
-    //   return;
-    // }
-    // component.setState({
-    //   hasDropped: true,
-    //   hasDroppedOnChild
-    // });
+    component.setState({
+      hasDropped: true,
+      hasDroppedOnChild
+    });
+    component.handleDrop(monitor.getItem());
   }
 };
 
@@ -59,10 +52,9 @@ class EditorLeft extends Component {
         {
           id: 1,
           OnDrag: "columnList",
-          content: [1, 1, 1, 1],
+          content: [1, 1, 1],
           columnListArray: [
             [{ id: 1, OnDrag: "content", content: "BUTTON" }],
-            [],
             [],
             []
           ]
@@ -86,18 +78,6 @@ class EditorLeft extends Component {
       console.log([hoverItem]);
       this.setState({
         cards: update(this.state.cards, { $push: [hoverItem] })
-      });
-      console.log(this.state.cards);
-    }
-  };
-
-  addCard = orderItem => {
-    if (!!orderItem) {
-      console.log(orderItem);
-      orderItem = { id: this.state.cards.length + 1, ...orderItem };
-      console.log([orderItem]);
-      this.setState({
-        cards: update(this.state.cards, { $push: [orderItem] })
       });
       console.log(this.state.cards);
     }
@@ -129,9 +109,9 @@ class EditorLeft extends Component {
     let backgroundColor = `rgba(${this.props.color.r}, ${this.props.color.g}, ${
       this.props.color.b
     }, ${this.props.color.a})`;
-    console.log(`${isOverCurrent} + ${isOver}`);
+    console.log(`Editleft: ${isOverCurrent} + ${isOver} + ${greedy}`);
     if (isOverCurrent || (isOver && greedy)) {
-      backgroundColor = "darkgreen";
+      backgroundColor = "#b8e994";
     }
     return (
       connectDropTarget &&
@@ -151,7 +131,7 @@ class EditorLeft extends Component {
           >
             {cards.map((card, index) => (
               <Card
-                addCard={this.addCard}
+                inColumn={false}
                 columnListArray={card.columnListArray}
                 cards={this.state.cards.length}
                 key={card.id}
@@ -169,8 +149,12 @@ class EditorLeft extends Component {
   }
 }
 
-export default DropTarget(ItemTypes.CONTENT, boxTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true })
-}))(EditorLeft);
+export default DropTarget(
+  [ItemTypes.CONTENT, ItemTypes.ROW],
+  boxTarget,
+  (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    isOverCurrent: monitor.isOver({ shallow: true })
+  })
+)(EditorLeft);

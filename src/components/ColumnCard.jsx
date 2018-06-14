@@ -24,6 +24,7 @@ const style = {
   borderRadius: "5px",
   backgroundColor: "white",
   width: "100%",
+
   position: "relative"
 };
 
@@ -99,7 +100,7 @@ const cardTarget = {
   }
 };
 
-class Card extends React.Component {
+class ColumnCard extends React.Component {
   static propTypes = {
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
@@ -144,13 +145,13 @@ class Card extends React.Component {
 }
 
 export default flow(
-  DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
+  DragSource(ItemTypes.COLUMNCARD, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),
     isDragging: monitor.isDragging()
   })),
-  DropTarget(ItemTypes.CARD, cardTarget, (connect, monitor) => ({
+  DropTarget(ItemTypes.COLUMNCARD, cardTarget, (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver()
   }))
-)(Card);
+)(ColumnCard);

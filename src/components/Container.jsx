@@ -44,7 +44,7 @@ export default class Container extends Component {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px",
+          padding: "10px",
           position: "relative"
         }}
       >
@@ -278,7 +278,7 @@ class Column extends Component {
       display: "grid",
       gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
     };
-    console.log(this.props.columnListArray);
+    // console.log(this.props.columnListArray);
     return (
       <div className="columnList" style={columnListStyle}>
         {this.props.columnListArray.map((columnList, index) => (

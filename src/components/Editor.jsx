@@ -43,7 +43,7 @@ class Editor extends Component {
               color={this.state.color}
               contentWidth={this.state.contentWidth}
               font={this.state.font}
-              greedy={true}
+              greedy={false}
             />
           </div>
           <div className={styles.right}>

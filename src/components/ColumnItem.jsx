@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import styles from "./ColumnItem.scss";
 
-import Card from "./Card";
+import ColumnCard from "./ColumnCard";
 import flow from "lodash.flow";
 import ItemTypes from "./ItemTypes";
 
@@ -13,21 +13,22 @@ import {
   DragDropContext,
   DropTargetMonitor
 } from "react-dnd";
+import { Transform } from "stream";
 const update = require("immutability-helper");
 
 const boxTarget = {
-  hover(props, monitor, component) {
-    const isJustOverThisOne = monitor.isOver({ shallow: true });
-    if (!component.state.contentHover && isJustOverThisOne) {
-      console.log(`hover on the editleft!`);
-      component.handleDrop(monitor.getItem());
-      component.setState({ contentHover: !component.state.contentHover });
-    }
-  },
   drop(props, monitor, component) {
-    component.setState({ contentHover: !component.state.contentHover });
+    const hasDroppedOnChild = monitor.didDrop();
+    if (hasDroppedOnChild && !props.greedy) {
+      return;
+    }
 
-    // component.handleDrop(monitor.getItem());
+    component.setState({
+      hasDropped: true,
+      hasDroppedOnChild
+    });
+    component.handleDrop(monitor.getItem());
+
     // const hasDroppedOnChild = monitor.didDrop();
     // if (hasDroppedOnChild && !props.greedy) {
     //   return;
@@ -72,18 +73,6 @@ class ColumnItem extends Component {
     }
   };
 
-  addCard = orderItem => {
-    if (!!orderItem) {
-      console.log(orderItem);
-      orderItem = { id: this.state.cards.length + 1, ...orderItem };
-      console.log([orderItem]);
-      this.setState({
-        cards: update(this.state.cards, { $push: [orderItem] })
-      });
-      console.log(this.state.cards);
-    }
-  };
-
   moveCard = (dragIndex, hoverIndex) => {
     const { cards } = this.state;
     const dragCard = cards[dragIndex];
@@ -107,27 +96,43 @@ class ColumnItem extends Component {
       children
     } = this.props;
     const { cards, hasDropped, hasDroppedOnChild } = this.state;
-    let backgroundColor = "white";
+    let backgroundColor = cards.length === 0 ? "#f6e58d" : "white";
+    if (isOverCurrent || (isOver && greedy)) {
+      backgroundColor = "#b8e994";
+    }
     const columnStyle = {
-      outline: "0.5px dashed darkblue",
+      outline: "0.5px dashed #8c7ae6",
       textAlign: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      backgroundColor
+    };
+
+    const insertTextStyle = {
+      height: "100px",
+      width: "100%",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor
+      fontWeight: "600",
+      color: "#5758BB"
     };
-    if (isOverCurrent || (isOver && greedy)) {
-      backgroundColor = "darkgreen";
-    }
+    console.log(`columnList: ${isOverCurrent} + ${isOver} + ${greedy}`);
     console.log(cards);
     return (
       connectDropTarget &&
       connectDropTarget(
         <div className="column" style={columnStyle}>
-          {cards.length !== 0 ? null : "Insert Content"}
+          {cards.length !== 0 ? null : (
+            <div style={insertTextStyle}>
+              INSERT<br />CONTENT
+            </div>
+          )}
           {cards.map((card, index) => (
-            <Card
-              addCard={this.addCard}
+            <ColumnCard
+              inColumn={true}
               cards={this.state.cards.length}
               key={card.id}
               index={index}
