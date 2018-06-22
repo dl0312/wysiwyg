@@ -6,11 +6,14 @@ import {
   ConnectDragSource,
   DragSourceConnector,
   DragSourceMonitor,
-  ConnectDragPreview
+  connectDragPreview
 } from "react-dnd";
 import ItemTypes from "./ItemTypes";
+import { XYCoord } from "dnd-core";
+import flow from "lodash.flow";
 import Container from "./Container";
 import classnames from "classnames";
+import { EventEmitter } from "events";
 
 const BUTTON_DEFAULT = -200;
 const BUTTON_CHANGED = -70;
@@ -20,7 +23,6 @@ const style = {
   width: "99%",
   position: "relative",
   marginBottom: "0.2rem",
-  padding: "0.1rem",
   display: "flex",
   alignItems: "center",
   justifyContent: "center"
@@ -75,10 +77,15 @@ const toolStyle = {
 
 const cardSource = {
   beginDrag(props, monitor, component) {
-    return { index: props.index };
+    return {
+      drag: component
+    };
   },
   endDrag(props, monitor, component) {
-    return { index: props.index };
+    console.log(`monitor.didDrop(): ${monitor.didDrop()}`);
+    if (!monitor.didDrop()) {
+      return;
+    }
   }
   // canDrag(props, monitor) {},
   // isDragging(props, monitor) {}
@@ -89,6 +96,7 @@ class Card extends React.Component {
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
+    isDragging: PropTypes.bool,
     id: PropTypes.any.isRequired,
     moveCard: PropTypes.func.isRequired,
     selected: PropTypes.bool.isRequired,
@@ -104,15 +112,15 @@ class Card extends React.Component {
     };
   }
 
-  componentDidMount() {
-    const { connectDragPreview } = this.props;
-    let img = new Image();
-    img.src =
-      "http://iconbug.com/data/ab/48/2d2ce45a67022a830dfd8692ec75c8b1.png";
-    img.onload = () => {
-      connectDragPreview && connectDragPreview(img);
-    };
-  }
+  // componentDidMount() {
+  //   const { connectDragPreview } = this.props;
+  //   let img = new Image();
+  //   img.src =
+  //     "http://www.newdesignfile.com/postpic/2015/08/global-brigades-icons_235534.png";
+  //   img.onload = () => {
+  //     connectDragPreview && connectDragPreview(img);
+  //   };
+  // }
 
   handleOnMouseOver = event => {
     event.stopPropagation();
@@ -163,75 +171,76 @@ class Card extends React.Component {
     const {
       isDragging,
       connectDragSource,
+      connectDropTarget,
       connectDragPreview,
       OnDrag,
       content,
+      id,
       index,
       callbackfromparent,
       contentWidth
     } = this.props;
     const opacity = isDragging ? 0.2 : 1;
-    return (
-      connectDragPreview &&
-      connectDragSource &&
-      connectDragPreview(
-        <div
-          style={{ ...style, opacity }}
-          className={classnames(
-            "frame",
-            this.state.hover ? "hover" : null,
-            this.state.active ? "active" : null
-          )}
-          onMouseOver={this.handleOnMouseOver}
-          onMouseDown={this.handleOnMouseDown}
-          onMouseLeave={this.handleOnMouseLeave}
-        >
-          {this.state.hover || this.state.active ? (
-            <div>
-              {this.state.toolHover ? (
-                <div
-                  onMouseLeave={this.handleOnMouseLeaveTool}
-                  style={{ ...toolStyle }}
+    return connectDragSource(
+      <div
+        style={{ ...style, opacity }}
+        className={classnames(
+          "frame",
+          this.state.hover ? "hover" : null,
+          this.state.active ? "active" : null
+        )}
+        onMouseOver={this.handleOnMouseOver}
+        onMouseDown={this.handleOnMouseDown}
+        onMouseLeave={this.handleOnMouseLeave}
+      >
+        {this.state.hover || this.state.active ? (
+          <div>
+            {this.state.toolHover ? (
+              <div
+                onMouseLeave={this.handleOnMouseLeaveTool}
+                style={{ ...toolStyle }}
+              >
+                <button
+                  onClick={() => {
+                    callbackfromparent("delete", index);
+                  }}
+                  style={{
+                    ...buttonStyle,
+                    borderTopLeftRadius: "100%",
+                    borderBottomLeftRadius: "100%"
+                  }}
                 >
-                  <button
-                    onClick={() => {
-                      callbackfromparent("delete", index, this);
-                    }}
-                    style={{
-                      ...buttonStyle,
-                      borderTopLeftRadius: "100%",
-                      borderBottomLeftRadius: "100%"
-                    }}
-                  >
-                    <i class="fas fa-trash-alt" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      callbackfromparent("duplicate", index, this);
-                    }}
-                    style={buttonStyle}
-                  >
-                    <i class="far fa-copy" />
-                  </button>
-                  {connectDragSource(
-                    <button style={buttonStyle}>
-                      <i class="fas fa-arrows-alt" />
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div
-                  onMouseOver={this.handleOnMouseOverTool}
-                  style={{ ...handleStyle }}
+                  <i class="fas fa-trash-alt" />
+                </button>
+                <button
+                  onClick={() => {
+                    callbackfromparent("duplicate", index);
+                  }}
+                  style={buttonStyle}
                 >
-                  <i class="fas fa-ellipsis-h" />
-                </div>
-              )}
-            </div>
-          ) : null}
-          {this.props.children}
-        </div>
-      )
+                  <i class="far fa-copy" />
+                </button>
+                <button style={buttonStyle}>
+                  <i class="fas fa-arrows-alt" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onMouseOver={this.handleOnMouseOverTool}
+                style={{ ...handleStyle }}
+              >
+                <i class="fas fa-ellipsis-h" />
+              </div>
+            )}
+          </div>
+        ) : null}
+        <Container
+          OnDrag={OnDrag}
+          content={content}
+          columnListArray={this.props.columnListArray}
+          contentWidth={contentWidth}
+        />
+      </div>
     );
   }
 }

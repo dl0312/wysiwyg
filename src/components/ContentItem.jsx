@@ -12,13 +12,24 @@ import { Value } from "slate";
 const itemSource = {
   beginDrag(props) {
     console.log("dragging");
-    return { OnDrag: "content", content: props.item.name };
+    const item = {
+      type: "content",
+      OnDrag: "content",
+      content: props.item.name
+    };
+    return item;
   },
   endDrag(props, monitor, component) {
-    console.log(`monitor.didDrop(): ${monitor.didDrop()}`);
-    if (!monitor.didDrop()) {
-      return;
-    }
+    // console.log(`monitor.didDrop(): ${monitor.didDrop()}`);
+    // if (!monitor.didDrop()) {
+    //   return;
+    // }
+    const item = {
+      type: "content",
+      OnDrag: "content",
+      content: props.item.name
+    };
+    return item;
   }
 };
 

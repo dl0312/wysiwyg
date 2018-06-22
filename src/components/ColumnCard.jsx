@@ -18,24 +18,21 @@ import flow from "lodash.flow";
 import Container from "./Container";
 
 const style = {
-  border: "1px dashed gray",
+  outline: "1px dashed gray",
   padding: "0.5rem",
-  marginBottom: ".5rem",
   borderRadius: "5px",
   backgroundColor: "white",
   width: "100%",
-
   position: "relative"
 };
 
 const handleStyle = {
   backgroundColor: "#9c88ff",
-  width: "1.4rem",
-  height: "1.4rem",
+  width: "1.5rem",
+  height: "1.5rem",
   borderRadius: "100%",
-  display: "inline-block",
+  cursor: "-webkit-grab",
   marginRight: "0.75rem",
-  cursor: "move",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -129,7 +126,7 @@ class ColumnCard extends React.Component {
           <div style={{ ...style, opacity }}>
             {connectDragSource(
               <div style={handleStyle}>
-                <i class="fas fa-arrows-alt" />
+                <i class="fas fa-plus" />
               </div>
             )}
             <Container

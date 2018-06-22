@@ -175,7 +175,11 @@ class Content extends Component {
       { icon: "fas fa-divide", name: "DIVIDER" },
       { icon: "fas fa-code", name: "HTML" },
       { icon: "fas fa-image", name: "IMAGE" },
-      { icon: "fas fa-font", name: "TEXT" }
+      { icon: "fas fa-font", name: "TEXT" },
+      { icon: "fab fa-youtube", name: "VIDEO" },
+      { icon: "fab fa-hubspot", name: "SOCIAL" },
+      { icon: "fas fa-bars", name: "BANNER" },
+      { icon: "fas fa-ellipsis-h", name: "MENU" }
     ]
   };
 

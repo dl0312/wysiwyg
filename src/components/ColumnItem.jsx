@@ -119,8 +119,7 @@ class ColumnItem extends Component {
       fontWeight: "600",
       color: "#5758BB"
     };
-    console.log(`columnList: ${isOverCurrent} + ${isOver} + ${greedy}`);
-    console.log(cards);
+
     return (
       connectDropTarget &&
       connectDropTarget(

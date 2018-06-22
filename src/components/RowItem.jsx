@@ -16,15 +16,26 @@ const itemSource = {
     });
     console.log(`columnListArray: ${columnListArray}`);
     return {
+      type: "columnList",
       OnDrag: "columnList",
       content: props.item.array,
       columnListArray
     };
   },
   endDrag(props, monitor, component) {
-    if (!monitor.didDrop()) {
-      return;
-    }
+    const columnListArray = [];
+    component.props.array.map(element => {
+      columnListArray.push([]);
+    });
+    return {
+      type: "columnList",
+      OnDrag: "columnList",
+      content: props.item.array,
+      columnListArray
+    };
+    // if (!monitor.didDrop()) {
+    //   return;
+    // }
   }
 };
 

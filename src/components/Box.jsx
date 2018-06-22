@@ -1,0 +1,115 @@
+import React, { Component, Fragment } from "react";
+import PropTypes from "prop-types";
+import classnames from "classnames";
+import ItemTypes from "./ItemTypes";
+import { findDOMNode } from "react-dom";
+import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
+
+const barStyle = {
+  width: "500px",
+  outline: "darkblue solid 1px"
+};
+
+const builderStyle = {
+  textAlign: "center",
+  color: "white",
+  backgroundColor: "darkblue",
+  borderRadius: "5px",
+  fontSize: "12px",
+  padding: "5px 15px",
+  position: "absolute"
+};
+
+const builderTarget = {
+  drop(props, monitor, component) {
+    console.log("drop");
+    // component.setState({ contentHover: !component.state.contentHover });
+    const hasDroppedOnChild = monitor.didDrop();
+    if (hasDroppedOnChild && !props.greedy) {
+      return;
+    }
+
+    component.setState({
+      hasDropped: true,
+      hasDroppedOnChild
+    });
+    component.handleDrop(monitor.getItem());
+  }
+};
+
+// const builderTarget = {
+//   drop(props, monitor, component) {
+//     console.log("drop");
+//     const dragComponent = monitor.getItem().component;
+//     component.dragItem(dragComponent);
+//   },
+//   canDrop(props, monitor) {
+//     // console.log(`can drop`);
+//   }
+// };
+
+class Box extends Component {
+  static propTypes = {
+    connectDropTarget: PropTypes.func.isRequired,
+    isOver: PropTypes.bool.isRequired,
+    isOverCurrent: PropTypes.bool.isRequired,
+    didDrop: PropTypes.bool.isRequired
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      hover: false,
+      drop: false
+    };
+  }
+
+  dragItem = component => {
+    console.log(component);
+    this.setState({
+      drop: true
+    });
+    this.setState({ component });
+  };
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.props.isOver && nextProps.isOver) {
+      // You can use this as enter handler
+      this.setState({ hover: true });
+    }
+    if (this.props.isOver && !nextProps.isOver) {
+      // You can use this as leave handler
+      this.setState({
+        hover: false
+      });
+    }
+    if (this.props.isOverCurrent && !nextProps.isOverCurrent) {
+      // You can be more specific and track enter/leave
+      // shallowly, not including nested targets
+    }
+  }
+
+  render() {
+    const { isOver, isOverCurrent, connectDropTarget } = this.props;
+    const opacity = !this.state.hover ? "0" : "1";
+    return (
+      connectDropTarget &&
+      connectDropTarget(
+        <div
+          style={{ width: "100px", height: "100px", backgroundColor: "grey" }}
+        />
+      )
+    );
+  }
+}
+
+export default DropTarget(
+  ItemTypes.CARD,
+  builderTarget,
+  (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    isOverCurrent: monitor.isOver({ shallow: true }),
+    didDrop: monitor.didDrop()
+  })
+)(Box);
