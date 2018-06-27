@@ -163,6 +163,9 @@ class Container extends Component {
           selected={this.props.selected}
           columnArray={this.props.content}
           columnListArray={this.props.columnListArray}
+          index={this.props.index}
+          callbackfromparent={this.props.callbackfromparent}
+          handleDrop={this.props.handleDrop}
         />
       );
     }
@@ -225,6 +228,7 @@ class Container extends Component {
       contentWidth
     } = this.props;
     const opacity = isDragging ? 0.2 : 1;
+    // console.log(this.props.index);
 
     return (
       connectDragPreview &&
@@ -257,6 +261,10 @@ class Container extends Component {
                   style={{ ...toolStyle }}
                 >
                   <button
+                    onClick={() => {
+                      console.log(index);
+                      callbackfromparent("delete", index, this);
+                    }}
                     style={{
                       ...buttonStyle,
                       borderTopLeftRadius: "100%",
@@ -265,7 +273,12 @@ class Container extends Component {
                   >
                     <i class="fas fa-trash-alt" />
                   </button>
-                  <button style={buttonStyle}>
+                  <button
+                    onClick={() => {
+                      callbackfromparent("duplicate", index, this);
+                    }}
+                    style={buttonStyle}
+                  >
                     <i class="far fa-copy" />
                   </button>
                   {connectDragSource(
@@ -459,9 +472,9 @@ class Video extends Component {
           width="560"
           height="315"
           src="https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1"
-          frameborder="0"
+          frameBorder="0"
           allow="autoplay; encrypted-media"
-          allowfullscreen
+          allowFullScreen
         />
       </div>
     );
@@ -532,11 +545,16 @@ class Column extends Component {
       display: "grid",
       gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
     };
-    // console.log(this.props.columnListArray);
     return (
       <div className="columnList" style={columnListStyle}>
         {this.props.columnListArray.map((columnList, index) => (
-          <ColumnItem key={index} columnList={columnList} />
+          <ColumnItem
+            key={index}
+            cards={columnList}
+            index={this.props.index.slice(0, 1).concat(index)}
+            callbackfromparent={this.props.callbackfromparent}
+            handleDrop={this.props.handleDrop}
+          />
         ))}
       </div>
     );

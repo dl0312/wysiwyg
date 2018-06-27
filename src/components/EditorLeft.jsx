@@ -3,15 +3,9 @@ import React, { Component, Fragment } from "react";
 import styles from "./EditorLeft.scss";
 import "./EditorLeft.css";
 import Card from "./Card";
-import Box from "./Box";
 import ItemTypes from "./ItemTypes";
-import Builder from "./Builder";
+import Builder from "./MasterBuilder";
 import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
-import flow from "lodash.flow";
-import _ from "lodash";
-import { Motion, spring } from "react-motion";
-import Container from "./Container";
-import deepcopy from "deepcopy";
 
 const update = require("immutability-helper");
 const boxTarget = {

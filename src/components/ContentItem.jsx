@@ -17,6 +17,80 @@ const itemSource = {
       OnDrag: "content",
       content: props.item.name
     };
+    switch (props.item.name) {
+      case "BUTTON":
+        item.value = Value.fromJSON({
+          document: {
+            nodes: [
+              {
+                object: "block",
+                type: "paragraph",
+                nodes: [
+                  {
+                    object: "text",
+                    leaves: [
+                      {
+                        text: "CLICK ME!"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+        break;
+      case "TEXT":
+        item.value = Value.fromJSON({
+          document: {
+            nodes: [
+              {
+                object: "block",
+                type: "paragraph",
+                nodes: [
+                  {
+                    object: "text",
+                    leaves: [
+                      {
+                        text: "A line of text in a paragraph."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+        break;
+      case "HTML":
+        item.value = Value.fromJSON({
+          document: {
+            nodes: [
+              {
+                object: "block",
+                marks: {
+                  b: "bold"
+                },
+                type: "paragraph",
+                nodes: [
+                  {
+                    object: "text",
+                    leaves: [
+                      {
+                        text: "Hello, world!"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+        break;
+      default:
+        break;
+    }
+
     return item;
   },
   endDrag(props, monitor, component) {

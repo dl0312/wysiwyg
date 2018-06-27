@@ -6,7 +6,7 @@ import { findDOMNode } from "react-dom";
 import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
 
 const barStyle = {
-  width: "500px",
+  width: "120px",
   outline: "darkblue solid 1px"
 };
 
@@ -62,7 +62,7 @@ const builderTarget = {
   }
 };
 
-class Builder extends Component {
+class BlockBuilder extends Component {
   static propTypes = {
     connectDropTarget: PropTypes.func.isRequired,
     isOver: PropTypes.bool.isRequired,
@@ -102,7 +102,7 @@ class Builder extends Component {
 
   render() {
     const { isOver, isOverCurrent, connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "0" : "1";
+    const opacity = !this.state.hover ? "1" : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
@@ -143,7 +143,7 @@ class Builder extends Component {
 }
 
 export default DropTarget(
-  [ItemTypes.CARD, ItemTypes.CONTENT, ItemTypes.ROW],
+  ItemTypes.CONTENT,
   builderTarget,
   (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),
@@ -151,4 +151,4 @@ export default DropTarget(
     isOverCurrent: monitor.isOver({ shallow: true }),
     didDrop: monitor.didDrop()
   })
-)(Builder);
+)(BlockBuilder);

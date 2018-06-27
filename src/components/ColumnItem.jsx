@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import Builder from "./BlockBuilder";
+import Card from "./Card";
+import Container from "./Container";
 
 import styles from "./ColumnItem.scss";
 
@@ -28,15 +31,6 @@ const boxTarget = {
       hasDroppedOnChild
     });
     component.handleDrop(monitor.getItem());
-
-    // const hasDroppedOnChild = monitor.didDrop();
-    // if (hasDroppedOnChild && !props.greedy) {
-    //   return;
-    // }
-    // component.setState({
-    //   hasDropped: true,
-    //   hasDroppedOnChild
-    // });
   }
 };
 
@@ -54,25 +48,9 @@ class ColumnItem extends Component {
     this.state = {
       hasDropped: false,
       hasDroppedOnChild: false,
-      contentHover: false,
-      cards: this.props.columnList
+      contentHover: false
     };
   }
-
-  handleDrop = orderItem => {
-    // var joined = this.state.cards.concat(orderItem);
-    // this.setState({ cards: joined });
-    if (!!orderItem) {
-      console.log(orderItem);
-      orderItem = { id: this.state.cards.length + 1, ...orderItem };
-      console.log([orderItem]);
-      this.setState({
-        cards: update(this.state.cards, { $push: [orderItem] })
-      });
-      console.log(this.state.cards);
-    }
-  };
-
   moveCard = (dragIndex, hoverIndex) => {
     const { cards } = this.state;
     const dragCard = cards[dragIndex];
@@ -93,9 +71,11 @@ class ColumnItem extends Component {
       isOver,
       isOverCurrent,
       connectDropTarget,
-      children
+      selectedCardsId,
+      children,
+      cards
     } = this.props;
-    const { cards, hasDropped, hasDroppedOnChild } = this.state;
+    const { hasDropped, hasDroppedOnChild } = this.state;
     let backgroundColor = cards.length === 0 ? "#f6e58d" : "white";
     if (isOverCurrent || (isOver && greedy)) {
       backgroundColor = "#b8e994";
@@ -120,35 +100,51 @@ class ColumnItem extends Component {
       color: "#5758BB"
     };
 
-    return (
-      connectDropTarget &&
-      connectDropTarget(
-        <div className="column" style={columnStyle}>
-          {cards.length !== 0 ? null : (
-            <div style={insertTextStyle}>
-              INSERT<br />CONTENT
-            </div>
-          )}
-          {cards.map((card, index) => (
-            <ColumnCard
-              inColumn={true}
-              cards={this.state.cards.length}
-              key={card.id}
-              index={index}
-              id={card.id}
-              OnDrag={card.OnDrag}
-              content={card.content}
+    const compArray = [];
+    console.log(cards);
+    cards.map((item, index) => {
+      switch (item.type) {
+        case "builder":
+          compArray.push(
+            <Builder
+              id={item.id}
+              index={this.props.index.concat(index)}
               moveCard={this.moveCard}
+              handleDrop={this.props.handleDrop}
             />
-          ))}
-        </div>
-      )
+          );
+          break;
+        case "content":
+          compArray.push(
+            <Container
+              value={item.value}
+              OnDrag={item.OnDrag}
+              content={item.content}
+              callbackfromparent={this.props.callbackfromparent}
+              index={this.props.index.concat(index)}
+              key={index}
+              onChange={({ value }) => {
+                this.handleOnChange({ value }, index);
+              }}
+            />
+          );
+          break;
+        default:
+          break;
+      }
+    });
+
+    return (
+      <div className="column" style={columnStyle}>
+        {compArray}
+        {cards.length !== 1 ? null : (
+          <div style={insertTextStyle}>
+            INSERT<br />CONTENT
+          </div>
+        )}
+      </div>
     );
   }
 }
 
-export default DropTarget(ItemTypes.CONTENT, boxTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true })
-}))(ColumnItem);
+export default ColumnItem;

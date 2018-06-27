@@ -1,6 +1,5 @@
-import React, { Component, Fragment } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { findDOMNode } from "react-dom";
 import {
   DragSource,
   ConnectDragSource,
@@ -9,11 +8,7 @@ import {
   ConnectDragPreview
 } from "react-dnd";
 import ItemTypes from "./ItemTypes";
-import Container from "./Container";
 import classnames from "classnames";
-
-const BUTTON_DEFAULT = -200;
-const BUTTON_CHANGED = -70;
 
 const style = {
   backgroundColor: "transparent",
@@ -164,11 +159,8 @@ class Card extends React.Component {
       isDragging,
       connectDragSource,
       connectDragPreview,
-      OnDrag,
-      content,
       index,
-      callbackfromparent,
-      contentWidth
+      callbackfromparent
     } = this.props;
     const opacity = isDragging ? 0.2 : 1;
     return (
