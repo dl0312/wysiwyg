@@ -12,7 +12,7 @@ const itemSource = {
     console.log("dragging");
     const columnListArray = [];
     component.props.array.map(element => {
-      columnListArray.push([]);
+      columnListArray.push([{ type: "builder" }]);
     });
     console.log(`columnListArray: ${columnListArray}`);
     return {

@@ -102,7 +102,7 @@ class Builder extends Component {
 
   render() {
     const { isOver, isOverCurrent, connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "1" : "1";
+    const opacity = !this.state.hover ? "0" : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
@@ -114,7 +114,7 @@ class Builder extends Component {
               alignItems: "center",
               justifyContent: "center",
               transition: "opacity 0.3s ease",
-              height: "30px",
+              height: "10px",
               opacity
             }}
           >
@@ -125,7 +125,7 @@ class Builder extends Component {
               )}
               style={{ ...builderStyle }}
             >
-              Drop Here {this.props.id}
+              Drop Here
             </div>
             <div style={{ ...barStyle }} />
           </div>

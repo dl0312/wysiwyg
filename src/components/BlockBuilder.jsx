@@ -25,7 +25,7 @@ const builderTarget = {
     console.log("drop");
     const hasDroppedOnChild = monitor.didDrop();
     const type = monitor.getItemType();
-    console.log(type);
+    console.log(monitor.getItem().index);
     if (type === ItemTypes.CARD) {
       props.moveCard(monitor.getItem().index, props.index);
     } else if (type === ItemTypes.CONTENT || type === ItemTypes.ROW) {
@@ -102,7 +102,7 @@ class BlockBuilder extends Component {
 
   render() {
     const { isOver, isOverCurrent, connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "1" : "1";
+    const opacity = !this.state.hover ? "0" : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
@@ -114,7 +114,7 @@ class BlockBuilder extends Component {
               alignItems: "center",
               justifyContent: "center",
               transition: "opacity 0.3s ease",
-              height: "30px",
+              height: "10px",
               opacity
             }}
           >
@@ -143,7 +143,7 @@ class BlockBuilder extends Component {
 }
 
 export default DropTarget(
-  ItemTypes.CONTENT,
+  [ItemTypes.CARD, ItemTypes.CONTENT],
   builderTarget,
   (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),

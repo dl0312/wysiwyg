@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-
 import styles from "./Editor.scss";
 import EditorLeft from "./EditorLeft";
 import EditorRight from "./EditorRight";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
-import Builder from "./MasterBuilder";
+import MasterBuilder from "./MasterBuilder";
+import BlockBuilder from "./BlockBuilder";
 import Card from "./Card";
 import Container from "./Container";
 import { Value } from "slate";
@@ -32,12 +32,11 @@ class Editor extends Component {
       hasDropped: false,
       hasDroppedOnChild: false,
       contentHover: false,
-      selectedCardsId: null,
-      hoveredCardId: null,
+      selectedIndex: null,
+      hoveredIndex: null,
       cards: [
-        { id: 1, type: "builder" },
+        { type: "builder" },
         {
-          id: 2,
           type: "content",
           OnDrag: "content",
           content: "BUTTON",
@@ -62,9 +61,8 @@ class Editor extends Component {
             }
           })
         },
-        { id: 3, type: "builder" },
+        { type: "builder" },
         {
-          id: 4,
           type: "content",
           OnDrag: "content",
           content: "TEXT",
@@ -89,25 +87,23 @@ class Editor extends Component {
             }
           })
         },
-        { id: 5, type: "builder" },
-        { id: 6, type: "content", OnDrag: "content", content: "IMAGE" },
-        { id: 7, type: "builder" },
+        { type: "builder" },
+        { type: "content", OnDrag: "content", content: "IMAGE" },
+        { type: "builder" },
         {
-          id: 8,
           type: "columnList",
           OnDrag: "columnList",
           content: [1, 1, 1],
           columnListArray: [
-            [{ id: 5, type: "builder" }],
-            [{ id: 5, type: "builder" }],
-            [{ id: 5, type: "builder" }]
+            [{ type: "builder" }],
+            [{ type: "builder" }],
+            [{ type: "builder" }]
           ]
         },
-        { id: 9, type: "builder" },
-        { id: 10, type: "content", OnDrag: "content", content: "VIDEO" },
-        { id: 11, type: "builder" },
+        { type: "builder" },
+        { type: "content", OnDrag: "content", content: "VIDEO" },
+        { type: "builder" },
         {
-          id: 12,
           type: "content",
           OnDrag: "content",
           content: "HTML",
@@ -135,38 +131,46 @@ class Editor extends Component {
             }
           })
         },
-        { id: 13, type: "builder" }
+        { type: "builder" }
       ],
       maxId: 13,
-      cardsExample: [{ id: 1, OnDrag: "content", content: "TEXT" }]
+      cardsExample: [{ OnDrag: "content", content: "TEXT" }]
     };
   }
 
-  buttonCallback = (type, dataFromChild, component) => {
-    console.log(`type: ${type}, data: ${dataFromChild}, comp: ${component}`);
-    if (type === "hover") {
-      if (this.state.selectedCardsId === dataFromChild) {
-        this.setState({ selectedCardsId: null });
-      } else {
-        this.setState({ selectedCardsId: dataFromChild });
+  buttonCallback = (type, dataFromChild) => {
+    const { cards, hoveredIndex, selectedIndex } = this.state;
+    console.log(`type: ${type}, data: ${dataFromChild}`);
+    if (type === "mouseover") {
+      this.setState({ hoveredIndex: dataFromChild });
+    } else if (type === "mouseleave") {
+      if (hoveredIndex === dataFromChild) {
+        this.setState({ hoveredIndex: null });
       }
     } else if (type === "select") {
-      if (this.state.selectedCardsId === dataFromChild) {
-        this.setState({ selectedCardsId: null });
+      if (selectedIndex !== null) {
+        if (
+          (!Array.isArray(selectedIndex) && selectedIndex === dataFromChild) ||
+          (Array.isArray(selectedIndex) &&
+            (selectedIndex.length === dataFromChild.length &&
+              selectedIndex.every((v, i) => v === dataFromChild[i])))
+        ) {
+          this.setState({ selectedIndex: null });
+        } else {
+          this.setState({ selectedIndex: dataFromChild });
+        }
       } else {
-        this.setState({ selectedCardsId: dataFromChild });
+        this.setState({ selectedIndex: dataFromChild });
       }
     } else if (type === "delete") {
       // block
       if (dataFromChild.length === 3) {
-        console.log(this.state.cards[dataFromChild[0]]);
-        console.log(this.state.cards[dataFromChild[0]].columnListArray);
-        console.log(
-          this.state.cards[dataFromChild[0]].columnListArray[dataFromChild[1]]
-        );
+        console.log(cards[dataFromChild[0]]);
+        console.log(cards[dataFromChild[0]].columnListArray);
+        console.log(cards[dataFromChild[0]].columnListArray[dataFromChild[1]]);
 
-        if (this.state.selectedCardsId === dataFromChild) {
-          this.setState({ selectedCardsId: null });
+        if (selectedIndex === dataFromChild) {
+          this.setState({ selectedIndex: null });
         }
         this.setState(
           update(this.state, {
@@ -183,8 +187,8 @@ class Editor extends Component {
         );
       } else {
         // frame
-        if (this.state.selectedCardsId === dataFromChild) {
-          this.setState({ selectedCardsId: null });
+        if (selectedIndex === dataFromChild) {
+          this.setState({ selectedIndex: null });
         }
         this.setState(
           update(this.state, {
@@ -195,21 +199,62 @@ class Editor extends Component {
         );
       }
     } else if (type === "duplicate") {
-      // const { cards } = this.state;
-      console.log(component);
-      const targetCard = this.state.cards[dataFromChild];
-      this.setState(
-        update(this.state, {
-          cards: {
-            $splice: [[dataFromChild, 0, targetCard]]
-          }
-        })
-      );
-
-      this.setState({ maxId: this.state.maxId + 1 });
+      if (!Array.isArray(dataFromChild)) {
+        const targetCard = cards[dataFromChild];
+        const masterBuilder = { type: "builder" };
+        console.log(masterBuilder);
+        this.setState(
+          update(this.state, {
+            cards: {
+              $splice: [
+                [dataFromChild, 0, masterBuilder],
+                [dataFromChild, 0, targetCard]
+              ]
+            }
+          })
+        );
+      } else {
+        if (dataFromChild.length === 2) {
+          const targetCard = cards[dataFromChild[0]];
+          const masterBuilder = { type: "builder" };
+          this.setState(
+            update(this.state, {
+              cards: {
+                $splice: [
+                  [dataFromChild[0], 0, masterBuilder],
+                  [dataFromChild[0], 0, targetCard]
+                ]
+              }
+            })
+          );
+        } else if (dataFromChild.length === 3) {
+          const targetCard =
+            cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
+              dataFromChild[2]
+            ];
+          const blockBuilder = { type: "builder" };
+          this.setState(
+            update(this.state, {
+              cards: {
+                [dataFromChild[0]]: {
+                  columnListArray: {
+                    [dataFromChild[1]]: {
+                      $splice: [
+                        [dataFromChild[2], 0, blockBuilder],
+                        [dataFromChild[2], 0, targetCard]
+                      ]
+                    }
+                  }
+                }
+              }
+            })
+          );
+        }
+      }
     }
   };
 
+  // 오른쪽 버튼 Drop Here에 놨을 때
   handleDrop = (hoverItem, hoverIndex) => {
     // on column
     if (hoverIndex.length === 3) {
@@ -222,8 +267,7 @@ class Editor extends Component {
       console.log(hoverItem);
 
       if (!!hoverItem) {
-        hoverItem = { id: this.state.maxId + 1, ...hoverItem };
-        const builder = { id: this.state.maxId + 2, type: "builder" };
+        const builder = { type: "builder" };
         this.setState(
           update(this.state, {
             cards: {
@@ -240,7 +284,6 @@ class Editor extends Component {
             }
           })
         );
-        this.setState({ maxId: this.state.maxId + 2 });
         console.log(this.state.cards);
       }
     } else {
@@ -248,8 +291,7 @@ class Editor extends Component {
       console.log(hoverItem);
       console.log(hoverIndex);
       if (!!hoverItem) {
-        hoverItem = { id: this.state.maxId + 1, ...hoverItem };
-        const builder = { id: this.state.maxId + 2, type: "builder" };
+        const builder = { type: "builder" };
         this.setState(
           update(this.state, {
             cards: {
@@ -257,49 +299,171 @@ class Editor extends Component {
             }
           })
         );
-        this.setState({ maxId: this.state.maxId + 2 });
         console.log(this.state.cards);
       }
     }
   };
 
-  // frame 움직이기
+  // frame과 block들간의 이동 4가지
+  // block on column -> block on column ([1,2,1] > [3,1,1])
+  // block on column -> frame ([1,2,1] > 5)
+  // block on frame -> block ([5,0] > [1,2,1])
+  // frame -> frame (5 > 7)
   moveCard = (dragIndex, hoverIndex) => {
-    // block => block
-
-    // block => frame
-
-    // frame => block
-
-    // frame => frame
-    const { cards } = this.state;
-    const dragCard = cards[dragIndex];
-    const dragBuilder = cards[dragIndex - 1];
-    console.log(dragCard);
-    if (dragIndex < hoverIndex) {
+    console.log(`${dragIndex}, ${hoverIndex}`);
+    if (dragIndex.length === 3 && hoverIndex.length === 3) {
+      // block => block
+      const { cards } = this.state;
+      const dragCard =
+        cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2]];
+      const dragBuilder =
+        cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2] - 1];
       this.setState(
         update(this.state, {
           cards: {
-            $splice: [
-              [dragIndex - 1, 2],
-              [hoverIndex - 2, 0, dragCard],
-              [hoverIndex - 2, 0, dragBuilder]
-            ]
+            [dragIndex[0]]: {
+              columnListArray: {
+                [dragIndex[1]]: {
+                  $splice: [[dragIndex[2] - 1, 2]]
+                }
+              }
+            }
           }
         })
       );
-    } else if (dragIndex > hoverIndex) {
+
       this.setState(
         update(this.state, {
           cards: {
-            $splice: [
-              [dragIndex - 1, 2],
-              [hoverIndex, 0, dragCard],
-              [hoverIndex, 0, dragBuilder]
-            ]
+            [hoverIndex[0]]: {
+              columnListArray: {
+                [hoverIndex[1]]: {
+                  $splice: [
+                    [hoverIndex[2], 0, dragCard],
+                    [hoverIndex[2], 0, dragBuilder]
+                  ]
+                }
+              }
+            }
           }
         })
       );
+    } else if (dragIndex.length === 3 && !Array.isArray(hoverIndex)) {
+      // block => frame
+
+      // copy
+      const { cards } = this.state;
+      const dragCard =
+        cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2]];
+      const dragBuilder = { type: "builder" };
+      // delete
+      this.setState(
+        update(this.state, {
+          cards: {
+            [dragIndex[0]]: {
+              columnListArray: {
+                [dragIndex[1]]: {
+                  $splice: [[dragIndex[2] - 1, 2]]
+                }
+              }
+            }
+          }
+        })
+      );
+
+      // drop
+      this.setState(
+        update(this.state, {
+          cards: {
+            $splice: [[hoverIndex, 0, dragCard], [hoverIndex, 0, dragBuilder]]
+          }
+        })
+      );
+    } else if (dragIndex.length === 2 && hoverIndex.length === 3) {
+      // frame => block
+
+      // copy
+      const { cards } = this.state;
+      const dragCard = cards[dragIndex[0]];
+      const dragBuilder = { type: "builder" };
+
+      // delete
+      this.setState(
+        update(this.state, {
+          cards: {
+            $splice: [[dragIndex[0] - 1, 2]]
+          }
+        })
+      );
+
+      console.log(cards[hoverIndex[0]].columnListArray[hoverIndex[1]]);
+      // drop
+      if (dragIndex[0] < hoverIndex[0]) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [hoverIndex[0] - 2]: {
+                columnListArray: {
+                  [hoverIndex[1]]: {
+                    $splice: [
+                      [hoverIndex[2], 0, dragCard],
+                      [hoverIndex[2], 0, dragBuilder]
+                    ]
+                  }
+                }
+              }
+            }
+          })
+        );
+      } else if (dragIndex[0] > hoverIndex[0]) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [hoverIndex[0]]: {
+                columnListArray: {
+                  [hoverIndex[1]]: {
+                    $splice: [
+                      [hoverIndex[2], 0, dragCard],
+                      [hoverIndex[2], 0, dragBuilder]
+                    ]
+                  }
+                }
+              }
+            }
+          })
+        );
+      }
+    } else if (!dragIndex.isArray && !Array.isArray(hoverIndex)) {
+      // frame => frame
+      const { cards } = this.state;
+      const dragCard = cards[dragIndex];
+      const dragBuilder = { type: "builder" };
+      console.log(dragCard);
+      if (dragIndex < hoverIndex) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              $splice: [
+                [dragIndex - 1, 2],
+                [hoverIndex - 2, 0, dragCard],
+                [hoverIndex - 2, 0, dragBuilder]
+              ]
+            }
+          })
+        );
+      } else if (dragIndex > hoverIndex) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              $splice: [
+                [dragIndex - 1, 2],
+                [hoverIndex, 0, dragCard],
+                [hoverIndex, 0, dragBuilder]
+              ]
+            }
+          })
+        );
+      }
     }
   };
 
@@ -324,20 +488,33 @@ class Editor extends Component {
   handleOnChange = ({ value }, index) => {
     console.log({ value });
     console.log(index);
-    this.setState(
-      update(this.state, { cards: { [index]: { value: { $set: value } } } })
-    );
+    if (index.length === 2) {
+      this.setState(
+        update(this.state, {
+          cards: { [index[0]]: { value: { $set: value } } }
+        })
+      );
+    } else if (index.length === 3) {
+      this.setState(
+        update(this.state, {
+          cards: {
+            [index[0]]: {
+              columnListArray: {
+                [index[1]]: {
+                  [index[2]]: {
+                    value: { $set: value }
+                  }
+                }
+              }
+            }
+          }
+        })
+      );
+    }
   };
 
   render() {
-    const {
-      cards,
-      hasDropped,
-      hasDroppedOnChild,
-      selectedCardsId,
-      hoveredCardId,
-      contentWidth
-    } = this.state;
+    const { cards, selectedIndex, hoveredIndex, contentWidth } = this.state;
 
     const compArray = [];
     cards.map((item, index) => {
@@ -345,8 +522,7 @@ class Editor extends Component {
       switch (item.type) {
         case "builder":
           compArray.push(
-            <Builder
-              id={item.id}
+            <MasterBuilder
               index={index}
               moveCard={this.moveCard}
               handleDrop={this.handleDrop}
@@ -360,11 +536,10 @@ class Editor extends Component {
               cards={this.state.cards.length}
               key={index}
               index={index}
-              id={item.id}
               moveCard={this.moveCard}
               callbackfromparent={this.buttonCallback}
-              selected={selectedCardsId}
-              hovered={hoveredCardId}
+              selectedIndex={selectedIndex}
+              hoveredIndex={hoveredIndex}
             >
               <Container
                 value={item.value}
@@ -373,9 +548,11 @@ class Editor extends Component {
                 columnListArray={item.columnListArray}
                 callbackfromparent={this.buttonCallback}
                 contentWidth={contentWidth}
-                index={[index, 0, 0]}
+                selectedIndex={selectedIndex}
+                hoveredIndex={hoveredIndex}
+                index={[index, 0]}
                 onChange={({ value }) => {
-                  this.handleOnChange({ value }, index);
+                  this.handleOnChange({ value }, [index, 0]);
                 }}
               />
             </Card>
@@ -386,13 +563,12 @@ class Editor extends Component {
             <Card
               inColumn={false}
               cards={this.state.cards.length}
-              key={item.id}
+              key={index}
               index={index}
-              id={item.id}
               moveCard={this.moveCard}
               callbackfromparent={this.buttonCallback}
-              selected={selectedCardsId}
-              hovered={hoveredCardId}
+              selectedIndex={selectedIndex}
+              hoveredIndex={hoveredIndex}
             >
               <Container
                 onChange={this.onChange}
@@ -402,8 +578,11 @@ class Editor extends Component {
                 callbackfromparent={this.buttonCallback}
                 columnListArray={item.columnListArray}
                 contentWidth={contentWidth}
-                selected={item.id === selectedCardsId}
+                selectedIndex={selectedIndex}
+                hoveredIndex={hoveredIndex}
                 handleDrop={this.handleDrop}
+                moveCard={this.moveCard}
+                handleOnChange={this.handleOnChange}
               />
             </Card>
           );

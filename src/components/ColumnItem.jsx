@@ -44,25 +44,12 @@ class ColumnItem extends Component {
   };
   constructor(props) {
     super(props);
-    this.moveCard = this.moveCard.bind(this);
     this.state = {
       hasDropped: false,
       hasDroppedOnChild: false,
       contentHover: false
     };
   }
-  moveCard = (dragIndex, hoverIndex) => {
-    const { cards } = this.state;
-    const dragCard = cards[dragIndex];
-
-    this.setState(
-      update(this.state, {
-        cards: {
-          $splice: [[dragIndex, 1], [hoverIndex, 0, dragCard]]
-        }
-      })
-    );
-  };
 
   render() {
     // 기본상태의 에디터화면 id=container, id=body
@@ -101,7 +88,6 @@ class ColumnItem extends Component {
     };
 
     const compArray = [];
-    console.log(cards);
     cards.map((item, index) => {
       switch (item.type) {
         case "builder":
@@ -109,7 +95,7 @@ class ColumnItem extends Component {
             <Builder
               id={item.id}
               index={this.props.index.concat(index)}
-              moveCard={this.moveCard}
+              moveCard={this.props.moveCard}
               handleDrop={this.props.handleDrop}
             />
           );
@@ -121,10 +107,15 @@ class ColumnItem extends Component {
               OnDrag={item.OnDrag}
               content={item.content}
               callbackfromparent={this.props.callbackfromparent}
+              selectedIndex={this.props.selectedIndex}
+              hoveredIndex={this.props.hoveredIndex}
               index={this.props.index.concat(index)}
               key={index}
               onChange={({ value }) => {
-                this.handleOnChange({ value }, index);
+                this.props.handleOnChange(
+                  { value },
+                  this.props.index.concat(index)
+                );
               }}
             />
           );

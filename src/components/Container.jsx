@@ -23,8 +23,8 @@ const handleStyle = {
   backgroundColor: "#9c88ff",
   width: "2rem",
   height: "2rem",
-  borderTopLeftRadius: "100%",
-  borderBottomLeftRadius: "100%",
+  borderTopRightRadius: "100%",
+  borderBottomRightRadius: "100%",
   marginRight: "0.75rem",
   cursor: "pointer",
   display: "flex",
@@ -32,8 +32,9 @@ const handleStyle = {
   justifyContent: "center",
   color: "white",
   position: "absolute",
+  zIndex: "100",
   top: "50%",
-  transform: "translate(12px,-16px)",
+  transform: "translate(44px,-16px)",
   marginLeft: "-2px",
   right: "0px"
 };
@@ -54,6 +55,7 @@ const buttonStyle = {
 
 const toolStyle = {
   display: "flex",
+  zIndex: "100",
   position: "absolute",
   marginRight: "0.75rem",
   cursor: "-webkit-grab",
@@ -61,20 +63,18 @@ const toolStyle = {
   justifyContent: "center",
   color: "white",
   top: "50%",
-  transform: "translate(12px,-16px)",
+  transform: "translate(108px,-16px)",
   marginLeft: "-2px",
   right: "0px"
 };
 
 const cardSource = {
   beginDrag(props, monitor, component) {
-    return {
-      component
-    };
+    return { index: props.index };
   },
   endDrag(props, monitor, component) {
-    console.log(component);
-    return { component };
+    console.log(props.index);
+    return { index: props.index };
   }
   // canDrag(props, monitor) {},
   // isDragging(props, monitor) {}
@@ -166,6 +166,10 @@ class Container extends Component {
           index={this.props.index}
           callbackfromparent={this.props.callbackfromparent}
           handleDrop={this.props.handleDrop}
+          moveCard={this.props.moveCard}
+          handleOnChange={this.props.handleOnChange}
+          selectedIndex={this.props.selectedIndex}
+          hoveredIndex={this.props.hoveredIndex}
         />
       );
     }
@@ -173,9 +177,10 @@ class Container extends Component {
 
   handleOnMouseOver = event => {
     event.stopPropagation();
-    this.setState({
-      hover: true
-    });
+    this.props.callbackfromparent("mouseover", this.props.index);
+    // this.setState({
+    //   hover: true
+    // });
     // console.log(`card in hover true`);
   };
 
@@ -198,20 +203,22 @@ class Container extends Component {
 
   handleOnMouseDown = event => {
     event.stopPropagation();
-    if (this.state.hover === true) {
-      this.setState({ hover: false });
-    }
-    this.state.active
-      ? this.setState({
-          active: false,
-          hover: true
-        })
-      : this.setState({ active: true });
+    this.props.callbackfromparent("select", this.props.index);
+    // if (this.state.hover === true) {
+    //   this.setState({ hover: false });
+    // }
+    // this.state.active
+    //   ? this.setState({
+    //       active: false,
+    //       hover: true
+    //     })
+    //   : this.setState({ active: true });
   };
 
   handleOnMouseLeave = event => {
     event.stopPropagation();
-    this.setState({ hover: false, toolHover: false });
+    this.props.callbackfromparent("mouseleave", this.props.index);
+    // this.setState({ hover: false, toolHover: false });
   };
 
   render() {
@@ -225,11 +232,26 @@ class Container extends Component {
       id,
       index,
       callbackfromparent,
-      contentWidth
+      contentWidth,
+      hoveredIndex,
+      selectedIndex
     } = this.props;
     const opacity = isDragging ? 0.2 : 1;
+    const hover = hoveredIndex
+      ? hoveredIndex.length === index.length &&
+        hoveredIndex.every((v, i) => v === index[i])
+        ? true
+        : false
+      : false;
+    const active = selectedIndex
+      ? selectedIndex.length === index.length &&
+        selectedIndex.every((v, i) => v === index[i])
+        ? true
+        : false
+      : false;
     // console.log(this.props.index);
-
+    // console.log(hoveredIndex);
+    // console.log(index);
     return (
       connectDragPreview &&
       connectDragSource &&
@@ -237,8 +259,8 @@ class Container extends Component {
         <div
           className={classnames(
             "container",
-            this.state.hover ? "hover" : null,
-            this.state.active ? "active" : null
+            hover ? "hover" : null,
+            active ? "active" : null
           )}
           style={{
             display: "flex",
@@ -246,14 +268,16 @@ class Container extends Component {
             justifyContent: "center",
             position: "relative",
             padding: "10px",
-            width: `${this.props.contentWidth}px`,
+            width: this.props.contentWidth
+              ? `${this.props.contentWidth}px`
+              : "100%",
             opacity
           }}
           onMouseOver={this.handleOnMouseOver}
           onMouseDown={this.handleOnMouseDown}
           onMouseLeave={this.handleOnMouseLeave}
         >
-          {this.state.hover || this.state.active ? (
+          {hover || active ? (
             <div>
               {this.state.toolHover ? (
                 <div
@@ -266,9 +290,7 @@ class Container extends Component {
                       callbackfromparent("delete", index, this);
                     }}
                     style={{
-                      ...buttonStyle,
-                      borderTopLeftRadius: "100%",
-                      borderBottomLeftRadius: "100%"
+                      ...buttonStyle
                     }}
                   >
                     <i class="fas fa-trash-alt" />
@@ -282,7 +304,13 @@ class Container extends Component {
                     <i class="far fa-copy" />
                   </button>
                   {connectDragSource(
-                    <button style={buttonStyle}>
+                    <button
+                      style={{
+                        ...buttonStyle,
+                        borderTopRightRadius: "100%",
+                        borderBottomRightRadius: "100%"
+                      }}
+                    >
                       <i class="fas fa-arrows-alt" />
                     </button>
                   )}
@@ -462,6 +490,9 @@ class Video extends Component {
       <div
         className="content"
         style={{
+          paddingBottom: "56.25%",
+          paddingTop: "25px",
+          height: "0",
           borderTop: "0 solid transparent",
           borderRight: "0 solid transparent",
           borderLeft: "0 solid transparent",
@@ -469,8 +500,14 @@ class Video extends Component {
         }}
       >
         <iframe
-          width="560"
-          height="315"
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%"
+          }}
+          width="500px"
           src="https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1"
           frameBorder="0"
           allow="autoplay; encrypted-media"
@@ -543,6 +580,7 @@ class Column extends Component {
     const columnListStyle = {
       width: "100%",
       display: "grid",
+      gridGap: "10px",
       gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
     };
     return (
@@ -554,6 +592,10 @@ class Column extends Component {
             index={this.props.index.slice(0, 1).concat(index)}
             callbackfromparent={this.props.callbackfromparent}
             handleDrop={this.props.handleDrop}
+            moveCard={this.props.moveCard}
+            handleOnChange={this.props.handleOnChange}
+            selectedIndex={this.props.selectedIndex}
+            hoveredIndex={this.props.hoveredIndex}
           />
         ))}
       </div>

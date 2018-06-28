@@ -112,10 +112,7 @@ class Card extends React.Component {
   handleOnMouseOver = event => {
     event.stopPropagation();
     // console.log(event.target);
-
-    this.setState({
-      hover: true
-    });
+    this.props.callbackfromparent("mouseover", this.props.index);
     // console.log(`card in hover true`);
   };
 
@@ -137,20 +134,23 @@ class Card extends React.Component {
 
   handleOnMouseDown = event => {
     event.stopPropagation();
-    if (this.state.hover === true) {
-      this.setState({ hover: false });
-    }
-    this.state.active
-      ? this.setState({
-          active: false,
-          hover: true
-        })
-      : this.setState({ active: true });
+    this.props.callbackfromparent("select", this.props.index);
+
+    // if (this.state.hover === true) {
+    //   this.setState({ hover: false });
+    // }
+    // this.state.active
+    //   ? this.setState({
+    //       active: false,
+    //       hover: true
+    //     })
+    //   : this.setState({ active: true });
   };
 
   handleOnMouseLeave = event => {
     event.stopPropagation();
-    this.setState({ hover: false, toolHover: false });
+    this.props.callbackfromparent("mouseleave", this.props.index);
+    // this.setState({ hover: false, toolHover: false });
     // console.log(`card out hover false`);
   };
 
@@ -160,9 +160,16 @@ class Card extends React.Component {
       connectDragSource,
       connectDragPreview,
       index,
-      callbackfromparent
+      callbackfromparent,
+      selectedIndex,
+      hoveredIndex
     } = this.props;
     const opacity = isDragging ? 0.2 : 1;
+    const hover = hoveredIndex === index;
+    const active = selectedIndex === index;
+    // console.log(hoveredIndex);
+    // console.log(index);
+
     return (
       connectDragPreview &&
       connectDragSource &&
@@ -171,14 +178,14 @@ class Card extends React.Component {
           style={{ ...style, opacity }}
           className={classnames(
             "frame",
-            this.state.hover ? "hover" : null,
-            this.state.active ? "active" : null
+            hover ? "hover" : null,
+            active ? "active" : null
           )}
           onMouseOver={this.handleOnMouseOver}
           onMouseDown={this.handleOnMouseDown}
           onMouseLeave={this.handleOnMouseLeave}
         >
-          {this.state.hover || this.state.active ? (
+          {hover || active ? (
             <div>
               {this.state.toolHover ? (
                 <div
