@@ -2,28 +2,6 @@ import React, { Component, Fragment } from "react";
 
 import styles from "./EditorLeft.scss";
 import "./EditorLeft.css";
-import Card from "./Card";
-import ItemTypes from "./ItemTypes";
-import Builder from "./MasterBuilder";
-import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
-
-const update = require("immutability-helper");
-const boxTarget = {
-  drop(props, monitor, component) {
-    console.log("drop");
-    // component.setState({ contentHover: !component.state.contentHover });
-    const hasDroppedOnChild = monitor.didDrop();
-    if (hasDroppedOnChild && !props.greedy) {
-      return;
-    }
-
-    component.setState({
-      hasDropped: true,
-      hasDroppedOnChild
-    });
-    component.handleDrop(monitor.getItem());
-  }
-};
 
 class EditorLeft extends Component {
   constructor(props) {
@@ -32,13 +10,7 @@ class EditorLeft extends Component {
   }
   render() {
     // 기본상태의 에디터화면 id=container
-    const {
-      greedy,
-      isOver,
-      isOverCurrent,
-      connectDropTarget,
-      children
-    } = this.props;
+    const { greedy, isOver, isOverCurrent } = this.props;
     let backgroundColor = `rgba(${this.props.color.r}, ${this.props.color.g}, ${
       this.props.color.b
     }, ${this.props.color.a})`;
@@ -46,22 +18,15 @@ class EditorLeft extends Component {
       backgroundColor = "#b8e994";
     }
     return (
-      connectDropTarget &&
-      connectDropTarget(
-        <div
-          style={{ backgroundColor, fontFamily: `${this.props.font}` }}
-          className={styles.editor}
-          id="container"
-        >
-          {this.props.children}
-        </div>
-      )
+      <div
+        style={{ backgroundColor, fontFamily: `${this.props.font}` }}
+        className={styles.editor}
+        id="container"
+      >
+        {this.props.children}
+      </div>
     );
   }
 }
 
-export default DropTarget("hello", boxTarget, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  isOverCurrent: monitor.isOver({ shallow: true })
-}))(EditorLeft);
+export default EditorLeft;

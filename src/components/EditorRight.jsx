@@ -159,9 +159,11 @@ class EditorRight extends Component {
             </li>
           </ul>
           {this.showSection()}
-          {this.props.selectedContent ? (
-            <Blockoption selectedContent={this.props.selectedContent} />
-          ) : null}
+          <Blockoption
+            handleOnChange={this.props.handleOnChange}
+            selectedIndex={this.props.selectedIndex}
+            selectedContent={this.props.selectedContent}
+          />
         </div>
       </Fragment>
     );
@@ -293,16 +295,14 @@ class Body extends Component {
                 <div className={styles.index}>
                   <button
                     onClick={() => {
-                      {
-                        this.state.contentWidth > 400
-                          ? this.setState(
-                              {
-                                contentWidth: this.state.contentWidth - 50
-                              },
-                              () => this.handleOnChange()
-                            )
-                          : null;
-                      }
+                      this.state.contentWidth > 400
+                        ? this.setState(
+                            {
+                              contentWidth: this.state.contentWidth - 50
+                            },
+                            () => this.handleOnChange()
+                          )
+                        : null;
                     }}
                     className={styles.minusBtn}
                   >
@@ -316,7 +316,7 @@ class Body extends Component {
                   <button
                     onClick={() => {
                       {
-                        this.state.contentWidth < 1100
+                        this.state.contentWidth < 900
                           ? this.setState(
                               {
                                 contentWidth: this.state.contentWidth + 50
@@ -459,118 +459,252 @@ class SketchExample extends Component {
 
 class Blockoption extends Component {
   showOptions = () => {
-    switch (this.props.selectedContent) {
-      case "BUTTON":
-        return (
-          <div className={styles.optionRows}>
-            <div className={styles.option}>
-              <div className={styles.optionHeader}>
-                <div className={styles.optionTitle}>LINK</div>
-                <button className={styles.btn}>
-                  <i class="fas fa-angle-up" />
-                </button>
-              </div>
-              <div className={styles.featureColumn}>
-                <div className={styles.btnLinkColumn}>
-                  <div className={styles.title}>Button Link</div>
-                  <div className={styles.case}>Same Tag</div>
+    console.log(this.props.selectedContent.content);
+    if (
+      this.props.selectedIndex.length === 2 ||
+      this.props.selectedIndex.length === 3
+    ) {
+      switch (this.props.selectedContent.content) {
+        case "BUTTON":
+          return (
+            <div className={styles.optionRows}>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>LINK</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
                 </div>
-                <div className={styles.urlColumn}>
-                  <button className={styles.btn}>URL</button>
-                  <input className={styles.input} type="text" />
+                <div className={styles.featureColumn}>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Button Link</div>
+                    <div className={styles.case}>Same Tag</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <button className={styles.btn}>URL</button>
+                    <input className={styles.input} type="text" />
+                  </div>
+                </div>
+              </div>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>COLORS</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.colorsColumn}>
+                    <div className={styles.item}>
+                      <div className={styles.title}>Text Color</div>
+                      <div className={styles.color}>ㅁ</div>
+                    </div>
+                    <div className={styles.item}>
+                      <div className={styles.title}>Background Color</div>
+                      <div className={styles.color}>ㅁ</div>
+                    </div>
+                    <div className={styles.item}>
+                      <div className={styles.title}>Hover Color</div>
+                      <div className={styles.color}>ㅁ</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>SPACING</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.alignmentsColumn}>
+                    <div className={styles.title}>Alignments</div>
+                    <div className={styles.alignColumn}>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-left" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-center" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-right" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.lineHeightColumn}>
+                    <div className={styles.title}>Line Height</div>
+                    <div className={styles.alignColumn}>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-left" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-center" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-right" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>GENERAL</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Button Link</div>
+                    <div className={styles.case}>Same Tag</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <button className={styles.btn}>URL</button>
+                    <input type="text" />
+                  </div>
                 </div>
               </div>
             </div>
-            <div className={styles.option}>
-              <div className={styles.optionHeader}>
-                <div className={styles.optionTitle}>COLORS</div>
-                <button className={styles.btn}>
-                  <i class="fas fa-angle-up" />
-                </button>
+          );
+        case "IMAGE":
+          return (
+            <div className={styles.optionRows}>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>IMAGE LINK</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Link</div>
+                    <div className={styles.case}>Same Tag</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <button className={styles.btn}>URL</button>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={this.props.selectedContent.imageSrc}
+                      onChange={e =>
+                        this.props.handleOnChange(
+                          e.target,
+                          this.props.selectedIndex,
+                          "IMAGE"
+                        )
+                      }
+                    />
+                  </div>
+                </div>
               </div>
-              <div className={styles.featureColumn}>
-                <div className={styles.colorsColumn}>
-                  <div className={styles.item}>
-                    <div className={styles.title}>Text Color</div>
-                    <div className={styles.color}>ㅁ</div>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>COLORS</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.colorsColumn}>
+                    <div className={styles.item}>
+                      <div className={styles.title}>Text Color</div>
+                      <div className={styles.color}>ㅁ</div>
+                    </div>
+                    <div className={styles.item}>
+                      <div className={styles.title}>Background Color</div>
+                      <div className={styles.color}>ㅁ</div>
+                    </div>
+                    <div className={styles.item}>
+                      <div className={styles.title}>Hover Color</div>
+                      <div className={styles.color}>ㅁ</div>
+                    </div>
                   </div>
-                  <div className={styles.item}>
-                    <div className={styles.title}>Background Color</div>
-                    <div className={styles.color}>ㅁ</div>
+                </div>
+              </div>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>SPACING</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.alignmentsColumn}>
+                    <div className={styles.title}>Alignments</div>
+                    <div className={styles.alignColumn}>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-left" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-center" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-right" />
+                      </button>
+                    </div>
                   </div>
-                  <div className={styles.item}>
-                    <div className={styles.title}>Hover Color</div>
-                    <div className={styles.color}>ㅁ</div>
+                  <div className={styles.lineHeightColumn}>
+                    <div className={styles.title}>Line Height</div>
+                    <div className={styles.alignColumn}>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-left" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-center" />
+                      </button>
+                      <button className={styles.align}>
+                        <i class="fas fa-align-right" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>GENERAL</div>
+                  <button className={styles.btn}>
+                    <i class="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Button Link</div>
+                    <div className={styles.case}>Same Tag</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <button className={styles.btn}>URL</button>
+                    <input type="text" />
                   </div>
                 </div>
               </div>
             </div>
-            <div className={styles.option}>
-              <div className={styles.optionHeader}>
-                <div className={styles.optionTitle}>SPACING</div>
-                <button className={styles.btn}>
-                  <i class="fas fa-angle-up" />
-                </button>
-              </div>
-              <div className={styles.featureColumn}>
-                <div className={styles.alignmentsColumn}>
-                  <div className={styles.title}>Alignments</div>
-                  <div className={styles.alignColumn}>
-                    <button className={styles.align}>
-                      <i class="fas fa-align-left" />
-                    </button>
-                    <button className={styles.align}>
-                      <i class="fas fa-align-center" />
-                    </button>
-                    <button className={styles.align}>
-                      <i class="fas fa-align-right" />
-                    </button>
-                  </div>
-                </div>
-                <div className={styles.lineHeightColumn}>
-                  <div className={styles.title}>Line Height</div>
-                  <div className={styles.alignColumn}>
-                    <button className={styles.align}>
-                      <i class="fas fa-align-left" />
-                    </button>
-                    <button className={styles.align}>
-                      <i class="fas fa-align-center" />
-                    </button>
-                    <button className={styles.align}>
-                      <i class="fas fa-align-right" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={styles.option}>
-              <div className={styles.optionHeader}>
-                <div className={styles.optionTitle}>GENERAL</div>
-                <button className={styles.btn}>
-                  <i class="fas fa-angle-up" />
-                </button>
-              </div>
-              <div className={styles.featureColumn}>
-                <div className={styles.btnLinkColumn}>
-                  <div className={styles.title}>Button Link</div>
-                  <div className={styles.case}>Same Tag</div>
-                </div>
-                <div className={styles.urlColumn}>
-                  <button className={styles.btn}>URL</button>
-                  <input type="text" />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      default:
-        return null;
+          );
+        default:
+          return null;
+      }
     }
   };
 
   render() {
     return (
-      <div className={styles.blockOption}>
+      <div
+        style={{
+          top:
+            this.props.selectedContent === null ||
+            this.props.selectedContent === undefined
+              ? "200px"
+              : "45px",
+          opacity:
+            this.props.selectedContent === null ||
+            this.props.selectedContent === undefined
+              ? "0"
+              : "1"
+        }}
+        className={styles.blockOption}
+      >
         <div className={styles.header}>
           <div className={styles.blockName}>CONTENT</div>
           <div className={styles.btnColumn}>
@@ -585,7 +719,7 @@ class Blockoption extends Component {
             </button>
           </div>
         </div>
-        {this.showOptions()}
+        {this.props.selectedContent ? this.showOptions() : null}
       </div>
     );
   }

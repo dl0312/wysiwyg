@@ -2,13 +2,14 @@
   position: fixed;
   top: 0;
   width: 100%;
+  z-index: 200;
   .header {
-    height: 50px;
+    height: 5.2vh;
     padding: 0 10px;
     display: flex;
     justify-content: space-between;
     color: black;
-    background-color: transparent;
+    background-color: #fafafa;
     transition: background-color 0.1s ease;
     border-bottom: 0.1px solid darkgrey;
     .left-section {

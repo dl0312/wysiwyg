@@ -86,8 +86,7 @@ class Container extends Component {
     connectDragPreview: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     isDragging: PropTypes.bool,
-    id: PropTypes.any.isRequired,
-    selected: PropTypes.bool.isRequired
+    id: PropTypes.any.isRequired
   };
 
   constructor(props) {
@@ -95,72 +94,52 @@ class Container extends Component {
     this.state = {
       hover: false,
       active: false,
-      toolHover: false,
-      value: Value.fromJSON({
-        document: {
-          nodes: [
-            {
-              object: "block",
-              type: "paragraph",
-              nodes: [
-                {
-                  object: "text",
-                  leaves: [
-                    {
-                      text: "CLICK ME!"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      })
+      toolHover: false
     };
   }
 
-  showInner = () => {
+  showInner = selected => {
     if (this.props.OnDrag === "content") {
       switch (this.props.content) {
         case "BUTTON":
           return (
             <Button
               value={this.props.value}
-              selected={this.props.selected}
+              selected={selected}
               onChange={this.props.onChange}
             />
           );
         case "DIVIDER":
-          return <Divider selected={this.props.selected} />;
+          return <Divider selected={selected} />;
         case "HTML":
           return (
             <Html
               value={this.props.value}
-              selected={this.props.selected}
+              selected={selected}
               onChange={this.props.onChange}
             />
           );
         case "IMAGE":
-          return <Image selected={this.props.selected} />;
+          return <Image selected={selected} src={this.props.imageSrc} />;
         case "TEXT":
           return (
             <Text
               value={this.props.value}
-              selected={this.props.selected}
+              selected={selected}
               onChange={this.props.onChange}
             />
           );
         case "VIDEO":
-          return <Video selected={this.props.selected} />;
+          return <Video selected={selected} src={this.props.videoSrc} />;
         case "SOCIAL":
-          return <Social selected={this.props.selected} />;
+          return <Social selected={selected} />;
         default:
           break;
       }
     } else if (this.props.OnDrag === "columnList") {
       return (
         <Column
-          selected={this.props.selected}
+          selected={selected}
           columnArray={this.props.content}
           columnListArray={this.props.columnListArray}
           index={this.props.index}
@@ -204,21 +183,11 @@ class Container extends Component {
   handleOnMouseDown = event => {
     event.stopPropagation();
     this.props.callbackfromparent("select", this.props.index);
-    // if (this.state.hover === true) {
-    //   this.setState({ hover: false });
-    // }
-    // this.state.active
-    //   ? this.setState({
-    //       active: false,
-    //       hover: true
-    //     })
-    //   : this.setState({ active: true });
   };
 
   handleOnMouseLeave = event => {
     event.stopPropagation();
     this.props.callbackfromparent("mouseleave", this.props.index);
-    // this.setState({ hover: false, toolHover: false });
   };
 
   render() {
@@ -325,7 +294,7 @@ class Container extends Component {
               )}
             </div>
           ) : null}
-          {this.showInner()}
+          {this.showInner(active)}
         </div>
       )
     );
@@ -343,8 +312,8 @@ class Button extends Component {
     super(props);
     this.state = {};
   }
-
   render() {
+    console.log(this.props.selected);
     return (
       <div
         className="content"
@@ -366,7 +335,7 @@ class Button extends Component {
       >
         <Editor
           value={this.props.value}
-          readOnly={false}
+          readOnly={this.props.selected ? false : true}
           onChange={this.props.onChange}
         />
       </div>
@@ -438,10 +407,7 @@ class Image extends Component {
           borderBottom: "0 solid transparent"
         }}
       >
-        <img
-          src="https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
-          alt="logo"
-        />
+        <img src={this.props.src} alt="logo" />
       </div>
     );
   }
@@ -508,7 +474,7 @@ class Video extends Component {
             height: "100%"
           }}
           width="500px"
-          src="https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1"
+          src={this.props.src}
           frameBorder="0"
           allow="autoplay; encrypted-media"
           allowFullScreen

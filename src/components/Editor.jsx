@@ -34,106 +34,127 @@ class Editor extends Component {
       contentHover: false,
       selectedIndex: null,
       hoveredIndex: null,
+      selectedContent: null,
       cards: [
+        // ex 1
+        // { type: "builder" },
+        // {
+        //   type: "content",
+        //   OnDrag: "content",
+        //   content: "BUTTON",
+        //   value: Value.fromJSON({
+        //     document: {
+        //       nodes: [
+        //         {
+        //           object: "block",
+        //           type: "paragraph",
+        //           nodes: [
+        //             {
+        //               object: "text",
+        //               leaves: [
+        //                 {
+        //                   text: "CLICK ME!"
+        //                 }
+        //               ]
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   })
+        // },
+        // { type: "builder" },
+        // {
+        //   type: "content",
+        //   OnDrag: "content",
+        //   content: "TEXT",
+        //   value: Value.fromJSON({
+        //     document: {
+        //       nodes: [
+        //         {
+        //           object: "block",
+        //           type: "paragraph",
+        //           nodes: [
+        //             {
+        //               object: "text",
+        //               leaves: [
+        //                 {
+        //                   text: "A line of text in a paragraph."
+        //                 }
+        //               ]
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   })
+        // },
+        // { type: "builder" },
+        // {
+        //   type: "content",
+        //   OnDrag: "content",
+        //   content: "IMAGE",
+        //   imageSrc: "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
+        // },
+        // { type: "builder" },
+        // {
+        //   type: "columnList",
+        //   OnDrag: "columnList",
+        //   content: [1, 1, 1],
+        //   columnListArray: [
+        //     [{ type: "builder" }],
+        //     [{ type: "builder" }],
+        //     [{ type: "builder" }]
+        //   ]
+        // },
+        // { type: "builder" },
+        // {
+        //   type: "content",
+        //   OnDrag: "content",
+        //   content: "VIDEO",
+        //   videoSrc: "https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1"
+        // },
+        // { type: "builder" },
+        // {
+        //   type: "content",
+        //   OnDrag: "content",
+        //   content: "HTML",
+        //   value: Value.fromJSON({
+        //     document: {
+        //       nodes: [
+        //         {
+        //           object: "block",
+        //           marks: {
+        //             b: "bold"
+        //           },
+        //           type: "paragraph",
+        //           nodes: [
+        //             {
+        //               object: "text",
+        //               leaves: [
+        //                 {
+        //                   text: "Hello, world!"
+        //                 }
+        //               ]
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   })
+        // },
+        // { type: "builder" }
+
+        // ex2
         { type: "builder" },
         {
           type: "content",
           OnDrag: "content",
-          content: "BUTTON",
-          value: Value.fromJSON({
-            document: {
-              nodes: [
-                {
-                  object: "block",
-                  type: "paragraph",
-                  nodes: [
-                    {
-                      object: "text",
-                      leaves: [
-                        {
-                          text: "CLICK ME!"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          })
-        },
-        { type: "builder" },
-        {
-          type: "content",
-          OnDrag: "content",
-          content: "TEXT",
-          value: Value.fromJSON({
-            document: {
-              nodes: [
-                {
-                  object: "block",
-                  type: "paragraph",
-                  nodes: [
-                    {
-                      object: "text",
-                      leaves: [
-                        {
-                          text: "A line of text in a paragraph."
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          })
-        },
-        { type: "builder" },
-        { type: "content", OnDrag: "content", content: "IMAGE" },
-        { type: "builder" },
-        {
-          type: "columnList",
-          OnDrag: "columnList",
-          content: [1, 1, 1],
-          columnListArray: [
-            [{ type: "builder" }],
-            [{ type: "builder" }],
-            [{ type: "builder" }]
-          ]
-        },
-        { type: "builder" },
-        { type: "content", OnDrag: "content", content: "VIDEO" },
-        { type: "builder" },
-        {
-          type: "content",
-          OnDrag: "content",
-          content: "HTML",
-          value: Value.fromJSON({
-            document: {
-              nodes: [
-                {
-                  object: "block",
-                  marks: {
-                    b: "bold"
-                  },
-                  type: "paragraph",
-                  nodes: [
-                    {
-                      object: "text",
-                      leaves: [
-                        {
-                          text: "Hello, world!"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          })
+          content: "IMAGE",
+          imageSrc: "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
         },
         { type: "builder" }
       ],
-      maxId: 13,
       cardsExample: [{ OnDrag: "content", content: "TEXT" }]
     };
   }
@@ -155,22 +176,33 @@ class Editor extends Component {
             (selectedIndex.length === dataFromChild.length &&
               selectedIndex.every((v, i) => v === dataFromChild[i])))
         ) {
-          this.setState({ selectedIndex: null });
+          this.setState({ selectedIndex: null, selectedContent: null });
         } else {
-          this.setState({ selectedIndex: dataFromChild });
+          this.setState({
+            selectedIndex: dataFromChild,
+            selectedContent: this.showSelected(dataFromChild)
+          });
         }
       } else {
-        this.setState({ selectedIndex: dataFromChild });
+        this.setState({
+          selectedIndex: dataFromChild,
+          selectedContent: this.showSelected(dataFromChild)
+        });
       }
     } else if (type === "delete") {
-      // block
       if (dataFromChild.length === 3) {
+        // block
         console.log(cards[dataFromChild[0]]);
         console.log(cards[dataFromChild[0]].columnListArray);
         console.log(cards[dataFromChild[0]].columnListArray[dataFromChild[1]]);
 
-        if (selectedIndex === dataFromChild) {
-          this.setState({ selectedIndex: null });
+        if (
+          selectedIndex.length === dataFromChild.length &&
+          selectedIndex.every((v, i) => v === dataFromChild[i])
+        ) {
+          this.setState({
+            selectedIndex: null
+          });
         }
         this.setState(
           update(this.state, {
@@ -178,10 +210,24 @@ class Editor extends Component {
               [dataFromChild[0]]: {
                 columnListArray: {
                   [dataFromChild[1]]: {
-                    $splice: [[dataFromChild[2], 1]]
+                    $splice: [[dataFromChild[2] - 1, 2]]
                   }
                 }
               }
+            }
+          })
+        );
+      } else if (dataFromChild.length === 2) {
+        if (
+          selectedIndex.length === dataFromChild.length &&
+          selectedIndex.every((v, i) => v === dataFromChild[i])
+        ) {
+          this.setState({ selectedIndex: null });
+        }
+        this.setState(
+          update(this.state, {
+            cards: {
+              $splice: [[dataFromChild[0] - 1, 2]]
             }
           })
         );
@@ -193,7 +239,7 @@ class Editor extends Component {
         this.setState(
           update(this.state, {
             cards: {
-              $splice: [[dataFromChild, 1]]
+              $splice: [[dataFromChild - 1, 2]]
             }
           })
         );
@@ -485,36 +531,89 @@ class Editor extends Component {
     this.setState({ OnDrag: dataFromChild });
   };
 
-  handleOnChange = ({ value }, index) => {
-    console.log({ value });
+  handleOnChange = ({ value }, index, content) => {
+    console.log(value);
     console.log(index);
-    if (index.length === 2) {
-      this.setState(
-        update(this.state, {
-          cards: { [index[0]]: { value: { $set: value } } }
-        })
-      );
-    } else if (index.length === 3) {
-      this.setState(
-        update(this.state, {
-          cards: {
-            [index[0]]: {
-              columnListArray: {
-                [index[1]]: {
-                  [index[2]]: {
-                    value: { $set: value }
+    console.log(content);
+    if (content === "BUTTON" || content === "TEXT" || content === "HTML") {
+      if (index.length === 2) {
+        this.setState(
+          update(this.state, {
+            cards: { [index[0]]: { value: { $set: value } } }
+          })
+        );
+      } else if (index.length === 3) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [index[0]]: {
+                columnListArray: {
+                  [index[1]]: {
+                    [index[2]]: {
+                      value: { $set: value }
+                    }
                   }
                 }
               }
             }
-          }
-        })
-      );
+          })
+        );
+      }
+    } else if (content === "IMAGE") {
+      if (index.length === 2) {
+        this.setState(
+          update(this.state, {
+            cards: { [index[0]]: { imageSrc: { $set: value.value } } }
+          })
+        );
+      } else if (index.length === 3) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [index[0]]: {
+                columnListArray: {
+                  [index[1]]: {
+                    [index[2]]: {
+                      imageSrc: { $set: value.value }
+                    }
+                  }
+                }
+              }
+            }
+          })
+        );
+      }
+    }
+  };
+
+  showSelected = index => {
+    const { cards } = this.state;
+    const selected = null;
+    if (!Array.isArray(index)) {
+      // console.log(cards[index]);
+      const selected = cards[index];
+      return cards[index];
+    } else {
+      if (index.length === 2) {
+        console.log(cards[index[0]]);
+        const selected = cards[index[0]];
+        return cards[index[0]];
+      } else if (index.length === 3) {
+        console.log(cards[index[0]].columnListArray[index[1]][index[2]]);
+        const selected = cards[index[0]].columnListArray[index[1]][index[2]];
+        return cards[index[0]].columnListArray[index[1]][index[2]];
+      }
     }
   };
 
   render() {
-    const { cards, selectedIndex, hoveredIndex, contentWidth } = this.state;
+    const {
+      cards,
+      selectedIndex,
+      hoveredIndex,
+      selectedContent,
+      contentWidth
+    } = this.state;
 
     const compArray = [];
     cards.map((item, index) => {
@@ -543,6 +642,8 @@ class Editor extends Component {
             >
               <Container
                 value={item.value}
+                imageSrc={item.imageSrc}
+                videoSrc={item.videoSrc}
                 OnDrag={item.OnDrag}
                 content={item.content}
                 columnListArray={item.columnListArray}
@@ -552,7 +653,7 @@ class Editor extends Component {
                 hoveredIndex={hoveredIndex}
                 index={[index, 0]}
                 onChange={({ value }) => {
-                  this.handleOnChange({ value }, [index, 0]);
+                  this.handleOnChange({ value }, [index, 0], item.content);
                 }}
               />
             </Card>
@@ -595,7 +696,14 @@ class Editor extends Component {
     return (
       <Fragment>
         <div className={styles.editor}>
-          <div id="html" className={styles.left}>
+          <div
+            style={{
+              backgroundColor: `rgba(${this.state.color.r}, ${
+                this.state.color.g
+              }, ${this.state.color.b}, ${this.state.color.a})`
+            }}
+            className={styles.left}
+          >
             <EditorLeft
               color={this.state.color}
               contentWidth={this.state.contentWidth}
@@ -607,11 +715,29 @@ class Editor extends Component {
           </div>
           <div className={styles.right}>
             <EditorRight
+              selectedIndex={selectedIndex}
+              selectedContent={selectedContent}
               callbackfromparent={this.myCallback}
               callbackfromparentwidth={this.widthCallback}
               callbackfromparentfont={this.fontCallback}
+              handleOnChange={this.handleOnChange}
             />
           </div>
+          {/* <div
+            style={{
+              position: "absolute",
+              width: "100px",
+              right: "300px",
+              bottom: "200px"
+            }}
+          >
+            selectedIndex: {selectedIndex}
+            <br />
+            {JSON.stringify(this.showSelected(selectedIndex))}
+            <button onClick={() => this.showSelected(selectedIndex)}>
+              selectedInfo
+            </button>
+          </div> */}
         </div>
       </Fragment>
     );

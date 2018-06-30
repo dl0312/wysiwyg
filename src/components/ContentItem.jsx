@@ -17,7 +17,15 @@ const itemSource = {
       OnDrag: "content",
       content: props.item.name
     };
+    // default block content src, text etc...
     switch (props.item.name) {
+      case "IMAGE":
+        item.imageSrc =
+          "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif";
+        break;
+      case "VIDEO":
+        item.videoSrc = "https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1";
+        break;
       case "BUTTON":
         item.value = Value.fromJSON({
           document: {
