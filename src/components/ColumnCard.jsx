@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { findDOMNode } from "react-dom";
 import {
@@ -13,7 +13,6 @@ import {
   connectDragPreview
 } from "react-dnd";
 import ItemTypes from "./ItemTypes";
-import { XYCoord } from "dnd-core";
 import flow from "lodash.flow";
 import Container from "./Container";
 
@@ -104,7 +103,6 @@ class ColumnCard extends React.Component {
     connectDropTarget: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
     isDragging: PropTypes.bool.isRequired,
-    id: PropTypes.any.isRequired,
     moveCard: PropTypes.func.isRequired
   };
 

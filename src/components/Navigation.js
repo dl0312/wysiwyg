@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
-import Ionicon from "react-ionicons";
 import styles from "./Navigation.scss";
 
 class Navigation extends Component {
@@ -38,10 +37,10 @@ class Navigation extends Component {
             <div className={styles.userColumn}>
               <ul className={styles.userMenu}>
                 <li className={styles.menuItem}>
-                  <i class="fas fa-bell" />
+                  <i className="fas fa-bell" />
                 </li>
                 <NavLink to="/profile" className={styles.menuItem}>
-                  <i class="fas fa-user-circle" />
+                  <i className="fas fa-user-circle" />
                 </NavLink>
               </ul>
             </div>

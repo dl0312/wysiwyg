@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import { Editor } from "slate-react";
-import { Value } from "slate";
+// import { Value } from "slate";
 import ColumnItem from "./ColumnItem";
 import classnames from "classnames";
 import ItemTypes from "./ItemTypes";
-import { findDOMNode } from "react-dom";
 import PropTypes from "prop-types";
 import {
   DragSource,
@@ -17,7 +16,6 @@ import {
   DragSourceMonitor,
   connectDragPreview
 } from "react-dnd";
-import flow from "lodash.flow";
 
 const handleStyle = {
   backgroundColor: "#9c88ff",
@@ -84,9 +82,8 @@ class Container extends Component {
   static propTypes = {
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
-    index: PropTypes.number.isRequired,
-    isDragging: PropTypes.bool,
-    id: PropTypes.any.isRequired
+    index: PropTypes.array.isRequired,
+    isDragging: PropTypes.bool
   };
 
   constructor(props) {
@@ -120,7 +117,14 @@ class Container extends Component {
             />
           );
         case "IMAGE":
-          return <Image selected={selected} src={this.props.imageSrc} />;
+          return (
+            <Image
+              selected={selected}
+              src={this.props.imageSrc}
+              fullWidth={this.props.fullWidth}
+              contentWidth={this.props.contentWidth}
+            />
+          );
         case "TEXT":
           return (
             <Text
@@ -130,7 +134,13 @@ class Container extends Component {
             />
           );
         case "VIDEO":
-          return <Video selected={selected} src={this.props.videoSrc} />;
+          return (
+            <Video
+              selected={selected}
+              src={this.props.videoSrc}
+              contentWidth={this.props.contentWidth}
+            />
+          );
         case "SOCIAL":
           return <Social selected={selected} />;
         default:
@@ -194,14 +204,12 @@ class Container extends Component {
     const {
       isDragging,
       connectDragSource,
-      connectDropTarget,
       connectDragPreview,
-      OnDrag,
-      content,
-      id,
+      // OnDrag,
+      // content,
+      // id,
       index,
       callbackfromparent,
-      contentWidth,
       hoveredIndex,
       selectedIndex
     } = this.props;
@@ -234,7 +242,8 @@ class Container extends Component {
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent:
+              this.props.align !== undefined ? this.props.align : "center",
             position: "relative",
             padding: "10px",
             width: this.props.contentWidth
@@ -258,11 +267,9 @@ class Container extends Component {
                       console.log(index);
                       callbackfromparent("delete", index, this);
                     }}
-                    style={{
-                      ...buttonStyle
-                    }}
+                    style={{ ...buttonStyle }}
                   >
-                    <i class="fas fa-trash-alt" />
+                    <i className="fas fa-trash-alt" />
                   </button>
                   <button
                     onClick={() => {
@@ -270,7 +277,7 @@ class Container extends Component {
                     }}
                     style={buttonStyle}
                   >
-                    <i class="far fa-copy" />
+                    <i className="far fa-copy" />
                   </button>
                   {connectDragSource(
                     <button
@@ -280,7 +287,7 @@ class Container extends Component {
                         borderBottomRightRadius: "100%"
                       }}
                     >
-                      <i class="fas fa-arrows-alt" />
+                      <i className="fas fa-arrows-alt" />
                     </button>
                   )}
                 </div>
@@ -289,7 +296,7 @@ class Container extends Component {
                   onMouseOver={this.handleOnMouseOverTool}
                   style={{ ...handleStyle }}
                 >
-                  <i class="fas fa-ellipsis-h" />
+                  <i className="fas fa-ellipsis-h" />
                 </div>
               )}
             </div>
@@ -407,7 +414,13 @@ class Image extends Component {
           borderBottom: "0 solid transparent"
         }}
       >
-        <img src={this.props.src} alt="logo" />
+        <img
+          style={{
+            width: this.props.fullWidth ? this.props.contentWidth : "100%"
+          }}
+          src={this.props.src}
+          alt="logo"
+        />
       </div>
     );
   }
@@ -456,9 +469,6 @@ class Video extends Component {
       <div
         className="content"
         style={{
-          paddingBottom: "56.25%",
-          paddingTop: "25px",
-          height: "0",
           borderTop: "0 solid transparent",
           borderRight: "0 solid transparent",
           borderLeft: "0 solid transparent",
@@ -466,15 +476,9 @@ class Video extends Component {
         }}
       >
         <iframe
-          style={{
-            position: "absolute",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "100%"
-          }}
-          width="500px"
-          src={this.props.src}
+          width={this.props.contentWidth - 100}
+          height={(this.props.contentWidth - 100) * 0.5625}
+          src={`https://www.youtube.com/embed/${this.props.src}?ecver=1`}
           frameBorder="0"
           allow="autoplay; encrypted-media"
           allowFullScreen
@@ -494,13 +498,13 @@ class Social extends Component {
       borderRadius: "100%",
       border: "none",
       color: "white",
-      width: "40px",
-      height: "40px",
-      fontSize: "25px",
+      width: "30px",
+      height: "30px",
+      fontSize: "20px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      margin: "0 5px"
+      margin: "0 2px"
     };
     return (
       <div
@@ -514,10 +518,10 @@ class Social extends Component {
         }}
       >
         <button style={{ ...buttonStyle, backgroundColor: "#1da1f2" }}>
-          <i class="fab fa-twitter" />
+          <i className="fab fa-twitter" />
         </button>
         <button style={{ ...buttonStyle, backgroundColor: "#3b5998" }}>
-          <i class="fab fa-facebook-f" />
+          <i className="fab fa-facebook-f" />
         </button>
         <button
           style={{
@@ -526,10 +530,10 @@ class Social extends Component {
               "radial-gradient(circle at 33% 100%, #FED373 4%, #F15245 30%, #D92E7F 62%, #9B36B7 85%, #515ECF)"
           }}
         >
-          <i class="fab fa-instagram" />
+          <i className="fab fa-instagram" />
         </button>
         <button style={{ ...buttonStyle, backgroundColor: "#ed3124" }}>
-          <i class="fab fa-youtube" />
+          <i className="fab fa-youtube" />
         </button>
       </div>
     );

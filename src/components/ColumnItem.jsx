@@ -1,14 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Builder from "./BlockBuilder";
-import Card from "./Card";
 import Container from "./Container";
 
 import styles from "./ColumnItem.scss";
-
-import ColumnCard from "./ColumnCard";
-import flow from "lodash.flow";
-import ItemTypes from "./ItemTypes";
 
 import {
   DropTarget,
@@ -58,11 +53,8 @@ class ColumnItem extends Component {
       isOver,
       isOverCurrent,
       connectDropTarget,
-      selectedCardsId,
-      children,
       cards
     } = this.props;
-    const { hasDropped, hasDroppedOnChild } = this.state;
     let backgroundColor = cards.length === 0 ? "#f6e58d" : "white";
     if (isOverCurrent || (isOver && greedy)) {
       backgroundColor = "#b8e994";
@@ -111,6 +103,10 @@ class ColumnItem extends Component {
               hoveredIndex={this.props.hoveredIndex}
               index={this.props.index.concat(index)}
               key={index}
+              imageSrc={item.imageSrc}
+              videoSrc={item.videoSrc}
+              align={item.align}
+              fullWidth={item.fullWidth}
               onChange={({ value }) => {
                 this.props.handleOnChange(
                   { value },
@@ -126,7 +122,13 @@ class ColumnItem extends Component {
     });
 
     return (
-      <div className="column" style={columnStyle}>
+      <div
+        className="column"
+        style={{
+          ...columnStyle,
+          outline: cards.length !== 1 ? null : "0.5px dashed #8c7ae6"
+        }}
+      >
         {compArray}
         {cards.length !== 1 ? null : (
           <div style={insertTextStyle}>

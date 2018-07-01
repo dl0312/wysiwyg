@@ -117,7 +117,7 @@ class EditorRight extends Component {
               className={styles.menuItem}
             >
               <div className={styles.icon}>
-                <i class="fas fa-th-large" />
+                <i className="fas fa-th-large" />
               </div>
               <div className={styles.title}>CONTENT</div>
             </li>
@@ -135,7 +135,7 @@ class EditorRight extends Component {
               className={styles.menuItem}
             >
               <div className={styles.icon}>
-                <i class="fas fa-bars" />
+                <i className="fas fa-bars" />
               </div>
               <div className={styles.title}>ROW</div>
             </li>
@@ -153,7 +153,7 @@ class EditorRight extends Component {
               className={styles.menuItem}
             >
               <div className={styles.icon}>
-                <i class="fas fa-columns" />
+                <i className="fas fa-columns" />
               </div>
               <div className={styles.title}>BODY</div>
             </li>
@@ -163,6 +163,8 @@ class EditorRight extends Component {
             handleOnChange={this.props.handleOnChange}
             selectedIndex={this.props.selectedIndex}
             selectedContent={this.props.selectedContent}
+            showSelected={this.props.showSelected}
+            OnChangeCards={this.props.OnChangeCards}
           />
         </div>
       </Fragment>
@@ -316,7 +318,7 @@ class Body extends Component {
                   <button
                     onClick={() => {
                       {
-                        this.state.contentWidth < 900
+                        this.state.contentWidth < 800
                           ? this.setState(
                               {
                                 contentWidth: this.state.contentWidth + 50
@@ -459,12 +461,16 @@ class SketchExample extends Component {
 
 class Blockoption extends Component {
   showOptions = () => {
+    const {
+      selectedIndex,
+      selectedContent,
+      showSelected,
+      handleOnChange,
+      OnChangeCards
+    } = this.props;
     console.log(this.props.selectedContent.content);
-    if (
-      this.props.selectedIndex.length === 2 ||
-      this.props.selectedIndex.length === 3
-    ) {
-      switch (this.props.selectedContent.content) {
+    if (selectedIndex.length === 2 || selectedIndex.length === 3) {
+      switch (selectedContent.content) {
         case "BUTTON":
           return (
             <div className={styles.optionRows}>
@@ -472,7 +478,7 @@ class Blockoption extends Component {
                 <div className={styles.optionHeader}>
                   <div className={styles.optionTitle}>LINK</div>
                   <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
+                    <i className="fas fa-angle-up" />
                   </button>
                 </div>
                 <div className={styles.featureColumn}>
@@ -490,7 +496,7 @@ class Blockoption extends Component {
                 <div className={styles.optionHeader}>
                   <div className={styles.optionTitle}>COLORS</div>
                   <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
+                    <i className="fas fa-angle-up" />
                   </button>
                 </div>
                 <div className={styles.featureColumn}>
@@ -514,7 +520,7 @@ class Blockoption extends Component {
                 <div className={styles.optionHeader}>
                   <div className={styles.optionTitle}>SPACING</div>
                   <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
+                    <i className="fas fa-angle-up" />
                   </button>
                 </div>
                 <div className={styles.featureColumn}>
@@ -522,13 +528,13 @@ class Blockoption extends Component {
                     <div className={styles.title}>Alignments</div>
                     <div className={styles.alignColumn}>
                       <button className={styles.align}>
-                        <i class="fas fa-align-left" />
+                        <i className="fas fa-align-left" />
                       </button>
                       <button className={styles.align}>
-                        <i class="fas fa-align-center" />
+                        <i className="fas fa-align-center" />
                       </button>
                       <button className={styles.align}>
-                        <i class="fas fa-align-right" />
+                        <i className="fas fa-align-right" />
                       </button>
                     </div>
                   </div>
@@ -536,13 +542,13 @@ class Blockoption extends Component {
                     <div className={styles.title}>Line Height</div>
                     <div className={styles.alignColumn}>
                       <button className={styles.align}>
-                        <i class="fas fa-align-left" />
+                        <i className="fas fa-align-left" />
                       </button>
                       <button className={styles.align}>
-                        <i class="fas fa-align-center" />
+                        <i className="fas fa-align-center" />
                       </button>
                       <button className={styles.align}>
-                        <i class="fas fa-align-right" />
+                        <i className="fas fa-align-right" />
                       </button>
                     </div>
                   </div>
@@ -552,7 +558,7 @@ class Blockoption extends Component {
                 <div className={styles.optionHeader}>
                   <div className={styles.optionTitle}>GENERAL</div>
                   <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
+                    <i className="fas fa-angle-up" />
                   </button>
                 </div>
                 <div className={styles.featureColumn}>
@@ -573,110 +579,154 @@ class Blockoption extends Component {
             <div className={styles.optionRows}>
               <div className={styles.option}>
                 <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>IMAGE LINK</div>
+                  <div className={styles.optionTitle}>IMAGE</div>
                   <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
+                    <i className="fas fa-angle-up" />
                   </button>
                 </div>
                 <div className={styles.featureColumn}>
                   <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Link</div>
-                    <div className={styles.case}>Same Tag</div>
+                    <div className={styles.title}>Image URL</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <input
+                      style={{ borderRadius: "5px" }}
+                      className={styles.input}
+                      type="text"
+                      value={showSelected(selectedIndex).imageSrc}
+                      onChange={e =>
+                        handleOnChange(e.target, selectedIndex, "IMAGE", "URL")
+                      }
+                    />
+                  </div>
+                  <div className={styles.alignmentsColumn}>
+                    <div className={styles.title}>Alignments</div>
+                    <div className={styles.alignColumn}>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-start")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-left" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "center")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-center" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-end")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-right" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.fullWidthColumn}>
+                    <div className={styles.title}>Full Width</div>
+                    <div className={styles.buttonColumn}>
+                      <label className={styles.switch}>
+                        <input
+                          onClick={() =>
+                            OnChangeCards(selectedIndex, "fullWidth", "toggle")
+                          }
+                          type="checkbox"
+                        />
+                        <span class={styles.sliderRound} />
+                      </label>
+                    </div>
+                  </div>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Alternate Text</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <input
+                      style={{ borderRadius: "5px" }}
+                      className={styles.input}
+                      type="text"
+                      value={showSelected(selectedIndex).alt}
+                      onChange={e =>
+                        handleOnChange(e.target, selectedIndex, "IMAGE", "ALT")
+                      }
+                    />
+                  </div>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Image URL</div>
                   </div>
                   <div className={styles.urlColumn}>
                     <button className={styles.btn}>URL</button>
                     <input
                       className={styles.input}
                       type="text"
-                      value={this.props.selectedContent.imageSrc}
+                      value={showSelected(selectedIndex).url}
                       onChange={e =>
-                        this.props.handleOnChange(
-                          e.target,
-                          this.props.selectedIndex,
-                          "IMAGE"
-                        )
+                        handleOnChange(e.target, selectedIndex, "IMAGE", "LINK")
                       }
                     />
                   </div>
                 </div>
               </div>
+            </div>
+          );
+        case "VIDEO":
+          return (
+            <div className={styles.optionRows}>
               <div className={styles.option}>
                 <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>COLORS</div>
+                  <div className={styles.optionTitle}>VIDEO</div>
                   <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.colorsColumn}>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Text Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Background Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Hover Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>SPACING</div>
-                  <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button className={styles.align}>
-                        <i class="fas fa-align-left" />
-                      </button>
-                      <button className={styles.align}>
-                        <i class="fas fa-align-center" />
-                      </button>
-                      <button className={styles.align}>
-                        <i class="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.lineHeightColumn}>
-                    <div className={styles.title}>Line Height</div>
-                    <div className={styles.alignColumn}>
-                      <button className={styles.align}>
-                        <i class="fas fa-align-left" />
-                      </button>
-                      <button className={styles.align}>
-                        <i class="fas fa-align-center" />
-                      </button>
-                      <button className={styles.align}>
-                        <i class="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>GENERAL</div>
-                  <button className={styles.btn}>
-                    <i class="fas fa-angle-up" />
+                    <i className="fas fa-angle-up" />
                   </button>
                 </div>
                 <div className={styles.featureColumn}>
                   <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Button Link</div>
-                    <div className={styles.case}>Same Tag</div>
+                    <div className={styles.title}>Video URL</div>
                   </div>
                   <div className={styles.urlColumn}>
                     <button className={styles.btn}>URL</button>
-                    <input type="text" />
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={showSelected(selectedIndex).videoSrc}
+                      onChange={e =>
+                        handleOnChange(e.target, selectedIndex, "VIDEO", "URL")
+                      }
+                    />
+                  </div>
+                  <div className={styles.alignmentsColumn}>
+                    <div className={styles.title}>Alignments</div>
+                    <div className={styles.alignColumn}>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-start")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-left" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "center")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-center" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-end")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-right" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -695,8 +745,9 @@ class Blockoption extends Component {
           top:
             this.props.selectedContent === null ||
             this.props.selectedContent === undefined
-              ? "200px"
+              ? "900px"
               : "45px",
+          height: "90vh",
           opacity:
             this.props.selectedContent === null ||
             this.props.selectedContent === undefined
@@ -709,13 +760,13 @@ class Blockoption extends Component {
           <div className={styles.blockName}>CONTENT</div>
           <div className={styles.btnColumn}>
             <button className={styles.btn}>
-              <i class="fas fa-trash-alt" />
+              <i className="fas fa-trash-alt" />
             </button>
             <button className={styles.btn}>
-              <i class="fas fa-copy" />
+              <i className="fas fa-copy" />
             </button>
             <button className={styles.btn}>
-              <i class="fas fa-angle-down" />
+              <i className="fas fa-angle-down" />
             </button>
           </div>
         </div>

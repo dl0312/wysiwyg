@@ -84,9 +84,7 @@ class Card extends React.Component {
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
-    id: PropTypes.any.isRequired,
     moveCard: PropTypes.func.isRequired,
-    selected: PropTypes.bool.isRequired,
     callbackfromparent: PropTypes.func.isRequired
   };
 
@@ -202,7 +200,7 @@ class Card extends React.Component {
                       borderBottomLeftRadius: "100%"
                     }}
                   >
-                    <i class="fas fa-trash-alt" />
+                    <i className="fas fa-trash-alt" />
                   </button>
                   <button
                     onClick={() => {
@@ -210,11 +208,11 @@ class Card extends React.Component {
                     }}
                     style={buttonStyle}
                   >
-                    <i class="far fa-copy" />
+                    <i className="far fa-copy" />
                   </button>
                   {connectDragSource(
                     <button style={buttonStyle}>
-                      <i class="fas fa-arrows-alt" />
+                      <i className="fas fa-arrows-alt" />
                     </button>
                   )}
                 </div>
@@ -223,7 +221,7 @@ class Card extends React.Component {
                   onMouseOver={this.handleOnMouseOverTool}
                   style={{ ...handleStyle }}
                 >
-                  <i class="fas fa-ellipsis-h" />
+                  <i className="fas fa-ellipsis-h" />
                 </div>
               )}
             </div>

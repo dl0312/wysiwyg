@@ -1,12 +1,10 @@
-import React, { Component, ThemeContext } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import styles from "./ContentItem.scss";
 
 import ItemTypes from "./ItemTypes";
-import { DragSource, ConnectDragSource } from "react-dnd";
-
-import { Editor } from "slate-react";
+import { DragSource } from "react-dnd";
 import { Value } from "slate";
 
 const itemSource = {
@@ -22,6 +20,8 @@ const itemSource = {
       case "IMAGE":
         item.imageSrc =
           "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif";
+        item.fullWidth = false;
+        item.alt = "Image";
         break;
       case "VIDEO":
         item.videoSrc = "https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1";
@@ -127,7 +127,7 @@ class ContentItem extends Component {
       connectDragSource(
         <li style={{ opacity }} className={styles.item}>
           <div className={styles.icon}>
-            <i class={icon} />
+            <i className={icon} />
           </div>
           <div className={styles.title}>{name}</div>
         </li>

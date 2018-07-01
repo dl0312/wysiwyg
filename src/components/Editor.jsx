@@ -16,8 +16,6 @@ const update = require("immutability-helper");
 class Editor extends Component {
   static propTypes = {
     connectDropTarget: PropTypes.func,
-    isOver: PropTypes.bool.isRequired,
-    isOverCurrent: PropTypes.bool,
     greedy: PropTypes.bool,
     children: PropTypes.node
   };
@@ -151,7 +149,16 @@ class Editor extends Component {
           type: "content",
           OnDrag: "content",
           content: "IMAGE",
+          fullWidth: false,
+          alt: "Image",
           imageSrc: "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
+        },
+        { type: "builder" },
+        {
+          type: "content",
+          OnDrag: "content",
+          content: "VIDEO",
+          videoSrc: "TRmdXDH9b1s"
         },
         { type: "builder" }
       ],
@@ -531,7 +538,67 @@ class Editor extends Component {
     this.setState({ OnDrag: dataFromChild });
   };
 
-  handleOnChange = ({ value }, index, content) => {
+  OnChangeCards = (index, props, value) => {
+    if (value === "toggle") {
+      if (index.length === 2) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [index[0]]: {
+                [props]: { $set: !this.state.cards[index[0]][props] }
+              }
+            }
+          })
+        );
+      } else if (index.length === 3) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [index[0]]: {
+                columnListArray: {
+                  [index[1]]: {
+                    [index[2]]: {
+                      [props]: {
+                        $set: !this.state.cards[index[0]].columnListArray[
+                          index[1]
+                        ][index[2]][props]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          })
+        );
+      }
+    } else {
+      if (index.length === 2) {
+        this.setState(
+          update(this.state, {
+            cards: { [index[0]]: { [props]: { $set: value } } }
+          })
+        );
+      } else if (index.length === 3) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [index[0]]: {
+                columnListArray: {
+                  [index[1]]: {
+                    [index[2]]: {
+                      [props]: { $set: value }
+                    }
+                  }
+                }
+              }
+            }
+          })
+        );
+      }
+    }
+  };
+
+  handleOnChange = ({ value }, index, content, type) => {
     console.log(value);
     console.log(index);
     console.log(content);
@@ -560,28 +627,108 @@ class Editor extends Component {
         );
       }
     } else if (content === "IMAGE") {
-      if (index.length === 2) {
-        this.setState(
-          update(this.state, {
-            cards: { [index[0]]: { imageSrc: { $set: value.value } } }
-          })
-        );
-      } else if (index.length === 3) {
-        this.setState(
-          update(this.state, {
-            cards: {
-              [index[0]]: {
-                columnListArray: {
-                  [index[1]]: {
-                    [index[2]]: {
-                      imageSrc: { $set: value.value }
+      if (type === "URL") {
+        if (index.length === 2) {
+          console.log(this.state.cards[index[0]]);
+          this.setState(
+            update(this.state, {
+              cards: { [index[0]]: { imageSrc: { $set: value } } }
+            })
+          );
+        } else if (index.length === 3) {
+          this.setState(
+            update(this.state, {
+              cards: {
+                [index[0]]: {
+                  columnListArray: {
+                    [index[1]]: {
+                      [index[2]]: {
+                        imageSrc: { $set: value }
+                      }
                     }
                   }
                 }
               }
-            }
-          })
-        );
+            })
+          );
+        }
+      } else if (type === "ALT") {
+        if (index.length === 2) {
+          console.log(this.state.cards[index[0]]);
+          this.setState(
+            update(this.state, {
+              cards: { [index[0]]: { alt: { $set: value } } }
+            })
+          );
+        } else if (index.length === 3) {
+          this.setState(
+            update(this.state, {
+              cards: {
+                [index[0]]: {
+                  columnListArray: {
+                    [index[1]]: {
+                      [index[2]]: {
+                        alt: { $set: value }
+                      }
+                    }
+                  }
+                }
+              }
+            })
+          );
+        }
+      } else if (type === "LINK") {
+        if (index.length === 2) {
+          console.log(this.state.cards[index[0]]);
+          this.setState(
+            update(this.state, {
+              cards: { [index[0]]: { link: { $set: value } } }
+            })
+          );
+        } else if (index.length === 3) {
+          this.setState(
+            update(this.state, {
+              cards: {
+                [index[0]]: {
+                  columnListArray: {
+                    [index[1]]: {
+                      [index[2]]: {
+                        link: { $set: value }
+                      }
+                    }
+                  }
+                }
+              }
+            })
+          );
+        }
+      }
+    } else if (content === "VIDEO") {
+      if (type === "URL") {
+        if (index.length === 2) {
+          console.log(this.state.cards[index[0]]);
+          this.setState(
+            update(this.state, {
+              cards: { [index[0]]: { videoSrc: { $set: value } } }
+            })
+          );
+        } else if (index.length === 3) {
+          this.setState(
+            update(this.state, {
+              cards: {
+                [index[0]]: {
+                  columnListArray: {
+                    [index[1]]: {
+                      [index[2]]: {
+                        videoSrc: { $set: value }
+                      }
+                    }
+                  }
+                }
+              }
+            })
+          );
+        }
       }
     }
   };
@@ -622,6 +769,7 @@ class Editor extends Component {
         case "builder":
           compArray.push(
             <MasterBuilder
+              key={index}
               index={index}
               moveCard={this.moveCard}
               handleDrop={this.handleDrop}
@@ -652,6 +800,8 @@ class Editor extends Component {
                 selectedIndex={selectedIndex}
                 hoveredIndex={hoveredIndex}
                 index={[index, 0]}
+                align={item.align}
+                fullWidth={item.fullWidth}
                 onChange={({ value }) => {
                   this.handleOnChange({ value }, [index, 0], item.content);
                 }}
@@ -715,12 +865,15 @@ class Editor extends Component {
           </div>
           <div className={styles.right}>
             <EditorRight
+              cards={this.state.cards}
               selectedIndex={selectedIndex}
               selectedContent={selectedContent}
               callbackfromparent={this.myCallback}
               callbackfromparentwidth={this.widthCallback}
               callbackfromparentfont={this.fontCallback}
               handleOnChange={this.handleOnChange}
+              showSelected={this.showSelected}
+              OnChangeCards={this.OnChangeCards}
             />
           </div>
           {/* <div
