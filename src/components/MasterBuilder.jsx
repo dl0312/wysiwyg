@@ -100,7 +100,7 @@ class Builder extends Component {
 
   render() {
     const { connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "0" : "1";
+    const opacity = !this.state.hover ? "0.5" : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
@@ -123,7 +123,7 @@ class Builder extends Component {
               )}
               style={{ ...builderStyle }}
             >
-              Drop Here
+              Column Here
             </div>
             <div style={{ ...barStyle }} />
           </div>
@@ -141,7 +141,7 @@ class Builder extends Component {
 }
 
 export default DropTarget(
-  [ItemTypes.CARD, ItemTypes.CONTENT, ItemTypes.ROW],
+  [ItemTypes.ROW],
   builderTarget,
   (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),

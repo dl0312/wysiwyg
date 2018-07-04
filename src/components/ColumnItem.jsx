@@ -53,6 +53,7 @@ class ColumnItem extends Component {
       isOver,
       isOverCurrent,
       connectDropTarget,
+      contentWidth,
       cards
     } = this.props;
     let backgroundColor = cards.length === 0 ? "#f6e58d" : "white";
@@ -96,6 +97,8 @@ class ColumnItem extends Component {
           compArray.push(
             <Container
               value={item.value}
+              imageSrc={item.imageSrc}
+              videoSrc={item.videoSrc}
               OnDrag={item.OnDrag}
               content={item.content}
               callbackfromparent={this.props.callbackfromparent}
@@ -103,10 +106,9 @@ class ColumnItem extends Component {
               hoveredIndex={this.props.hoveredIndex}
               index={this.props.index.concat(index)}
               key={index}
-              imageSrc={item.imageSrc}
-              videoSrc={item.videoSrc}
               align={item.align}
               fullWidth={item.fullWidth}
+              contentWidth={contentWidth}
               onChange={({ value }) => {
                 this.props.handleOnChange(
                   { value },

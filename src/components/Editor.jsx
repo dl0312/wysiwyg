@@ -9,6 +9,7 @@ import MasterBuilder from "./MasterBuilder";
 import BlockBuilder from "./BlockBuilder";
 import Card from "./Card";
 import Container from "./Container";
+import Column from "./Column";
 import { Value } from "slate";
 
 const update = require("immutability-helper");
@@ -23,6 +24,7 @@ class Editor extends Component {
     super(props);
     this.moveCard = this.moveCard.bind(this);
     this.state = {
+      rightMenu: null,
       color: { r: "255", g: "255", b: "255", a: "1" },
       contentWidth: 600,
       font: null,
@@ -146,19 +148,31 @@ class Editor extends Component {
         // ex2
         { type: "builder" },
         {
-          type: "content",
-          OnDrag: "content",
-          content: "IMAGE",
-          fullWidth: false,
-          alt: "Image",
-          imageSrc: "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
-        },
-        { type: "builder" },
-        {
-          type: "content",
-          OnDrag: "content",
-          content: "VIDEO",
-          videoSrc: "TRmdXDH9b1s"
+          type: "columnList",
+          OnDrag: "columnList",
+          content: [1],
+          columnListArray: [
+            [
+              { type: "builder" },
+              {
+                type: "content",
+                OnDrag: "content",
+                content: "IMAGE",
+                fullWidth: false,
+                alt: "Image",
+                imageSrc:
+                  "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
+              },
+              { type: "builder" },
+              {
+                type: "content",
+                OnDrag: "content",
+                content: "VIDEO",
+                videoSrc: "TRmdXDH9b1s"
+              },
+              { type: "builder" }
+            ]
+          ]
         },
         { type: "builder" }
       ],
@@ -183,17 +197,18 @@ class Editor extends Component {
             (selectedIndex.length === dataFromChild.length &&
               selectedIndex.every((v, i) => v === dataFromChild[i])))
         ) {
-          this.setState({ selectedIndex: null, selectedContent: null });
         } else {
           this.setState({
             selectedIndex: dataFromChild,
-            selectedContent: this.showSelected(dataFromChild)
+            selectedContent: this.showSelected(dataFromChild),
+            rightMenu: null
           });
         }
       } else {
         this.setState({
           selectedIndex: dataFromChild,
-          selectedContent: this.showSelected(dataFromChild)
+          selectedContent: this.showSelected(dataFromChild),
+          rightMenu: null
         });
       }
     } else if (type === "delete") {
@@ -520,22 +535,23 @@ class Editor extends Component {
     }
   };
 
-  myCallback = dataFromChild => {
-    console.log(dataFromChild);
-    this.setState({ color: dataFromChild });
-  };
-
-  widthCallback = dataFromChild => {
-    console.log("change width: " + dataFromChild);
-    this.setState({ contentWidth: dataFromChild });
-  };
-
-  fontCallback = dataFromChild => {
-    this.setState({ font: dataFromChild });
-  };
-
-  dragCallback = dataFromChild => {
-    this.setState({ OnDrag: dataFromChild });
+  masterCallback = (type, dataFromChild) => {
+    if (type === "backgroundColor") {
+      this.setState({ color: dataFromChild });
+    } else if (type === "width") {
+      console.log("change width: " + dataFromChild);
+      this.setState({ contentWidth: dataFromChild });
+    } else if (type === "font") {
+      this.setState({ font: dataFromChild });
+    } else if (type === "onDrag") {
+      this.setState({ OnDrag: dataFromChild });
+    } else if (type === "rightMenu") {
+      this.setState({
+        rightMenu: dataFromChild,
+        selectedIndex: null,
+        selectedContent: null
+      });
+    }
   };
 
   OnChangeCards = (index, props, value) => {
@@ -821,19 +837,17 @@ class Editor extends Component {
               selectedIndex={selectedIndex}
               hoveredIndex={hoveredIndex}
             >
-              <Container
-                onChange={this.onChange}
-                OnDrag={item.OnDrag}
-                content={item.content}
+              <Column
+                columnArray={item.content}
+                columnListArray={item.columnListArray}
                 index={[index, 0, 0]}
                 callbackfromparent={this.buttonCallback}
-                columnListArray={item.columnListArray}
-                contentWidth={contentWidth}
-                selectedIndex={selectedIndex}
-                hoveredIndex={hoveredIndex}
                 handleDrop={this.handleDrop}
                 moveCard={this.moveCard}
-                handleOnChange={this.handleOnChange}
+                handleOnChange={this.props.handleOnChange}
+                selectedIndex={selectedIndex}
+                hoveredIndex={hoveredIndex}
+                contentWidth={contentWidth}
               />
             </Card>
           );
@@ -865,12 +879,11 @@ class Editor extends Component {
           </div>
           <div className={styles.right}>
             <EditorRight
+              rightMenu={this.state.rightMenu}
               cards={this.state.cards}
               selectedIndex={selectedIndex}
               selectedContent={selectedContent}
-              callbackfromparent={this.myCallback}
-              callbackfromparentwidth={this.widthCallback}
-              callbackfromparentfont={this.fontCallback}
+              masterCallback={this.masterCallback}
               handleOnChange={this.handleOnChange}
               showSelected={this.showSelected}
               OnChangeCards={this.OnChangeCards}

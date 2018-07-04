@@ -101,7 +101,7 @@ class BlockBuilder extends Component {
 
   render() {
     const { connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "0" : "1";
+    const opacity = !this.state.hover ? "0.5" : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
@@ -124,7 +124,7 @@ class BlockBuilder extends Component {
               )}
               style={{ ...builderStyle }}
             >
-              Drop Here {this.props.id}
+              Block Here {this.props.id}
             </div>
             <div style={{ ...barStyle }} />
           </div>
@@ -142,7 +142,7 @@ class BlockBuilder extends Component {
 }
 
 export default DropTarget(
-  [ItemTypes.CARD, ItemTypes.CONTENT],
+  [ItemTypes.CONTENT, ItemTypes.CARD],
   builderTarget,
   (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),

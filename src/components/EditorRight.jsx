@@ -16,15 +16,15 @@ const fontFamily = [
 
 class EditorRight extends Component {
   state = {
-    active: 0,
+    active: this.props.rightMenu,
     hover: null
   };
 
   toggle = position => {
     if (this.state.active === position) {
-      this.setState({ active: null });
+      this.props.masterCallback("rightMenu", null);
     } else {
-      this.setState({ active: position });
+      this.props.masterCallback("rightMenu", position);
     }
   };
 
@@ -43,7 +43,7 @@ class EditorRight extends Component {
   };
 
   myColor = position => {
-    if (this.state.active === position) {
+    if (this.props.rightMenu === position) {
       return "#fafafa";
     }
     if (this.state.hover === position) {
@@ -53,7 +53,7 @@ class EditorRight extends Component {
   };
 
   fontColor = position => {
-    if (this.state.active === position) {
+    if (this.props.rightMenu === position) {
       return "#505659";
     }
     if (this.state.hover === position) {
@@ -62,37 +62,14 @@ class EditorRight extends Component {
     return "";
   };
 
-  myCallback = dataFromChild => {
-    console.log(dataFromChild);
-    this.props.callbackfromparent(dataFromChild);
-  };
-
-  widthCallback = dataFromChild => {
-    this.props.callbackfromparentwidth(dataFromChild);
-  };
-
-  fontCallback = dataFromChild => {
-    this.props.callbackfromparentfont(dataFromChild);
-  };
-
-  dragCallback = dataFromChild => {
-    this.props.callbackfromparentdrag(dataFromChild);
-  };
-
   showSection = () => {
-    switch (this.state.active) {
+    switch (this.props.rightMenu) {
       case 0:
         return <Content />;
       case 1:
         return <Row />;
       case 2:
-        return (
-          <Body
-            callbackfromparent={this.myCallback.bind(this)}
-            callbackfromparentwidth={this.widthCallback.bind(this)}
-            callbackfromparentfont={this.fontCallback.bind(this)}
-          />
-        );
+        return <Body masterCallback={this.props.masterCallback} />;
       default:
         break;
     }
@@ -255,15 +232,9 @@ class Body extends Component {
     };
   }
 
-  myCallback = dataFromChild => {
-    console.log(dataFromChild);
-    this.props.callbackfromparent(dataFromChild);
-    this.setState({ displayFontFamily: false });
-  };
-
   handleOnChange = () => {
     console.log("in body comp width: " + this.state.contentWidth);
-    this.props.callbackfromparentwidth(this.state.contentWidth);
+    this.props.masterCallback("width", this.state.contentWidth);
   };
 
   handleOnClick = () => {
@@ -272,7 +243,7 @@ class Body extends Component {
   };
 
   handleOnClickFont = () => {
-    this.props.callbackfromparentfont(this.state.font);
+    this.props.masterCallback("font", this.state.font);
   };
 
   render() {
@@ -286,9 +257,7 @@ class Body extends Component {
             <li className={styles.item}>
               <div className={styles.subtitle}>Background Color</div>
               <div className={styles.func}>
-                <SketchExample
-                  callbackfromparent={this.myCallback.bind(this)}
-                />
+                <SketchExample masterCallback={this.props.masterCallback} />
               </div>
             </li>
             <li className={styles.item}>
@@ -392,7 +361,7 @@ class SketchExample extends Component {
 
   handleOnClick = () => {
     this.setState({ displayColorPicker: !this.state.displayColorPicker });
-    this.props.callbackfromparent(this.state.color);
+    this.props.masterCallback("backgroundColor", this.state.color);
   };
 
   handleClose = () => {
@@ -401,7 +370,7 @@ class SketchExample extends Component {
 
   handleChange = color => {
     this.setState({ color: color.rgb }, () =>
-      this.props.callbackfromparent(this.state.color)
+      this.props.masterCallback("backgroundColor", this.state.color)
     );
   };
 
@@ -569,6 +538,106 @@ class Blockoption extends Component {
                   <div className={styles.urlColumn}>
                     <button className={styles.btn}>URL</button>
                     <input type="text" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        case "TEXT":
+          return (
+            <div className={styles.optionRows}>
+              <div className={styles.option}>
+                <div className={styles.optionHeader}>
+                  <div className={styles.optionTitle}>TEXT</div>
+                  <button className={styles.btn}>
+                    <i className="fas fa-angle-up" />
+                  </button>
+                </div>
+                <div className={styles.featureColumn}>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Image URL</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <input
+                      style={{ borderRadius: "5px" }}
+                      className={styles.input}
+                      type="text"
+                      value={showSelected(selectedIndex).imageSrc}
+                      onChange={e =>
+                        handleOnChange(e.target, selectedIndex, "IMAGE", "URL")
+                      }
+                    />
+                  </div>
+                  <div className={styles.alignmentsColumn}>
+                    <div className={styles.title}>Alignments</div>
+                    <div className={styles.alignColumn}>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-start")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-left" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "center")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-center" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-end")
+                        }
+                        className={styles.align}
+                      >
+                        <i className="fas fa-align-right" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.fullWidthColumn}>
+                    <div className={styles.title}>Full Width</div>
+                    <div className={styles.buttonColumn}>
+                      <label className={styles.switch}>
+                        <input
+                          onClick={() =>
+                            OnChangeCards(selectedIndex, "fullWidth", "toggle")
+                          }
+                          type="checkbox"
+                        />
+                        <span class={styles.sliderRound} />
+                      </label>
+                    </div>
+                  </div>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Alternate Text</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <input
+                      style={{ borderRadius: "5px" }}
+                      className={styles.input}
+                      type="text"
+                      value={showSelected(selectedIndex).alt}
+                      onChange={e =>
+                        handleOnChange(e.target, selectedIndex, "IMAGE", "ALT")
+                      }
+                    />
+                  </div>
+                  <div className={styles.btnLinkColumn}>
+                    <div className={styles.title}>Image URL</div>
+                  </div>
+                  <div className={styles.urlColumn}>
+                    <button className={styles.btn}>URL</button>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={showSelected(selectedIndex).url}
+                      onChange={e =>
+                        handleOnChange(e.target, selectedIndex, "IMAGE", "LINK")
+                      }
+                    />
                   </div>
                 </div>
               </div>
