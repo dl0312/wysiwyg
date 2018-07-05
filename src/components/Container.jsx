@@ -16,8 +16,6 @@ import {
   DragSourceMonitor,
   connectDragPreview
 } from "react-dnd";
-import { isKeyHotkey } from "is-hotkey";
-import { ButtonComp, IconComp, ToolbarComp } from "./comp";
 
 const handleStyle = {
   backgroundColor: "#9c88ff",
@@ -106,6 +104,9 @@ class Container extends Component {
               value={this.props.value}
               selected={selected}
               onChange={this.props.onChange}
+              onKeyDown={this.props.onKeyDown}
+              renderNode={this.props.renderNode}
+              renderMark={this.props.renderMark}
             />
           );
         case "DIVIDER":
@@ -116,6 +117,9 @@ class Container extends Component {
               value={this.props.value}
               selected={selected}
               onChange={this.props.onChange}
+              onKeyDown={this.props.onKeyDown}
+              renderNode={this.props.renderNode}
+              renderMark={this.props.renderMark}
             />
           );
         case "IMAGE":
@@ -133,6 +137,9 @@ class Container extends Component {
               value={this.props.value}
               selected={selected}
               onChange={this.props.onChange}
+              onKeyDown={this.props.onKeyDown}
+              renderNode={this.props.renderNode}
+              renderMark={this.props.renderMark}
             />
           );
         case "VIDEO":
@@ -170,10 +177,6 @@ class Container extends Component {
   handleOnMouseOver = event => {
     event.stopPropagation();
     this.props.callbackfromparent("mouseover", this.props.index);
-    // this.setState({
-    //   hover: true
-    // });
-    // console.log(`card in hover true`);
   };
 
   handleOnMouseOverTool = event => {
@@ -249,9 +252,7 @@ class Container extends Component {
               this.props.align !== undefined ? this.props.align : "center",
             position: "relative",
             padding: "10px",
-            width: this.props.contentWidth
-              ? `${this.props.contentWidth}px`
-              : "100%",
+            width: "100%",
             opacity
           }}
           onMouseOver={this.handleOnMouseOver}
@@ -317,276 +318,11 @@ export default DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
   isDragging: monitor.isDragging()
 }))(Container);
 
-/**
- * Define the default node type.
- *
- * @type {String}
- */
-
-const DEFAULT_NODE = "paragraph";
-
-/**
- * Define hotkey matchers.
- *
- * @type {Function}
- */
-
-const isBoldHotkey = isKeyHotkey("mod+b");
-const isItalicHotkey = isKeyHotkey("mod+i");
-const isUnderlinedHotkey = isKeyHotkey("mod+u");
-const isCodeHotkey = isKeyHotkey("mod+`");
-
-/**
- * The rich text example.
- *
- * @type {Component}
- */
-
 class Button extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  /**
-   * Check if the current selection has a mark with `type` in it.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
-
-  hasMark = type => {
-    const { value } = this.props;
-    return value.activeMarks.some(mark => mark.type == type);
-  };
-
-  /**
-   * Check if the any of the currently selected blocks are of `type`.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
-
-  hasBlock = type => {
-    const { value } = this.props;
-    return value.blocks.some(node => node.type == type);
-  };
-
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
-
-  /**
-   * Render a mark-toggling toolbar button.
-   *
-   * @param {String} type
-   * @param {String} icon
-   * @return {Element}
-   */
-
-  renderMarkButton = (type, icon) => {
-    const isActive = this.hasMark(type);
-
-    return (
-      <ButtonComp
-        active={isActive}
-        onMouseDown={event => this.onClickMark(event, type)}
-      >
-        <IconComp>{icon}</IconComp>
-      </ButtonComp>
-    );
-  };
-
-  /**
-   * Render a block-toggling toolbar button.
-   *
-   * @param {String} type
-   * @param {String} icon
-   * @return {Element}
-   */
-
-  renderBlockButton = (type, icon) => {
-    let isActive = this.hasBlock(type);
-
-    if (["numbered-list", "bulleted-list"].includes(type)) {
-      const { value } = this.props;
-      const parent = value.document.getParent(value.blocks.first().key);
-      isActive = this.hasBlock("list-item") && parent && parent.type === type;
-    }
-
-    return (
-      <ButtonComp
-        active={isActive}
-        onMouseDown={event => this.onClickBlock(event, type)}
-      >
-        <IconComp>{icon}</IconComp>
-      </ButtonComp>
-    );
-  };
-
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderNode = props => {
-    const { attributes, children, node } = props;
-
-    switch (node.type) {
-      case "block-quote":
-        return <blockquote {...attributes}>{children}</blockquote>;
-      case "bulleted-list":
-        return <ul {...attributes}>{children}</ul>;
-      case "heading-one":
-        return <h1 {...attributes}>{children}</h1>;
-      case "heading-two":
-        return <h2 {...attributes}>{children}</h2>;
-      case "list-item":
-        return <li {...attributes}>{children}</li>;
-      case "numbered-list":
-        return <ol {...attributes}>{children}</ol>;
-      default:
-        break;
-    }
-  };
-
-  /**
-   * Render a Slate mark.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderMark = props => {
-    const { children, mark, attributes } = props;
-
-    switch (mark.type) {
-      case "bold":
-        return <strong {...attributes}>{children}</strong>;
-      case "code":
-        return <code {...attributes}>{children}</code>;
-      case "italic":
-        return <em {...attributes}>{children}</em>;
-      case "underlined":
-        return <u {...attributes}>{children}</u>;
-      default:
-        break;
-    }
-  };
-
-  /**
-   * On change, save the new `value`.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value });
-  };
-
-  /**
-   * On key down, if it's a formatting command toggle a mark.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @return {Change}
-   */
-
-  onKeyDown = (event, change) => {
-    let mark;
-
-    if (isBoldHotkey(event)) {
-      mark = "bold";
-    } else if (isItalicHotkey(event)) {
-      mark = "italic";
-    } else if (isUnderlinedHotkey(event)) {
-      mark = "underlined";
-    } else if (isCodeHotkey(event)) {
-      mark = "code";
-    } else {
-      return;
-    }
-
-    event.preventDefault();
-    change.toggleMark(mark);
-    return true;
-  };
-
-  /**
-   * When a mark button is clicked, toggle the current mark.
-   *
-   * @param {Event} event
-   * @param {String} type
-   */
-
-  onClickMark = (event, type) => {
-    event.preventDefault();
-    const { value } = this.props;
-    const change = value.change().toggleMark(type);
-    this.onChange(change);
-  };
-
-  /**
-   * When a block button is clicked, toggle the block type.
-   *
-   * @param {Event} event
-   * @param {String} type
-   */
-
-  onClickBlock = (event, type) => {
-    event.preventDefault();
-    const { value } = this.props;
-    const change = value.change();
-    const { document } = value;
-
-    // Handle everything but list buttons.
-    if (type != "bulleted-list" && type != "numbered-list") {
-      const isActive = this.hasBlock(type);
-      const isList = this.hasBlock("list-item");
-
-      if (isList) {
-        change
-          .setBlocks(isActive ? DEFAULT_NODE : type)
-          .unwrapBlock("bulleted-list")
-          .unwrapBlock("numbered-list");
-      } else {
-        change.setBlocks(isActive ? DEFAULT_NODE : type);
-      }
-    } else {
-      // Handle the extra wrapping required for list buttons.
-      const isList = this.hasBlock("list-item");
-      const isType = value.blocks.some(block => {
-        return !!document.getClosest(block.key, parent => parent.type == type);
-      });
-
-      if (isList && isType) {
-        change
-          .setBlocks(DEFAULT_NODE)
-          .unwrapBlock("bulleted-list")
-          .unwrapBlock("numbered-list");
-      } else if (isList) {
-        change
-          .unwrapBlock(
-            type == "bulleted-list" ? "numbered-list" : "bulleted-list"
-          )
-          .wrapBlock(type);
-      } else {
-        change.setBlocks("list-item").wrapBlock(type);
-      }
-    }
-
-    this.onChange(change);
-  };
 
   render() {
     console.log(this.props.selected);
@@ -609,21 +345,14 @@ class Button extends Component {
           paddingBottom: "10px"
         }}
       >
-        <ToolbarComp>
-          {this.renderMarkButton("bold", "format_bold")}
-          {this.renderMarkButton("italic", "format_italic")}
-          {this.renderMarkButton("underlined", "format_underlined")}
-          {this.renderMarkButton("code", "code")}
-          {this.renderBlockButton("heading-one", "looks_one")}
-          {this.renderBlockButton("heading-two", "looks_two")}
-          {this.renderBlockButton("block-quote", "format_quote")}
-          {this.renderBlockButton("numbered-list", "format_list_numbered")}
-          {this.renderBlockButton("bulleted-list", "format_list_bulleted")}
-        </ToolbarComp>
         <Editor
+          autoFocus
           value={this.props.value}
           readOnly={this.props.selected ? false : true}
           onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
+          renderNode={this.props.renderNode}
+          renderMark={this.props.renderMark}
         />
       </div>
     );
@@ -639,7 +368,7 @@ class Divider extends Component {
   render() {
     return (
       <div className="content" style={{ width: "100%", padding: "20px" }}>
-        <div
+        <divs
           style={{
             width: "100%",
             borderBottom: "1px solid black"
@@ -669,9 +398,13 @@ class Html extends Component {
         }}
       >
         <Editor
+          autoFocus
           value={this.props.value}
           readOnly={false}
           onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
+          renderNode={this.props.renderNode}
+          renderMark={this.props.renderMark}
         />
       </div>
     );
@@ -730,9 +463,13 @@ class Text extends Component {
         }}
       >
         <Editor
+          autoFocus
           value={this.props.value}
           readOnly={this.props.selected ? false : true}
           onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
+          renderNode={this.props.renderNode}
+          renderMark={this.props.renderMark}
         />
       </div>
     );
@@ -749,6 +486,10 @@ class Video extends Component {
       <div
         className="content"
         style={{
+          position: "relative",
+          width: "100%",
+          height: "0",
+          paddingBottom: "56.25%",
           borderTop: "0 solid transparent",
           borderRight: "0 solid transparent",
           borderLeft: "0 solid transparent",
@@ -756,8 +497,15 @@ class Video extends Component {
         }}
       >
         <iframe
-          width={this.props.contentWidth - 100}
-          height={(this.props.contentWidth - 100) * 0.5625}
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%"
+          }}
+          width="560"
+          height="315"
           src={`https://www.youtube.com/embed/${this.props.src}?ecver=1`}
           frameBorder="0"
           allow="autoplay; encrypted-media"
@@ -844,6 +592,9 @@ class Column extends Component {
             handleDrop={this.props.handleDrop}
             moveCard={this.props.moveCard}
             handleOnChange={this.props.handleOnChange}
+            onKeyDown={this.props.onKeyDown}
+            renderNode={this.props.renderNode}
+            renderMark={this.props.renderMark}
             selectedIndex={this.props.selectedIndex}
             hoveredIndex={this.props.hoveredIndex}
             contentWidth={this.props.contentWidth}

@@ -112,9 +112,14 @@ class ColumnItem extends Component {
               onChange={({ value }) => {
                 this.props.handleOnChange(
                   { value },
-                  this.props.index.concat(index)
+                  this.props.index.concat(index),
+                  item.content,
+                  "change"
                 );
               }}
+              onKeyDown={this.props.onKeyDown}
+              renderNode={this.props.renderNode}
+              renderMark={this.props.renderMark}
             />
           );
           break;

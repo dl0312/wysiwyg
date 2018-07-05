@@ -9,7 +9,7 @@ export default class Column extends Component {
 
   render() {
     const columnListStyle = {
-      width: "100%",
+      width: this.props.contentWidth,
       display: "grid",
       gridGap: "10px",
       gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
@@ -25,6 +25,9 @@ export default class Column extends Component {
             handleDrop={this.props.handleDrop}
             moveCard={this.props.moveCard}
             handleOnChange={this.props.handleOnChange}
+            onKeyDown={this.props.onKeyDown}
+            renderNode={this.props.renderNode}
+            renderMark={this.props.renderMark}
             selectedIndex={this.props.selectedIndex}
             hoveredIndex={this.props.hoveredIndex}
             contentWidth={this.props.contentWidth}

@@ -24,7 +24,7 @@ const itemSource = {
         item.alt = "Image";
         break;
       case "VIDEO":
-        item.videoSrc = "https://www.youtube.com/embed/TRmdXDH9b1s?ecver=1";
+        item.videoSrc = "TRmdXDH9b1s";
         break;
       case "BUTTON":
         item.value = Value.fromJSON({

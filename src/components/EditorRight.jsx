@@ -607,7 +607,7 @@ class Blockoption extends Component {
                           }
                           type="checkbox"
                         />
-                        <span class={styles.sliderRound} />
+                        <span className={styles.sliderRound} />
                       </label>
                     </div>
                   </div>

@@ -6,13 +6,38 @@ import EditorRight from "./EditorRight";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 import MasterBuilder from "./MasterBuilder";
-import BlockBuilder from "./BlockBuilder";
 import Card from "./Card";
 import Container from "./Container";
 import Column from "./Column";
 import { Value } from "slate";
-
+import { isKeyHotkey } from "is-hotkey";
+import { Button, Icon, Toolbar } from "./Components";
 const update = require("immutability-helper");
+
+/**
+ * Define the default node type.
+ *
+ * @type {String}
+ */
+
+const DEFAULT_NODE = "paragraph";
+
+/**
+ * Define hotkey matchers.
+ *
+ * @type {Function}
+ */
+
+const isBoldHotkey = isKeyHotkey("mod+b");
+const isItalicHotkey = isKeyHotkey("mod+i");
+const isUnderlinedHotkey = isKeyHotkey("mod+u");
+const isCodeHotkey = isKeyHotkey("mod+`");
+
+/**
+ * The rich text example.
+ *
+ * @type {Component}
+ */
 
 class Editor extends Component {
   static propTypes = {
@@ -150,6 +175,13 @@ class Editor extends Component {
         {
           type: "columnList",
           OnDrag: "columnList",
+          content: [1, 1],
+          columnListArray: [[{ type: "builder" }], [{ type: "builder" }]]
+        },
+        { type: "builder" },
+        {
+          type: "columnList",
+          OnDrag: "columnList",
           content: [1],
           columnListArray: [
             [
@@ -180,9 +212,62 @@ class Editor extends Component {
     };
   }
 
+  /**
+   * Deserialize the initial editor value.
+   *
+   * @type {Object}
+   */
+
+  /**
+   * Check if the current selection has a mark with `type` in it.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasMark = type => {
+    if (
+      this.state.selectedIndex !== null &&
+      (this.state.selectedContent.content === "TEXT" ||
+        this.state.selectedContent.content === "BUTTON" ||
+        this.state.selectedContent.content === "HTML")
+    ) {
+      console.log(this.state.selectedIndex);
+      console.log(this.showSelected(this.state.selectedIndex));
+      const { value } = this.showSelected(this.state.selectedIndex);
+      return value.activeMarks.some(mark => mark.type === type);
+    }
+  };
+
+  /**
+   * Check if the any of the currently selected blocks are of `type`.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasBlock = type => {
+    if (
+      this.state.selectedIndex !== null &&
+      (this.state.selectedContent.content === "TEXT" ||
+        this.state.selectedContent.content === "BUTTON" ||
+        this.state.selectedContent.content === "HTML")
+    ) {
+      const { value } = this.showSelected(this.state.selectedIndex);
+      return value.blocks.some(node => node.type === type);
+    }
+  };
+
+  /**
+   * Render.
+   *
+   * @return {Element}
+   */
+
   buttonCallback = (type, dataFromChild) => {
+    // console.log(type);
+    // console.log(dataFromChild);
     const { cards, hoveredIndex, selectedIndex } = this.state;
-    console.log(`type: ${type}, data: ${dataFromChild}`);
     if (type === "mouseover") {
       this.setState({ hoveredIndex: dataFromChild });
     } else if (type === "mouseleave") {
@@ -223,7 +308,8 @@ class Editor extends Component {
           selectedIndex.every((v, i) => v === dataFromChild[i])
         ) {
           this.setState({
-            selectedIndex: null
+            selectedIndex: null,
+            selectedContent: null
           });
         }
         this.setState(
@@ -244,7 +330,7 @@ class Editor extends Component {
           selectedIndex.length === dataFromChild.length &&
           selectedIndex.every((v, i) => v === dataFromChild[i])
         ) {
-          this.setState({ selectedIndex: null });
+          this.setState({ selectedIndex: null, selectedContent: null });
         }
         this.setState(
           update(this.state, {
@@ -256,7 +342,7 @@ class Editor extends Component {
       } else {
         // frame
         if (selectedIndex === dataFromChild) {
-          this.setState({ selectedIndex: null });
+          this.setState({ selectedIndex: null, selectedContent: null });
         }
         this.setState(
           update(this.state, {
@@ -386,6 +472,11 @@ class Editor extends Component {
         cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2]];
       const dragBuilder =
         cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2] - 1];
+
+      this.setState({
+        selectedIndex: null,
+        selectedContent: null
+      });
       this.setState(
         update(this.state, {
           cards: {
@@ -758,11 +849,11 @@ class Editor extends Component {
       return cards[index];
     } else {
       if (index.length === 2) {
-        console.log(cards[index[0]]);
+        // console.log(cards[index[0]]);
         const selected = cards[index[0]];
         return cards[index[0]];
       } else if (index.length === 3) {
-        console.log(cards[index[0]].columnListArray[index[1]][index[2]]);
+        // console.log(cards[index[0]].columnListArray[index[1]][index[2]]);
         const selected = cards[index[0]].columnListArray[index[1]][index[2]];
         return cards[index[0]].columnListArray[index[1]][index[2]];
       }
@@ -819,8 +910,16 @@ class Editor extends Component {
                 align={item.align}
                 fullWidth={item.fullWidth}
                 onChange={({ value }) => {
-                  this.handleOnChange({ value }, [index, 0], item.content);
+                  this.handleOnChange(
+                    { value },
+                    [index, 0],
+                    item.content,
+                    "change"
+                  );
                 }}
+                onKeyDown={this.onKeyDown}
+                renderNode={this.renderNode}
+                renderMark={this.renderMark}
               />
             </Card>
           );
@@ -844,7 +943,10 @@ class Editor extends Component {
                 callbackfromparent={this.buttonCallback}
                 handleDrop={this.handleDrop}
                 moveCard={this.moveCard}
-                handleOnChange={this.props.handleOnChange}
+                handleOnChange={this.handleOnChange}
+                onKeyDown={this.onKeyDown}
+                renderNode={this.renderNode}
+                renderMark={this.renderMark}
                 selectedIndex={selectedIndex}
                 hoveredIndex={hoveredIndex}
                 contentWidth={contentWidth}
@@ -874,6 +976,48 @@ class Editor extends Component {
               font={this.state.font}
               greedy={false}
             >
+              <div
+                style={{
+                  position: "relative",
+                  padding: "15px 15px",
+                  margin: "0 -20px",
+                  borderBottom: "2px solid #eee",
+                  marginBottom: "20px",
+                  display: "flex",
+                  transition: "opacity 0.5s ease",
+                  opacity:
+                    this.state.selectedContent !== null
+                      ? this.state.selectedContent.content === "TEXT"
+                        ? "1"
+                        : "0"
+                      : "0"
+                }}
+              >
+                {this.renderMarkButton("bold", <i className="fas fa-bold" />)}
+                {this.renderMarkButton(
+                  "italic",
+                  <i className="fas fa-italic" />
+                )}
+                {this.renderMarkButton(
+                  "underlined",
+                  <i className="fas fa-underline" />
+                )}
+                {this.renderMarkButton("code", <i className="fas fa-code" />)}
+                {this.renderBlockButton("heading-one", "H1")}
+                {this.renderBlockButton("heading-two", "H2")}
+                {this.renderBlockButton(
+                  "block-quote",
+                  <i class="fas fa-quote-right" />
+                )}
+                {this.renderBlockButton(
+                  "numbered-list",
+                  <i className="fas fa-list-ol" />
+                )}
+                {this.renderBlockButton(
+                  "bulleted-list",
+                  <i className="fas fa-list-ul" />
+                )}
+              </div>
               {compArray}
             </EditorLeft>
           </div>
@@ -908,6 +1052,210 @@ class Editor extends Component {
       </Fragment>
     );
   }
+
+  /**
+   * Render a mark-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
+  renderMarkButton = (type, icon) => {
+    const isActive = this.hasMark(type);
+
+    return (
+      <Button
+        active={isActive}
+        onMouseDown={event => this.onClickMark(event, type)}
+      >
+        <Icon>{icon}</Icon>
+      </Button>
+    );
+  };
+
+  /**
+   * Render a block-toggling toolbar button.
+   *
+   * @param {String} type
+   * @param {String} icon
+   * @return {Element}
+   */
+
+  renderBlockButton = (type, icon) => {
+    let isActive = this.hasBlock(type);
+
+    if (["numbered-list", "bulleted-list"].includes(type)) {
+      if (
+        this.state.selectedIndex !== null &&
+        (this.state.selectedContent.content === "TEXT" ||
+          this.state.selectedContent.content === "BUTTON" ||
+          this.state.selectedContent.content === "HTML")
+      ) {
+        const { value } = this.showSelected(this.state.selectedIndex);
+        const parent = value.document.getParent(value.blocks.first().key);
+        isActive = this.hasBlock("list-item") && parent && parent.type === type;
+      }
+    }
+
+    return (
+      <Button
+        active={isActive}
+        onMouseDown={event => this.onClickBlock(event, type)}
+      >
+        <Icon>{icon}</Icon>
+      </Button>
+    );
+  };
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderNode = props => {
+    const { attributes, children, node } = props;
+
+    switch (node.type) {
+      case "block-quote":
+        return <blockquote {...attributes}>{children}</blockquote>;
+      case "bulleted-list":
+        return <ul {...attributes}>{children}</ul>;
+      case "heading-one":
+        return <h1 {...attributes}>{children}</h1>;
+      case "heading-two":
+        return <h2 {...attributes}>{children}</h2>;
+      case "list-item":
+        return <li {...attributes}>{children}</li>;
+      case "numbered-list":
+        return <ol {...attributes}>{children}</ol>;
+      default:
+        return;
+    }
+  };
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = props => {
+    const { children, mark, attributes } = props;
+
+    switch (mark.type) {
+      case "bold":
+        return <strong {...attributes}>{children}</strong>;
+      case "code":
+        return <code {...attributes}>{children}</code>;
+      case "italic":
+        return <em {...attributes}>{children}</em>;
+      case "underlined":
+        return <u {...attributes}>{children}</u>;
+      default:
+        return;
+    }
+  };
+
+  /**
+   * On change, save the new `value`.
+   *
+   * @param {Change} change
+   */
+
+  /**
+   * On key down, if it's a formatting command toggle a mark.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @return {Change}
+   */
+
+  /**
+   * When a mark button is clicked, toggle the current mark.
+   *
+   * @param {Event} event
+   * @param {String} type
+   */
+
+  onClickMark = (event, type) => {
+    event.preventDefault();
+    if (
+      this.state.selectedIndex !== null &&
+      (this.state.selectedContent.content === "TEXT" ||
+        this.state.selectedContent.content === "BUTTON" ||
+        this.state.selectedContent.content === "HTML")
+    ) {
+      const { value } = this.showSelected(this.state.selectedIndex);
+      const change = value.change().toggleMark(type);
+      this.handleOnChange(change, this.state.selectedIndex, "TEXT", "change");
+    }
+  };
+
+  /**
+   * When a block button is clicked, toggle the block type.
+   *
+   * @param {Event} event
+   * @param {String} type
+   */
+
+  onClickBlock = (event, type) => {
+    event.preventDefault();
+    if (
+      this.state.selectedIndex !== null &&
+      (this.state.selectedContent.content === "TEXT" ||
+        this.state.selectedContent.content === "BUTTON" ||
+        this.state.selectedContent.content === "HTML")
+    ) {
+      console.log(this.state.selectedContent);
+      const { value } = this.showSelected(this.state.selectedIndex);
+      const change = value.change();
+      const { document } = value;
+
+      // Handle everything but list buttons.
+      if (type !== "bulleted-list" && type !== "numbered-list") {
+        const isActive = this.hasBlock(type);
+        const isList = this.hasBlock("list-item");
+
+        if (isList) {
+          change
+            .setBlocks(isActive ? DEFAULT_NODE : type)
+            .unwrapBlock("bulleted-list")
+            .unwrapBlock("numbered-list");
+        } else {
+          change.setBlocks(isActive ? DEFAULT_NODE : type);
+        }
+      } else {
+        // Handle the extra wrapping required for list buttons.
+        const isList = this.hasBlock("list-item");
+        const isType = value.blocks.some(block => {
+          return !!document.getClosest(
+            block.key,
+            parent => parent.type === type
+          );
+        });
+
+        if (isList && isType) {
+          change
+            .setBlocks(DEFAULT_NODE)
+            .unwrapBlock("bulleted-list")
+            .unwrapBlock("numbered-list");
+        } else if (isList) {
+          change
+            .unwrapBlock(
+              type === "bulleted-list" ? "numbered-list" : "bulleted-list"
+            )
+            .wrapBlock(type);
+        } else {
+          change.setBlocks("list-item").wrapBlock(type);
+        }
+      }
+      this.handleOnChange(change, this.state.selectedIndex, "TEXT", "change");
+    }
+  };
 }
 
 export default DragDropContext(HTML5Backend)(Editor);
