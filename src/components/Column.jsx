@@ -31,6 +31,8 @@ export default class Column extends Component {
             selectedIndex={this.props.selectedIndex}
             hoveredIndex={this.props.hoveredIndex}
             contentWidth={this.props.contentWidth}
+            OnDrag={this.props.OnDrag}
+            masterCallback={this.props.masterCallback}
           />
         ))}
       </div>

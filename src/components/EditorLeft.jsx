@@ -19,7 +19,10 @@ class EditorLeft extends Component {
     }
     return (
       <div
-        style={{ backgroundColor, fontFamily: `${this.props.font}` }}
+        style={{
+          backgroundColor,
+          fontFamily: `${this.props.font}`
+        }}
         className={styles.editor}
         id="container"
       >

@@ -96,7 +96,7 @@ class Container extends Component {
   }
 
   showInner = selected => {
-    if (this.props.OnDrag === "content") {
+    if (this.props.type === "content") {
       switch (this.props.content) {
         case "BUTTON":
           return (
@@ -155,22 +155,6 @@ class Container extends Component {
         default:
           break;
       }
-    } else if (this.props.OnDrag === "columnList") {
-      return (
-        <Column
-          selected={selected}
-          columnArray={this.props.content}
-          columnListArray={this.props.columnListArray}
-          index={this.props.index}
-          callbackfromparent={this.props.callbackfromparent}
-          handleDrop={this.props.handleDrop}
-          moveCard={this.props.moveCard}
-          handleOnChange={this.props.handleOnChange}
-          selectedIndex={this.props.selectedIndex}
-          hoveredIndex={this.props.hoveredIndex}
-          contentWidth={this.props.contentWidth}
-        />
-      );
     }
   };
 
@@ -325,7 +309,7 @@ class Button extends Component {
   }
 
   render() {
-    console.log(this.props.selected);
+    // console.log(this.props.selected);
     return (
       <div
         className="content"

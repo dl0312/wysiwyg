@@ -10,6 +10,9 @@ import { Value } from "slate";
 const itemSource = {
   beginDrag(props) {
     console.log("dragging");
+    props.masterCallback("OnDrag", "content");
+    console.log(props.item);
+
     const item = {
       type: "content",
       OnDrag: "content",
@@ -106,6 +109,8 @@ const itemSource = {
     // if (!monitor.didDrop()) {
     //   return;
     // }
+    console.log(monitor.getDropResult());
+    props.masterCallback("OnDrag", null);
     const item = {
       type: "content",
       OnDrag: "content",
@@ -125,7 +130,10 @@ class ContentItem extends Component {
     return (
       connectDragSource &&
       connectDragSource(
-        <li style={{ opacity }} className={styles.item}>
+        <li
+          style={{ opacity, backgroundColor: "#fafafa" }}
+          className={styles.item}
+        >
           <div className={styles.icon}>
             <i className={icon} />
           </div>

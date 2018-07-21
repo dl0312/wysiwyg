@@ -65,9 +65,9 @@ class EditorRight extends Component {
   showSection = () => {
     switch (this.props.rightMenu) {
       case 0:
-        return <Content />;
+        return <Content masterCallback={this.props.masterCallback} />;
       case 1:
-        return <Row />;
+        return <Row masterCallback={this.props.masterCallback} />;
       case 2:
         return <Body masterCallback={this.props.masterCallback} />;
       default:
@@ -179,6 +179,7 @@ class Content extends Component {
               icon={item.icon}
               name={item.name}
               handleDrop={name => this.addItem(name)}
+              masterCallback={this.props.masterCallback}
             />
           ))}
         </ul>
@@ -214,6 +215,7 @@ class Row extends Component {
               item={item}
               array={item.array}
               handleDrop={name => this.addItem(name)}
+              masterCallback={this.props.masterCallback}
             />
           ))}
         </div>
@@ -435,9 +437,10 @@ class Blockoption extends Component {
       selectedContent,
       showSelected,
       handleOnChange,
-      OnChangeCards
+      OnChangeCards,
+      imageSrc
     } = this.props;
-    console.log(this.props.selectedContent.content);
+    // console.log(this.props.selectedContent.content);
     if (selectedIndex.length === 2 || selectedIndex.length === 3) {
       switch (selectedContent.content) {
         case "BUTTON":
@@ -453,7 +456,6 @@ class Blockoption extends Component {
                 <div className={styles.featureColumn}>
                   <div className={styles.btnLinkColumn}>
                     <div className={styles.title}>Button Link</div>
-                    <div className={styles.case}>Same Tag</div>
                   </div>
                   <div className={styles.urlColumn}>
                     <button className={styles.btn}>URL</button>

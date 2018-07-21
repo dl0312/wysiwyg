@@ -10,6 +10,9 @@ const update = require("immutability-helper");
 const itemSource = {
   beginDrag(props, monitor, component) {
     console.log("dragging");
+    props.masterCallback("OnDrag", "columnList");
+    console.log(props.masterCallback);
+
     const columnListArray = [];
     component.props.array.map(element => {
       columnListArray.push([{ type: "builder" }]);
@@ -24,6 +27,7 @@ const itemSource = {
   },
   endDrag(props, monitor, component) {
     const columnListArray = [];
+    props.masterCallback("OnDrag", null);
     component.props.array.map(element => {
       columnListArray.push([]);
     });

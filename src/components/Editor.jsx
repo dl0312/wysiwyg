@@ -174,21 +174,18 @@ class Editor extends Component {
         { type: "builder" },
         {
           type: "columnList",
-          OnDrag: "columnList",
           content: [1, 1],
           columnListArray: [[{ type: "builder" }], [{ type: "builder" }]]
         },
         { type: "builder" },
         {
           type: "columnList",
-          OnDrag: "columnList",
           content: [1],
           columnListArray: [
             [
               { type: "builder" },
               {
                 type: "content",
-                OnDrag: "content",
                 content: "IMAGE",
                 fullWidth: false,
                 alt: "Image",
@@ -198,7 +195,6 @@ class Editor extends Component {
               { type: "builder" },
               {
                 type: "content",
-                OnDrag: "content",
                 content: "VIDEO",
                 videoSrc: "TRmdXDH9b1s"
               },
@@ -302,29 +298,48 @@ class Editor extends Component {
         console.log(cards[dataFromChild[0]]);
         console.log(cards[dataFromChild[0]].columnListArray);
         console.log(cards[dataFromChild[0]].columnListArray[dataFromChild[1]]);
-
-        if (
-          selectedIndex.length === dataFromChild.length &&
-          selectedIndex.every((v, i) => v === dataFromChild[i])
-        ) {
-          this.setState({
+        this.setState(
+          {
             selectedIndex: null,
             selectedContent: null
-          });
-        }
-        this.setState(
-          update(this.state, {
-            cards: {
-              [dataFromChild[0]]: {
-                columnListArray: {
-                  [dataFromChild[1]]: {
-                    $splice: [[dataFromChild[2] - 1, 2]]
+          },
+          this.setState(
+            update(this.state, {
+              cards: {
+                [dataFromChild[0]]: {
+                  columnListArray: {
+                    [dataFromChild[1]]: {
+                      $splice: [[dataFromChild[2] - 1, 2]]
+                    }
                   }
                 }
               }
-            }
-          })
+            })
+          )
         );
+        // if (
+        //   selectedIndex.length === dataFromChild.length &&
+        //   selectedIndex.every((v, i) => v === dataFromChild[i])
+        // ) {
+        //   this.setState({
+        //     selectedIndex: null,
+        //     selectedContent: null
+        //   });
+        // }
+
+        // this.setState(
+        //   update(this.state, {
+        //     cards: {
+        //       [dataFromChild[0]]: {
+        //         columnListArray: {
+        //           [dataFromChild[1]]: {
+        //             $splice: [[dataFromChild[2] - 1, 2]]
+        //           }
+        //         }
+        //       }
+        //     }
+        //   })
+        // );
       } else if (dataFromChild.length === 2) {
         if (
           selectedIndex.length === dataFromChild.length &&
@@ -634,7 +649,8 @@ class Editor extends Component {
       this.setState({ contentWidth: dataFromChild });
     } else if (type === "font") {
       this.setState({ font: dataFromChild });
-    } else if (type === "onDrag") {
+    } else if (type === "OnDrag") {
+      console.log(dataFromChild);
       this.setState({ OnDrag: dataFromChild });
     } else if (type === "rightMenu") {
       this.setState({
@@ -880,6 +896,9 @@ class Editor extends Component {
               index={index}
               moveCard={this.moveCard}
               handleDrop={this.handleDrop}
+              contentWidth={contentWidth}
+              OnDrag={this.state.OnDrag}
+              masterCallback={this.masterCallback}
             />
           );
           break;
@@ -899,7 +918,6 @@ class Editor extends Component {
                 value={item.value}
                 imageSrc={item.imageSrc}
                 videoSrc={item.videoSrc}
-                OnDrag={item.OnDrag}
                 content={item.content}
                 columnListArray={item.columnListArray}
                 callbackfromparent={this.buttonCallback}
@@ -950,6 +968,8 @@ class Editor extends Component {
                 selectedIndex={selectedIndex}
                 hoveredIndex={hoveredIndex}
                 contentWidth={contentWidth}
+                OnDrag={this.state.OnDrag}
+                masterCallback={this.masterCallback}
               />
             </Card>
           );
@@ -966,7 +986,8 @@ class Editor extends Component {
             style={{
               backgroundColor: `rgba(${this.state.color.r}, ${
                 this.state.color.g
-              }, ${this.state.color.b}, ${this.state.color.a})`
+              }, ${this.state.color.b}, ${this.state.color.a})`,
+              position: "relative"
             }}
             className={styles.left}
           >
@@ -978,16 +999,21 @@ class Editor extends Component {
             >
               <div
                 style={{
-                  position: "relative",
+                  position: "fixed",
                   padding: "15px 15px",
-                  margin: "0 -20px",
                   borderBottom: "2px solid #eee",
-                  marginBottom: "20px",
                   display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                   transition: "opacity 0.5s ease",
+                  backgroundColor: "white",
+                  marginTop: "1px",
+                  zIndex: "200",
                   opacity:
                     this.state.selectedContent !== null
-                      ? this.state.selectedContent.content === "TEXT"
+                      ? (this.state.selectedContent.content === "TEXT") |
+                        (this.state.selectedContent.content === "BUTTON") |
+                        (this.state.selectedContent.content === "HTML")
                         ? "1"
                         : "0"
                       : "0"
@@ -1018,6 +1044,7 @@ class Editor extends Component {
                   <i className="fas fa-list-ul" />
                 )}
               </div>
+              <div style={{ marginTop: "60px" }} />
               {compArray}
             </EditorLeft>
           </div>
@@ -1033,21 +1060,6 @@ class Editor extends Component {
               OnChangeCards={this.OnChangeCards}
             />
           </div>
-          {/* <div
-            style={{
-              position: "absolute",
-              width: "100px",
-              right: "300px",
-              bottom: "200px"
-            }}
-          >
-            selectedIndex: {selectedIndex}
-            <br />
-            {JSON.stringify(this.showSelected(selectedIndex))}
-            <button onClick={() => this.showSelected(selectedIndex)}>
-              selectedInfo
-            </button>
-          </div> */}
         </div>
       </Fragment>
     );

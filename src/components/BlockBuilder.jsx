@@ -6,7 +6,7 @@ import { findDOMNode } from "react-dom";
 import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
 
 const barStyle = {
-  width: "120px",
+  width: "100%",
   outline: "darkblue solid 1px"
 };
 
@@ -16,7 +16,7 @@ const builderStyle = {
   backgroundColor: "darkblue",
   borderRadius: "5px",
   fontSize: "12px",
-  padding: "5px 15px",
+  padding: "2px 10px",
   position: "absolute"
 };
 
@@ -24,6 +24,8 @@ const builderTarget = {
   drop(props, monitor, component) {
     console.log("drop");
     const type = monitor.getItemType();
+    props.masterCallback("OnDrag", null);
+
     console.log(monitor.getItem().index);
     if (type === ItemTypes.CARD) {
       props.moveCard(monitor.getItem().index, props.index);
@@ -101,11 +103,15 @@ class BlockBuilder extends Component {
 
   render() {
     const { connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "0.5" : "1";
+    const opacity = !this.state.hover
+      ? this.props.OnDrag !== "content"
+        ? "0"
+        : "0.5"
+      : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
-        <div>
+        <div style={{ width: "100%" }}>
           <div
             style={{
               position: "relative",

@@ -5,7 +5,6 @@ import ItemTypes from "./ItemTypes";
 import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
 
 const barStyle = {
-  width: "120px",
   outline: "darkblue solid 1px"
 };
 
@@ -15,7 +14,7 @@ const builderStyle = {
   backgroundColor: "darkblue",
   borderRadius: "5px",
   fontSize: "12px",
-  padding: "5px 15px",
+  padding: "2px 15px",
   position: "absolute"
 };
 
@@ -23,6 +22,8 @@ const builderTarget = {
   drop(props, monitor, component) {
     console.log("drop");
     const type = monitor.getItemType();
+    props.masterCallback("OnDrag", null);
+
     console.log(type);
     if (type === ItemTypes.CARD) {
       props.moveCard(monitor.getItem().index, props.index);
@@ -100,11 +101,15 @@ class Builder extends Component {
 
   render() {
     const { connectDropTarget } = this.props;
-    const opacity = !this.state.hover ? "0.5" : "1";
+    const opacity = !this.state.hover
+      ? this.props.OnDrag !== "columnList"
+        ? "0"
+        : "0.5"
+      : "1";
     return (
       connectDropTarget &&
       connectDropTarget(
-        <div>
+        <div style={{ width: "100%" }}>
           <div
             style={{
               position: "relative",
@@ -112,7 +117,8 @@ class Builder extends Component {
               alignItems: "center",
               justifyContent: "center",
               transition: "opacity 0.3s ease",
-              height: "10px",
+              height: "5px",
+              zIndex: "300",
               opacity
             }}
           >
@@ -125,7 +131,7 @@ class Builder extends Component {
             >
               Column Here
             </div>
-            <div style={{ ...barStyle }} />
+            <div style={{ ...barStyle, width: "100%" }} />
           </div>
           {this.state.drop ? (
             <div className="drag">

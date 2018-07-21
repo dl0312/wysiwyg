@@ -90,16 +90,18 @@ class ColumnItem extends Component {
               index={this.props.index.concat(index)}
               moveCard={this.props.moveCard}
               handleDrop={this.props.handleDrop}
+              OnDrag={this.props.OnDrag}
+              masterCallback={this.props.masterCallback}
             />
           );
           break;
         case "content":
           compArray.push(
             <Container
+              type={item.type}
               value={item.value}
               imageSrc={item.imageSrc}
               videoSrc={item.videoSrc}
-              OnDrag={item.OnDrag}
               content={item.content}
               callbackfromparent={this.props.callbackfromparent}
               selectedIndex={this.props.selectedIndex}

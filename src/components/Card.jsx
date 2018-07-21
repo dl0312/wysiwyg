@@ -14,7 +14,6 @@ const style = {
   backgroundColor: "transparent",
   width: "99%",
   position: "relative",
-  marginBottom: "0.2rem",
   padding: "0.1rem",
   display: "flex",
   alignItems: "center",
