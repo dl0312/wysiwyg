@@ -1,6 +1,6 @@
 export default {
   CARD: "card",
-  COLUMNCARD: "columncard",
+  COLUMN: "COLUMN",
   CONTENT: "content",
   ROW: "row",
   BOX: "box"

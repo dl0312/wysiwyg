@@ -2,10 +2,10 @@ import React from "react";
 import { Route, withRouter } from "react-router-dom";
 import styles from "./App.scss";
 import Navigation from "./components/Navigation";
-import Home from "./components/Home";
-import Guide from "./components/Guide";
-import Wiki from "./components/Wiki";
-import Store from "./components/Store";
+import Home from "./components/Home/Home";
+import Board from "./components/Board/Board";
+import Wiki from "./components/Wiki/Wiki";
+import Store from "./components/Store/Store";
 import Editor from "./components/Editor";
 import Profile from "./components/Profile";
 import "./App.css";
@@ -16,7 +16,7 @@ const App = () => {
       <Navigation />
       <div className={styles.content}>
         <Route path="/ " component={Home} />
-        <Route path="/guide" component={Guide} />
+        <Route path="/guide" component={Board} />
         <Route path="/wiki" component={Wiki} />
         <Route path="/store" component={Store} />
         <Route path="/undefined" component={Editor} />

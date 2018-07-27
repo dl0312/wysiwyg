@@ -1,11 +1,41 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-
 import styles from "./ContentItem.scss";
-
 import ItemTypes from "./ItemTypes";
+import BlockDefaults from "./BlockDefaults";
 import { DragSource } from "react-dnd";
 import { Value } from "slate";
+import styled from "styled-components";
+
+const Item = styled.li`
+  cursor: -webkit-grab;
+  border: 0.4px solid #d8d8d8;
+  border-radius: 5px;
+  height: 115px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  transition: box-shadow 0.2s ease;
+  opacity: ${props => props.opacity};
+  background-color: #fafafa;
+  &:hover {
+    -webkit-box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
+    -moz-box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
+  }
+`;
+
+const Icon = styled.div`
+  font-size: 40px;
+  margin-bottom: 10px;
+`;
+
+const Title = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+`;
 
 const itemSource = {
   beginDrag(props) {
@@ -19,13 +49,12 @@ const itemSource = {
     // default block content src, text etc...
     switch (props.item.name) {
       case "IMAGE":
-        item.imageSrc =
-          "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif";
+        item.imageSrc = BlockDefaults.IMG_DEFAULT;
         item.fullWidth = false;
         item.alt = "Image";
         break;
       case "VIDEO":
-        item.videoSrc = "TRmdXDH9b1s";
+        item.videoSrc = BlockDefaults.VIDEO_DEFAULT;
         break;
       case "BUTTON":
         item.value = Value.fromJSON({
@@ -39,7 +68,7 @@ const itemSource = {
                     object: "text",
                     leaves: [
                       {
-                        text: "CLICK ME!"
+                        text: BlockDefaults.BUTTON_DEFAULT
                       }
                     ]
                   }
@@ -61,7 +90,7 @@ const itemSource = {
                     object: "text",
                     leaves: [
                       {
-                        text: "A line of text in a paragraph."
+                        text: BlockDefaults.TEXT_DEFAULT
                       }
                     ]
                   }
@@ -86,7 +115,7 @@ const itemSource = {
                     object: "text",
                     leaves: [
                       {
-                        text: "Hello, world!"
+                        text: BlockDefaults.HTML_DEFAULT
                       }
                     ]
                   }
@@ -123,15 +152,12 @@ class ContentItem extends Component {
     return (
       connectDragSource &&
       connectDragSource(
-        <li
-          style={{ opacity, backgroundColor: "#fafafa" }}
-          className={styles.item}
-        >
-          <div className={styles.icon}>
-            <i className={icon} />
-          </div>
-          <div className={styles.title}>{name}</div>
-        </li>
+        <div>
+          <Item opacity={opacity}>
+            <Icon className={icon} />
+            <Title>{name}</Title>
+          </Item>
+        </div>
       )
     );
   }

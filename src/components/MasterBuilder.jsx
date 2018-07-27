@@ -23,11 +23,9 @@ const builderTarget = {
     console.log("drop");
     const type = monitor.getItemType();
     props.masterCallback("OnDrag", null);
-
-    console.log(type);
-    if (type === ItemTypes.CARD) {
+    if (type === ItemTypes.COLUMN) {
       props.moveCard(monitor.getItem().index, props.index);
-    } else if (type === ItemTypes.CONTENT || type === ItemTypes.ROW) {
+    } else if (type === ItemTypes.ROW) {
       props.handleDrop(monitor.getItem(), props.index);
     }
   }
@@ -119,7 +117,7 @@ class Builder extends Component {
 }
 
 export default DropTarget(
-  [ItemTypes.ROW],
+  [ItemTypes.ROW, ItemTypes.COLUMN],
   builderTarget,
   (connect, monitor) => ({
     connectDropTarget: connect.dropTarget(),

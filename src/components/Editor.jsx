@@ -451,7 +451,7 @@ class Editor extends Component {
       const { cards } = this.state;
       const dragCard = cards[dragIndex];
       const dragBuilder = { type: "builder" };
-      console.log(dragCard);
+      console.log(dragIndex);
       if (dragIndex < hoverIndex) {
         this.setState(
           update(this.state, {

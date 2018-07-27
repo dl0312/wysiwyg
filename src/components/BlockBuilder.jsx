@@ -1,35 +1,41 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import classnames from "classnames";
 import ItemTypes from "./ItemTypes";
-import { findDOMNode } from "react-dom";
-import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
+import { DropTarget } from "react-dnd";
+import styled from "styled-components";
 
-const barStyle = {
-  width: "100%",
-  outline: "darkblue solid 1px"
-};
+const Bar = styled.div`
+  width: 100%;
+  outline: darkblue solid 1px;
+`;
 
-const builderStyle = {
-  textAlign: "center",
-  color: "white",
-  backgroundColor: "darkblue",
-  borderRadius: "5px",
-  fontSize: "12px",
-  padding: "2px 10px",
-  position: "absolute"
-};
+const Builder = styled.div`
+  text-align: center;
+  color: white;
+  background-color: darkblue;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 2px 10px;
+  position: absolute;
+`;
+
+const BuilderContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+  height: 10px;
+  opacity: ${props => props.opacity};
+`;
 
 const builderTarget = {
-  drop(props, monitor, component) {
-    // console.log("drop");
+  drop(props, monitor) {
     const type = monitor.getItemType();
     props.masterCallback("OnDrag", null);
-
-    // console.log(monitor.getItem().index);
     if (type === ItemTypes.CARD) {
       props.moveCard(monitor.getItem().index, props.index);
-    } else if (type === ItemTypes.CONTENT || type === ItemTypes.ROW) {
+    } else if (type === ItemTypes.CONTENT) {
       props.handleDrop(monitor.getItem(), props.index);
     }
   }
@@ -84,35 +90,10 @@ class BlockBuilder extends Component {
       connectDropTarget &&
       connectDropTarget(
         <div style={{ width: "100%" }}>
-          <div
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "opacity 0.3s ease",
-              height: "10px",
-              opacity
-            }}
-          >
-            <div
-              className={classnames(
-                "builder",
-                this.state.hover ? "builder-hover" : null
-              )}
-              style={{ ...builderStyle }}
-            >
-              Block Here {this.props.id}
-            </div>
-            <div style={{ ...barStyle }} />
-          </div>
-          {this.state.drop ? (
-            <div className="drag">
-              <button onClick={() => console.log(this.state.drag)} />
-            </div>
-          ) : (
-            <div className="notdrag" />
-          )}
+          <BuilderContainer opacity={opacity}>
+            <Builder>Block Here {this.props.id}</Builder>
+            <Bar />
+          </BuilderContainer>
         </div>
       )
     );

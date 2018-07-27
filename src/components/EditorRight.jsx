@@ -3,7 +3,134 @@ import styles from "./EditorRight.scss";
 import reactCSS from "reactcss";
 import ContentItem from "./ContentItem";
 import RowItem from "./RowItem";
+import BlockOptions from "./BlockOptions";
 import { SketchPicker } from "react-color";
+import styled from "styled-components";
+
+const Container = styled.div`
+  color: #505659;
+  position: relative;
+`;
+
+const MenuColumn = styled.ul`
+  color: #abacad;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 45px;
+  background-color: #d6d9dc;
+`;
+
+const MenuItem = styled.li`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: -webkit-grab;
+`;
+
+const Icon = styled.i`
+  font-size: 20px;
+`;
+
+const Title = styled.div`
+  margin-left: 5px;
+  font-size: 12px;
+  font-weight: 600;
+`;
+
+const ContentBody = styled.div`
+  padding: 15px;
+`;
+
+const ContentColumn = styled.ul`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+`;
+
+const RowBody = styled.div`
+  padding: 25px;
+`;
+
+const BodyContainer = styled.div`
+  padding-top: 2px;
+`;
+
+const NavBar = styled.div`
+  padding: 0 20px;
+  height: 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 12px;
+  color: rgb(81, 97, 103);
+  background-color: rgb(234, 234, 234);
+`;
+
+const BodyColumn = styled.ul`
+  height: 0px;
+  padding: 0 20px;
+`;
+
+const Item = styled.li`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  font-weight: 600;
+  color: #8f9699;
+`;
+
+const Indicator = styled.input`
+  height: 30px;
+  text-align: center;
+  width: 45px;
+  border: none;
+  border-top: 0.4px solid #d8d8d8;
+  border-bottom: 0.4px solid #d8d8d8;
+`;
+
+const Operator = styled.button`
+  height: 30px;
+  width: 25px;
+  border: none;
+  background-color: #fff;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  border: 0.4px solid #d8d8d8;
+  outline: none;
+`;
+
+const Swatch = styled.div`
+  width: 150px;
+  padding: 5px;
+  background-color: #fff;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  cursor: pointer;
+`;
+
+const PopOver = styled.div`
+  position: absolute;
+  margin-top: 5px;
+  z-index: 2;
+`;
+
+const FontColumn = styled.div`
+  position: relative;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  border: none;
+  border-radius: 3px;
+  border: 0.4px solid #d8d8d8;
+  padding: 5px 0;
+`;
 
 const fontFamily = [
   "Roboto",
@@ -78,9 +205,9 @@ class EditorRight extends Component {
   render() {
     return (
       <Fragment>
-        <div className={styles.editorRight}>
-          <ul className={styles.menuColumn}>
-            <li
+        <Container>
+          <MenuColumn>
+            <MenuItem
               style={{ background: this.myColor(0), color: this.fontColor(0) }}
               onClick={() => {
                 this.toggle(0);
@@ -91,14 +218,11 @@ class EditorRight extends Component {
               onMouseLeave={() => {
                 this.leave(0);
               }}
-              className={styles.menuItem}
             >
-              <div className={styles.icon}>
-                <i className="fas fa-th-large" />
-              </div>
-              <div className={styles.title}>CONTENT</div>
-            </li>
-            <li
+              <Icon className="fas fa-th-large" />
+              <Title>CONTENT</Title>
+            </MenuItem>
+            <MenuItem
               style={{ background: this.myColor(1), color: this.fontColor(1) }}
               onClick={() => {
                 this.toggle(1);
@@ -109,14 +233,11 @@ class EditorRight extends Component {
               onMouseLeave={() => {
                 this.leave(1);
               }}
-              className={styles.menuItem}
             >
-              <div className={styles.icon}>
-                <i className="fas fa-bars" />
-              </div>
-              <div className={styles.title}>ROW</div>
-            </li>
-            <li
+              <Icon className="fas fa-bars" />
+              <Title>ROW</Title>
+            </MenuItem>
+            <MenuItem
               style={{ background: this.myColor(2), color: this.fontColor(2) }}
               onClick={() => {
                 this.toggle(2);
@@ -127,23 +248,20 @@ class EditorRight extends Component {
               onMouseLeave={() => {
                 this.leave(2);
               }}
-              className={styles.menuItem}
             >
-              <div className={styles.icon}>
-                <i className="fas fa-columns" />
-              </div>
-              <div className={styles.title}>BODY</div>
-            </li>
-          </ul>
+              <Icon className="fas fa-columns" />
+              <Title>BODY</Title>
+            </MenuItem>
+          </MenuColumn>
           {this.showSection()}
-          <Blockoption
+          <BlockOptions
             handleOnChange={this.props.handleOnChange}
             selectedIndex={this.props.selectedIndex}
             selectedContent={this.props.selectedContent}
             showSelected={this.props.showSelected}
             OnChangeCards={this.props.OnChangeCards}
           />
-        </div>
+        </Container>
       </Fragment>
     );
   }
@@ -170,8 +288,8 @@ class Content extends Component {
 
   render() {
     return (
-      <div className={styles.contentBody}>
-        <ul className={styles.contentColumn}>
+      <ContentBody>
+        <ContentColumn>
           {this.state.contentItems.map((item, index) => (
             <ContentItem
               key={index}
@@ -182,8 +300,8 @@ class Content extends Component {
               masterCallback={this.props.masterCallback}
             />
           ))}
-        </ul>
-      </div>
+        </ContentColumn>
+      </ContentBody>
     );
   }
 }
@@ -207,19 +325,17 @@ class Row extends Component {
 
   render() {
     return (
-      <div className={styles.rowBody}>
-        <div className={styles.rowRow}>
-          {this.state.rowItems.map((item, index) => (
-            <RowItem
-              key={index}
-              item={item}
-              array={item.array}
-              handleDrop={name => this.addItem(name)}
-              masterCallback={this.props.masterCallback}
-            />
-          ))}
-        </div>
-      </div>
+      <RowBody>
+        {this.state.rowItems.map((item, index) => (
+          <RowItem
+            key={index}
+            item={item}
+            array={item.array}
+            handleDrop={name => this.addItem(name)}
+            masterCallback={this.props.masterCallback}
+          />
+        ))}
+      </RowBody>
     );
   }
 }
@@ -235,13 +351,32 @@ class Body extends Component {
   }
 
   handleOnChange = () => {
-    console.log("in body comp width: " + this.state.contentWidth);
     this.props.masterCallback("width", this.state.contentWidth);
   };
 
   handleOnClick = () => {
-    console.log("popup!!!");
     this.setState({ displayFontFamily: !this.state.displayFontFamily });
+  };
+
+  handleOperatorOnClick = operator => {
+    if (operator === "-") {
+      if (this.state.contentWidth > 400) {
+        this.setState(
+          {
+            contentWidth: this.state.contentWidth - 50
+          },
+          () => this.handleOnChange()
+        );
+      }
+    } else if (operator === "+") {
+      if (this.state.contentWidth < 800)
+        this.setState(
+          {
+            contentWidth: this.state.contentWidth + 50
+          },
+          () => this.handleOnChange()
+        );
+    }
   };
 
   handleOnClickFont = () => {
@@ -250,102 +385,72 @@ class Body extends Component {
 
   render() {
     return (
-      <div className={styles.bodyBody}>
-        <div className={styles.nav}>
-          <div className={styles.navBar}>
-            <div className={styles.title}>GENERAL</div>
-          </div>
-          <ul className={styles.column}>
-            <li className={styles.item}>
-              <div className={styles.subtitle}>Background Color</div>
-              <div className={styles.func}>
-                <SketchExample masterCallback={this.props.masterCallback} />
-              </div>
-            </li>
-            <li className={styles.item}>
-              <div className={styles.subtitle}>Content Width</div>
-              <div className={styles.func}>
-                <div className={styles.index}>
-                  <button
-                    onClick={() => {
-                      this.state.contentWidth > 400
-                        ? this.setState(
-                            {
-                              contentWidth: this.state.contentWidth - 50
-                            },
-                            () => this.handleOnChange()
-                          )
-                        : null;
+      <BodyContainer>
+        <NavBar>GENERAL</NavBar>
+        <BodyColumn>
+          <Item>
+            Background Color
+            <SketchExample masterCallback={this.props.masterCallback} />
+          </Item>
+          <Item>
+            Content Width
+            <div>
+              <Operator onClick={() => this.handleOperatorOnClick("-")}>
+                -
+              </Operator>
+              <Indicator value={this.state.contentWidth} readOnly="true" />
+              <Operator onClick={() => this.handleOperatorOnClick("+")}>
+                +
+              </Operator>
+            </div>
+          </Item>
+          <Item>
+            Font Family
+            <div className="func">
+              <div>
+                <Swatch onClick={this.handleOnClick}>
+                  <div
+                    style={{
+                      padding: "5px 10px",
+                      fontFamily: `${this.state.font}`
                     }}
-                    className={styles.minusBtn}
+                    className={styles.font}
                   >
-                    -
-                  </button>
-                  <input
-                    className={styles.num}
-                    value={this.state.contentWidth}
-                    readOnly="true"
-                  />
-                  <button
-                    onClick={() => {
-                      {
-                        this.state.contentWidth < 800
-                          ? this.setState(
-                              {
-                                contentWidth: this.state.contentWidth + 50
-                              },
-                              () => this.handleOnChange()
-                            )
-                          : null;
-                      }
-                    }}
-                    className={styles.plusBtn}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            </li>
-            <li className={styles.item}>
-              <div className={styles.subtitle}>Font Family</div>
-              <div className={styles.func}>
-                <div>
-                  <div className={styles.swatch} onClick={this.handleOnClick}>
-                    <div
-                      style={{ fontFamily: `${this.state.font}` }}
-                      className={styles.font}
-                    >
-                      {this.state.font}
-                    </div>
+                    {this.state.font}
                   </div>
-                  {this.state.displayFontFamily ? (
-                    <div className={styles.popover}>
-                      <div className={styles.fontColumn}>
-                        {fontFamily.map(font => (
-                          <div
-                            className={styles.title}
-                            onClick={() =>
-                              this.setState(
-                                {
-                                  font
-                                },
-                                () => this.handleOnClickFont()
-                              )
-                            }
-                            style={{ fontFamily: `${font}` }}
-                          >
-                            {font}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
+                </Swatch>
+                {this.state.displayFontFamily ? (
+                  <PopOver>
+                    <FontColumn>
+                      {fontFamily.map(font => (
+                        <div
+                          className={styles.title}
+                          onClick={() =>
+                            this.setState(
+                              {
+                                font
+                              },
+                              () => this.handleOnClickFont()
+                            )
+                          }
+                          style={{
+                            fontFamily: `${font}`,
+                            cursor: "pointer",
+                            width: "150px",
+                            padding: "5px 10px"
+                          }}
+                        >
+                          {font}
+                        </div>
+                      ))}
+                    </FontColumn>
+                  </PopOver>
+                ) : null}
               </div>
-            </li>
-          </ul>
-        </div>
-      </div>
+            </div>
+          </Item>
+        </BodyColumn>
+      </BodyContainer>
     );
   }
 }
@@ -425,423 +530,6 @@ class SketchExample extends Component {
             />
           </div>
         ) : null}
-      </div>
-    );
-  }
-}
-
-class Blockoption extends Component {
-  showOptions = () => {
-    const {
-      selectedIndex,
-      selectedContent,
-      showSelected,
-      handleOnChange,
-      OnChangeCards,
-      imageSrc
-    } = this.props;
-    // console.log(this.props.selectedContent.content);
-    if (selectedIndex.length === 2 || selectedIndex.length === 3) {
-      switch (selectedContent.content) {
-        case "BUTTON":
-          return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>LINK</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Button Link</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input className={styles.input} type="text" />
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>COLORS</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.colorsColumn}>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Text Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Background Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Hover Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>SPACING</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button className={styles.align}>
-                        <i className="fas fa-align-left" />
-                      </button>
-                      <button className={styles.align}>
-                        <i className="fas fa-align-center" />
-                      </button>
-                      <button className={styles.align}>
-                        <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.lineHeightColumn}>
-                    <div className={styles.title}>Line Height</div>
-                    <div className={styles.alignColumn}>
-                      <button className={styles.align}>
-                        <i className="fas fa-align-left" />
-                      </button>
-                      <button className={styles.align}>
-                        <i className="fas fa-align-center" />
-                      </button>
-                      <button className={styles.align}>
-                        <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>GENERAL</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Button Link</div>
-                    <div className={styles.case}>Same Tag</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input type="text" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        case "TEXT":
-          return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>TEXT</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).imageSrc}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "URL")
-                      }
-                    />
-                  </div>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "flex-start")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-left" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "center")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-center" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "flex-end")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.fullWidthColumn}>
-                    <div className={styles.title}>Full Width</div>
-                    <div className={styles.buttonColumn}>
-                      <label className={styles.switch}>
-                        <input
-                          onClick={() =>
-                            OnChangeCards(selectedIndex, "fullWidth", "toggle")
-                          }
-                          type="checkbox"
-                        />
-                        <span className={styles.sliderRound} />
-                      </label>
-                    </div>
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Alternate Text</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).alt}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "ALT")
-                      }
-                    />
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).url}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "LINK")
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        case "IMAGE":
-          return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>IMAGE</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).imageSrc}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "URL")
-                      }
-                    />
-                  </div>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "flex-start")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-left" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "center")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-center" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "flex-end")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.fullWidthColumn}>
-                    <div className={styles.title}>Full Width</div>
-                    <div className={styles.buttonColumn}>
-                      <label className={styles.switch}>
-                        <input
-                          onClick={() =>
-                            OnChangeCards(selectedIndex, "fullWidth", "toggle")
-                          }
-                          type="checkbox"
-                        />
-                        <span class={styles.sliderRound} />
-                      </label>
-                    </div>
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Alternate Text</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).alt}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "ALT")
-                      }
-                    />
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).url}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "LINK")
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        case "VIDEO":
-          return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>VIDEO</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Video URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).videoSrc}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "VIDEO", "URL")
-                      }
-                    />
-                  </div>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "flex-start")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-left" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "center")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-center" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          OnChangeCards(selectedIndex, "align", "flex-end")
-                        }
-                        className={styles.align}
-                      >
-                        <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        default:
-          return null;
-      }
-    }
-  };
-
-  render() {
-    return (
-      <div
-        style={{
-          top:
-            this.props.selectedContent === null ||
-            this.props.selectedContent === undefined
-              ? "900px"
-              : "45px",
-          height: "90vh",
-          opacity:
-            this.props.selectedContent === null ||
-            this.props.selectedContent === undefined
-              ? "0"
-              : "1"
-        }}
-        className={styles.blockOption}
-      >
-        <div className={styles.header}>
-          <div className={styles.blockName}>CONTENT</div>
-          <div className={styles.btnColumn}>
-            <button className={styles.btn}>
-              <i className="fas fa-trash-alt" />
-            </button>
-            <button className={styles.btn}>
-              <i className="fas fa-copy" />
-            </button>
-            <button className={styles.btn}>
-              <i className="fas fa-angle-down" />
-            </button>
-          </div>
-        </div>
-        {this.props.selectedContent ? this.showOptions() : null}
       </div>
     );
   }

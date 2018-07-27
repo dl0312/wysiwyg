@@ -1,14 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {
-  DragSource,
-  ConnectDragSource,
-  DragSourceConnector,
-  DragSourceMonitor,
-  ConnectDragPreview
-} from "react-dnd";
+import { DragSource } from "react-dnd";
 import ItemTypes from "./ItemTypes";
 import classnames from "classnames";
+import styled from "styled-components";
 
 const style = {
   backgroundColor: "transparent",
@@ -20,52 +15,52 @@ const style = {
   justifyContent: "center"
 };
 
-const handleStyle = {
-  backgroundColor: "#9c88ff",
-  width: "2rem",
-  height: "2rem",
-  borderTopLeftRadius: "100%",
-  borderBottomLeftRadius: "100%",
-  marginRight: "0.75rem",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  position: "absolute",
-  top: "50%",
-  transform: "translate(12px,-16px)",
-  marginLeft: "-2px",
-  right: "0px"
-};
+const Handle = styled.div`
+  background-color: #9c88ff;
+  width: 2rem;
+  height: 2rem;
+  border-top-left-radius: 100%;
+  border-bottom-left-radius: 100%;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: absolute;
+  top: 50%;
+  transform: translate(12px, -16px);
+  margin-left: -2px;
+  right: 0px;
+`;
 
-const buttonStyle = {
-  border: "none",
-  outline: "none",
-  backgroundColor: "#9c88ff",
-  color: "white",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "2rem",
-  height: "2rem",
-  marginBottom: "10px",
-  cursor: "pointer"
-};
+const Button = styled.button`
+  border: none;
+  outline: none;
+  background-color: #9c88ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 10px;
+  cursor: pointer;
+`;
 
-const toolStyle = {
-  display: "flex",
-  position: "absolute",
-  marginRight: "0.75rem",
-  cursor: "-webkit-grab",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  top: "50%",
-  transform: "translate(12px,-16px)",
-  marginLeft: "-2px",
-  right: "0px"
-};
+const Tool = styled.div`
+  display: flex;
+  position: absolute;
+  margin-right: 0.75rem;
+  cursor: -webkit-grab;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  top: 50%;
+  transform: translate(12px, -16px);
+  margin-left: -2px;
+  right: 0px;
+`;
 
 const cardSource = {
   beginDrag(props, monitor, component) {
@@ -76,8 +71,6 @@ const cardSource = {
     props.masterCallback("OnDrag", null);
     return { index: props.index };
   }
-  // canDrag(props, monitor) {},
-  // isDragging(props, monitor) {}
 };
 
 class Card extends React.Component {
@@ -85,7 +78,6 @@ class Card extends React.Component {
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
     index: PropTypes.number.isRequired,
-    moveCard: PropTypes.func.isRequired,
     callbackfromparent: PropTypes.func.isRequired
   };
 
@@ -110,25 +102,20 @@ class Card extends React.Component {
 
   handleOnMouseOver = event => {
     event.stopPropagation();
-    // console.log(event.target);
     this.props.callbackfromparent("mouseover", this.props.index);
-    // console.log(`card in hover true`);
   };
 
   handleOnMouseOverTool = event => {
     this.setState({
       toolHover: true
     });
-    // console.log(`tool in toolHover true`);
   };
 
   handleOnMouseLeaveTool = event => {
     event.stopPropagation();
-
     this.setState({
       toolHover: false
     });
-    // console.log(`tool out toolHover true`);
   };
 
   handleOnMouseDown = event => {
@@ -173,43 +160,37 @@ class Card extends React.Component {
           {hover || active ? (
             <div>
               {this.state.toolHover ? (
-                <div
-                  onMouseLeave={this.handleOnMouseLeaveTool}
-                  style={{ ...toolStyle }}
-                >
-                  <button
+                <Tool onMouseLeave={this.handleOnMouseLeaveTool}>
+                  <Button
                     onClick={() => {
                       callbackfromparent("delete", index, this);
                     }}
                     style={{
-                      ...buttonStyle,
                       borderTopLeftRadius: "100%",
                       borderBottomLeftRadius: "100%"
                     }}
                   >
                     <i className="fas fa-trash-alt" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => {
                       callbackfromparent("duplicate", index, this);
                     }}
-                    style={buttonStyle}
                   >
                     <i className="far fa-copy" />
-                  </button>
+                  </Button>
                   {connectDragSource(
-                    <button style={buttonStyle}>
-                      <i className="fas fa-arrows-alt" />
-                    </button>
+                    <div>
+                      <Button>
+                        <i className="fas fa-arrows-alt" />
+                      </Button>
+                    </div>
                   )}
-                </div>
+                </Tool>
               ) : (
-                <div
-                  onMouseOver={this.handleOnMouseOverTool}
-                  style={{ ...handleStyle }}
-                >
+                <Handle onMouseOver={this.handleOnMouseOverTool}>
                   <i className="fas fa-ellipsis-h" />
-                </div>
+                </Handle>
               )}
             </div>
           ) : null}
@@ -220,7 +201,7 @@ class Card extends React.Component {
   }
 }
 
-export default DragSource(ItemTypes.ROW, cardSource, (connect, monitor) => ({
+export default DragSource(ItemTypes.COLUMN, cardSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging()
