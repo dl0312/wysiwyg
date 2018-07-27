@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import styles from "./EditorLeft.scss";
-import "./EditorLeft.css";
 
 class EditorLeft extends Component {
   constructor(props) {

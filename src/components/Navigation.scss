@@ -34,10 +34,9 @@
           .menu-item {
             text-align: center;
             padding: 15px;
-            &:link,
-            &:visited {
-              color: black;
-              text-decoration: none;
+            color: black;
+            text-decoration: none;
+            .menu-title {
             }
           }
         }

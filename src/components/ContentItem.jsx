@@ -9,9 +9,7 @@ import { Value } from "slate";
 
 const itemSource = {
   beginDrag(props) {
-    console.log("dragging");
     props.masterCallback("OnDrag", "content");
-    console.log(props.item);
 
     const item = {
       type: "content",
@@ -105,11 +103,6 @@ const itemSource = {
     return item;
   },
   endDrag(props, monitor, component) {
-    // console.log(`monitor.didDrop(): ${monitor.didDrop()}`);
-    // if (!monitor.didDrop()) {
-    //   return;
-    // }
-    console.log(monitor.getDropResult());
     props.masterCallback("OnDrag", null);
     const item = {
       type: "content",

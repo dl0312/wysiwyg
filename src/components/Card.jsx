@@ -69,9 +69,11 @@ const toolStyle = {
 
 const cardSource = {
   beginDrag(props, monitor, component) {
+    props.masterCallback("OnDrag", "columnList");
     return { index: props.index };
   },
   endDrag(props, monitor, component) {
+    props.masterCallback("OnDrag", null);
     return { index: props.index };
   }
   // canDrag(props, monitor) {},
@@ -132,23 +134,11 @@ class Card extends React.Component {
   handleOnMouseDown = event => {
     event.stopPropagation();
     this.props.callbackfromparent("select", this.props.index);
-
-    // if (this.state.hover === true) {
-    //   this.setState({ hover: false });
-    // }
-    // this.state.active
-    //   ? this.setState({
-    //       active: false,
-    //       hover: true
-    //     })
-    //   : this.setState({ active: true });
   };
 
   handleOnMouseLeave = event => {
     event.stopPropagation();
     this.props.callbackfromparent("mouseleave", this.props.index);
-    // this.setState({ hover: false, toolHover: false });
-    // console.log(`card out hover false`);
   };
 
   render() {
@@ -164,8 +154,6 @@ class Card extends React.Component {
     const opacity = isDragging ? 0.2 : 1;
     const hover = hoveredIndex === index;
     const active = selectedIndex === index;
-    // console.log(hoveredIndex);
-    // console.log(index);
 
     return (
       connectDragPreview &&
@@ -175,8 +163,8 @@ class Card extends React.Component {
           style={{ ...style, opacity }}
           className={classnames(
             "frame",
-            hover ? "hover" : null,
-            active ? "active" : null
+            hover ? "blockHover" : null,
+            active ? "blockActive" : null
           )}
           onMouseOver={this.handleOnMouseOver}
           onMouseDown={this.handleOnMouseDown}
@@ -232,7 +220,7 @@ class Card extends React.Component {
   }
 }
 
-export default DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
+export default DragSource(ItemTypes.ROW, cardSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
   connectDragPreview: connect.dragPreview(),
   isDragging: monitor.isDragging()

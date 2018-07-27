@@ -68,14 +68,13 @@ const toolStyle = {
 
 const cardSource = {
   beginDrag(props, monitor, component) {
+    props.masterCallback("OnDrag", "content");
     return { index: props.index };
   },
   endDrag(props, monitor, component) {
-    console.log(props.index);
+    props.masterCallback("OnDrag", null);
     return { index: props.index };
   }
-  // canDrag(props, monitor) {},
-  // isDragging(props, monitor) {}
 };
 
 class Container extends Component {
@@ -216,9 +215,6 @@ class Container extends Component {
         ? true
         : false
       : false;
-    // console.log(this.props.index);
-    // console.log(hoveredIndex);
-    // console.log(index);
     return (
       connectDragPreview &&
       connectDragSource &&
@@ -226,8 +222,8 @@ class Container extends Component {
         <div
           className={classnames(
             "container",
-            hover ? "hover" : null,
-            active ? "active" : null
+            hover ? "blockHover" : null,
+            active ? "blockActive" : null
           )}
           style={{
             display: "flex",

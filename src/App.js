@@ -8,6 +8,7 @@ import Wiki from "./components/Wiki";
 import Store from "./components/Store";
 import Editor from "./components/Editor";
 import Profile from "./components/Profile";
+import "./App.css";
 
 const App = () => {
   return (

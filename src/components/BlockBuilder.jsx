@@ -22,45 +22,17 @@ const builderStyle = {
 
 const builderTarget = {
   drop(props, monitor, component) {
-    console.log("drop");
+    // console.log("drop");
     const type = monitor.getItemType();
     props.masterCallback("OnDrag", null);
 
-    console.log(monitor.getItem().index);
+    // console.log(monitor.getItem().index);
     if (type === ItemTypes.CARD) {
       props.moveCard(monitor.getItem().index, props.index);
     } else if (type === ItemTypes.CONTENT || type === ItemTypes.ROW) {
       props.handleDrop(monitor.getItem(), props.index);
     }
   }
-
-  // candrop 없어야 drop이 뜸
-
-  // hover(props, monitor, component) {
-  //   // Determine rectangle on screen
-  //   const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
-
-  //   // Get vertical middle
-  //   const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-  //   // Determine mouse position
-  //   const clientOffset = monitor.getClientOffset();
-
-  //   // Get pixels to the top
-  //   const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-  //   // Only perform the move when the mouse has crossed half of the items height
-  //   // When dragging downwards, only move when the cursor is below 50%
-  //   // When dragging upwards, only move when the cursor is above 50%
-  //   // Dragging downwards
-  //   // console.log(hoverBoundingRect.top);
-
-  //   // Time to actually perform the action
-  //   // Note: we're mutating the monitor item here!
-  //   // Generally it's better to avoid mutations,
-  //   // but it's good here for the sake of performance
-  //   // to avoid expensive index searches.
-  // }
 };
 
 class BlockBuilder extends Component {

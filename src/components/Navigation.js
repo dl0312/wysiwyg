@@ -19,16 +19,16 @@ class Navigation extends Component {
                   <div className={styles.logoTitle}>CLAP</div>
                 </NavLink>
                 <NavLink to="/guide" className={styles.menuItem}>
-                  GUIDE
+                  <div className={styles.menuTitle}>GUIDE</div>
                 </NavLink>
                 <NavLink to="/wiki" className={styles.menuItem}>
-                  WIKI
+                  <div className={styles.menuTitle}>WIKI</div>
                 </NavLink>
                 <NavLink to="/store" className={styles.menuItem}>
-                  STORE
+                  <div className={styles.menuTitle}>STORE</div>
                 </NavLink>
                 <NavLink to="/undefined" className={styles.menuItem}>
-                  UNDEFINED
+                  <div className={styles.menuTitle}>UNDEFINED</div>
                 </NavLink>
               </ul>
             </div>

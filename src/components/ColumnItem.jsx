@@ -122,6 +122,7 @@ class ColumnItem extends Component {
               onKeyDown={this.props.onKeyDown}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}
+              masterCallback={this.props.masterCallback}
             />
           );
           break;
