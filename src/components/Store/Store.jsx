@@ -1,12 +1,23 @@
 import React, { Component } from "react";
 import styles from "./Store.scss";
+import ShowWindow from "./ShowWindow";
+import styled from "styled-components";
+
+const StoreContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 30px;
+  font-family: "Open Sans", sans-serif;
+`;
 
 class Store extends Component {
   render() {
     return (
-      <div className={styles.store}>
-        <Showcase />
-      </div>
+      <StoreContainer>
+        <ShowWindow />
+      </StoreContainer>
     );
   }
 }

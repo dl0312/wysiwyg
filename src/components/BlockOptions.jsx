@@ -389,7 +389,6 @@ class BlockOptions extends Component {
             this.props.selectedContent === undefined
               ? "900px"
               : "45px",
-          height: "90vh",
           opacity:
             this.props.selectedContent === null ||
             this.props.selectedContent === undefined

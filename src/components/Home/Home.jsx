@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-
+import Slide from "./Slide";
 class Home extends Component {
   render() {
-    return <div>home</div>;
+    return <Slide />;
   }
 }
 
