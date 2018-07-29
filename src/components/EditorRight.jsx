@@ -114,6 +114,11 @@ const Swatch = styled.div`
   cursor: pointer;
 `;
 
+const SwatchFont = styled.div`
+  padding: 5px 10px;
+  font-family: ${props => props.fontFamily};
+`;
+
 const PopOver = styled.div`
   position: absolute;
   margin-top: 5px;
@@ -130,6 +135,13 @@ const FontColumn = styled.div`
   border-radius: 3px;
   border: 0.4px solid #d8d8d8;
   padding: 5px 0;
+`;
+
+const FontColumnItem = styled.div`
+  cursor: pointer;
+  width: 150px;
+  padding: 5px 10px;
+  font-family: ${props => props.fontFamily};
 `;
 
 const fontFamily = [
@@ -409,22 +421,15 @@ class Body extends Component {
             <div className="func">
               <div>
                 <Swatch onClick={this.handleOnClick}>
-                  <div
-                    style={{
-                      padding: "5px 10px",
-                      fontFamily: `${this.state.font}`
-                    }}
-                    className={styles.font}
-                  >
+                  <SwatchFont fontFamily={this.state.font}>
                     {this.state.font}
-                  </div>
+                  </SwatchFont>
                 </Swatch>
                 {this.state.displayFontFamily ? (
                   <PopOver>
                     <FontColumn>
                       {fontFamily.map(font => (
-                        <div
-                          className={styles.title}
+                        <FontColumnItem
                           onClick={() =>
                             this.setState(
                               {
@@ -433,15 +438,10 @@ class Body extends Component {
                               () => this.handleOnClickFont()
                             )
                           }
-                          style={{
-                            fontFamily: `${font}`,
-                            cursor: "pointer",
-                            width: "150px",
-                            padding: "5px 10px"
-                          }}
+                          fontFamily={font}
                         >
                           {font}
-                        </div>
+                        </FontColumnItem>
                       ))}
                     </FontColumn>
                   </PopOver>

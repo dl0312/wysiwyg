@@ -23,8 +23,7 @@ export default {
               content: "IMAGE",
               fullWidth: false,
               alt: "Image",
-              imageSrc:
-                "https://media.giphy.com/media/26BoDtH35vKPiELnO/giphy.gif"
+              imageSrc: "https://media.giphy.com/media/A6aHBCFqlE0Rq/giphy.gif"
             },
             { type: "builder" },
             { type: "content", content: "VIDEO", videoSrc: "TRmdXDH9b1s" },

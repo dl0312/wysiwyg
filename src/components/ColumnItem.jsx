@@ -22,6 +22,7 @@ const InsertText = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: -10px;
   font-weight: 600;
   color: #5758bb;
 `;
