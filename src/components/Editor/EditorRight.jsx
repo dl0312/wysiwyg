@@ -1,11 +1,11 @@
 import React, { Component, Fragment } from "react";
-import styles from "./EditorRight.scss";
 import reactCSS from "reactcss";
 import ContentItem from "./ContentItem";
 import RowItem from "./RowItem";
 import BlockOptions from "./BlockOptions";
 import { SketchPicker } from "react-color";
 import styled from "styled-components";
+import EditorDefaults from "./EditorDefaults";
 
 const Container = styled.div`
   color: #505659;
@@ -122,7 +122,8 @@ const SwatchFont = styled.div`
 const PopOver = styled.div`
   position: absolute;
   margin-top: 5px;
-  z-index: 2;
+  z-index: 3;
+  background-color: white;
 `;
 
 const FontColumn = styled.div`
@@ -144,13 +145,38 @@ const FontColumnItem = styled.div`
   font-family: ${props => props.fontFamily};
 `;
 
+const ViewsContainer = styled.div`
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const ViewIcon = styled.i`
+  font-size: 20px;
+  transition: opacity 0.5s ease;
+  opacity: ${props => (props.isSelcted ? "1" : "0.2")};
+  color: black;
+  &:hover {
+    opacity: ${props => (props.isSelcted ? null : "0.5")};
+  }
+`;
+
 const fontFamily = [
   "Roboto",
   "Oxygen",
   "Times New Roman",
   "Segoe UI",
   "Open Sans",
-  "Helvetica Neue"
+  "Helvetica Neue",
+  "Nanum Gothic",
+  "Nanum Myeongjo",
+  "Kirang Haerang",
+  "Nanum Pen Script",
+  "Do Hyeon",
+  "Nanum Gothic Coding",
+  "Sunflower",
+  "Iropke Batang"
 ];
 
 class EditorRight extends Component {
@@ -208,7 +234,12 @@ class EditorRight extends Component {
       case 1:
         return <Row masterCallback={this.props.masterCallback} />;
       case 2:
-        return <Body masterCallback={this.props.masterCallback} />;
+        return (
+          <Body
+            view={this.props.view}
+            masterCallback={this.props.masterCallback}
+          />
+        );
       default:
         break;
     }
@@ -357,8 +388,9 @@ class Body extends Component {
     super(props);
     this.state = {
       displayFontFamily: false,
-      contentWidth: 600,
-      font: "Segoe UI"
+      view: this.props.view,
+      contentWidth: EditorDefaults.WIDTH,
+      font: EditorDefaults.FONT
     };
   }
 
@@ -366,8 +398,12 @@ class Body extends Component {
     this.props.masterCallback("width", this.state.contentWidth);
   };
 
-  handleOnClick = () => {
-    this.setState({ displayFontFamily: !this.state.displayFontFamily });
+  handleOnClick = type => {
+    if (type === "FontFamily") {
+      this.setState({ displayFontFamily: !this.state.displayFontFamily });
+    } else if (type === "View") {
+      this.setState({ displayViews: !this.state.displayViews });
+    }
   };
 
   handleOperatorOnClick = operator => {
@@ -395,7 +431,14 @@ class Body extends Component {
     this.props.masterCallback("font", this.state.font);
   };
 
+  handleOnClickView = view => {
+    this.setState({ view }, () =>
+      this.props.masterCallback("view", this.state.view)
+    );
+  };
+
   render() {
+    const { view } = this.state;
     return (
       <BodyContainer>
         <NavBar>GENERAL</NavBar>
@@ -420,7 +463,7 @@ class Body extends Component {
             Font Family
             <div className="func">
               <div>
-                <Swatch onClick={this.handleOnClick}>
+                <Swatch onClick={() => this.handleOnClick("FontFamily")}>
                   <SwatchFont fontFamily={this.state.font}>
                     {this.state.font}
                   </SwatchFont>
@@ -448,6 +491,26 @@ class Body extends Component {
                 ) : null}
               </div>
             </div>
+          </Item>
+          <Item>
+            Editor View
+            <ViewsContainer>
+              <ViewIcon
+                onClick={() => this.handleOnClickView("EDIT")}
+                isSelcted={view === "EDIT"}
+                className="fas fa-edit"
+              />
+              <ViewIcon
+                onClick={() => this.handleOnClickView("USER")}
+                isSelcted={view === "USER"}
+                className="fas fa-eye"
+              />
+              <ViewIcon
+                onClick={() => this.handleOnClickView("JSON")}
+                isSelcted={view === "JSON"}
+                className="fas fa-file-alt"
+              />
+            </ViewsContainer>
           </Item>
         </BodyColumn>
       </BodyContainer>

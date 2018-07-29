@@ -1,9 +1,173 @@
-import React, { Component } from "react";
-import { Editor } from "slate-react";
-import classnames from "classnames";
-import ItemTypes from "./ItemTypes";
+import React from "react";
+import EditorLeft from "./EditorLeft";
+import styled from "styled-components";
 import PropTypes from "prop-types";
-import { DragSource } from "react-dnd";
+import { Editor } from "slate-react";
+
+class UserView extends React.Component {
+  render() {
+    const { json } = this.props;
+    const compArray = [];
+    json.cards.map((item, index) => {
+      switch (item.type) {
+        case "columnList":
+          compArray.push(
+            <UserCard
+              inColumn={false}
+              cards={json.cards.length}
+              key={index}
+              hoveredIndex={json.hoveredIndex}
+            >
+              <UserColumn
+                columnArray={item.content}
+                columnListArray={item.columnListArray}
+                index={[index, 0, 0]}
+                renderNode={this.renderNode}
+                renderMark={this.renderMark}
+                contentWidth={json.contentWidth}
+              />
+            </UserCard>
+          );
+          break;
+        default:
+          break;
+      }
+    });
+    return (
+      <EditorLeft
+        color={json.color}
+        contentWidth={json.contentWidth}
+        font={json.font}
+      >
+        <div style={{ marginTop: "30px" }} />
+        {compArray}
+      </EditorLeft>
+    );
+  }
+}
+
+export default UserView;
+
+const style = {
+  backgroundColor: "transparent",
+  width: "99%",
+  position: "relative",
+  padding: "0.1rem",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
+
+class UserCard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    const { isDragging } = this.props;
+    const opacity = isDragging ? 0.2 : 1;
+
+    return (
+      <div style={{ ...style, opacity }} className="frame">
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
+class UserColumn extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  render() {
+    const columnListStyle = {
+      width: this.props.contentWidth,
+      display: "grid",
+      gridGap: "10px",
+      gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
+    };
+    return (
+      <div className="columnList" style={columnListStyle}>
+        {this.props.columnListArray.map((columnList, index) => (
+          <UserColumnItem
+            key={index}
+            cards={columnList}
+            index={this.props.index.slice(0, 1).concat(index)}
+            renderNode={this.props.renderNode}
+            renderMark={this.props.renderMark}
+            contentWidth={this.props.contentWidth}
+          />
+        ))}
+      </div>
+    );
+  }
+}
+
+const Column = styled.div`
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+class UserColumnItem extends React.Component {
+  static propTypes = {
+    connectDropTarget: PropTypes.func.isRequired,
+    isOver: PropTypes.bool.isRequired,
+    isOverCurrent: PropTypes.bool.isRequired,
+    greedy: PropTypes.bool,
+    children: PropTypes.node
+  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasDropped: false,
+      hasDroppedOnChild: false,
+      contentHover: false
+    };
+  }
+
+  render() {
+    // 기본상태의 에디터화면 id=container, id=body
+    const { greedy, isOver, isOverCurrent, contentWidth, cards } = this.props;
+    let backgroundColor = cards.length === 1 ? "#f6e58d" : "white";
+    if (isOverCurrent || (isOver && greedy)) {
+      backgroundColor = "#b8e994";
+    }
+
+    const compArray = [];
+    cards.map((item, index) => {
+      switch (item.type) {
+        case "content":
+          compArray.push(
+            <UserContainer
+              type={item.type}
+              value={item.value}
+              imageSrc={item.imageSrc}
+              videoSrc={item.videoSrc}
+              content={item.content}
+              index={this.props.index.concat(index)}
+              key={index}
+              align={item.align}
+              fullWidth={item.fullWidth}
+              contentWidth={contentWidth}
+              renderNode={this.props.renderNode}
+              renderMark={this.props.renderMark}
+            />
+          );
+          break;
+        default:
+          break;
+      }
+    });
+
+    return <Column>{compArray}</Column>;
+  }
+}
 
 const handleStyle = {
   backgroundColor: "#9c88ff",
@@ -65,7 +229,7 @@ const cardSource = {
   }
 };
 
-class Container extends Component {
+class UserContainer extends React.Component {
   static propTypes = {
     connectDragSource: PropTypes.func.isRequired,
     connectDragPreview: PropTypes.func.isRequired,
@@ -204,89 +368,26 @@ class Container extends Component {
         : false
       : false;
     return (
-      connectDragPreview &&
-      connectDragSource &&
-      connectDragPreview(
-        <div
-          className={classnames(
-            "container",
-            hover ? "blockHover" : null,
-            active ? "blockActive" : null
-          )}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent:
-              this.props.align !== undefined ? this.props.align : "center",
-            position: "relative",
-            padding: "10px",
-            width: "100%",
-            opacity
-          }}
-          onMouseOver={this.handleOnMouseOver}
-          onMouseDown={this.handleOnMouseDown}
-          onMouseLeave={this.handleOnMouseLeave}
-        >
-          {hover || active ? (
-            <div>
-              {this.state.toolHover ? (
-                <div
-                  onMouseLeave={this.handleOnMouseLeaveTool}
-                  style={{ ...toolStyle }}
-                >
-                  <button
-                    onClick={() => {
-                      console.log(index);
-                      callbackfromparent("delete", index, this);
-                    }}
-                    style={{ ...buttonStyle }}
-                  >
-                    <i className="fas fa-trash-alt" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      callbackfromparent("duplicate", index, this);
-                    }}
-                    style={buttonStyle}
-                  >
-                    <i className="far fa-copy" />
-                  </button>
-                  {connectDragSource(
-                    <button
-                      style={{
-                        ...buttonStyle,
-                        borderTopRightRadius: "100%",
-                        borderBottomRightRadius: "100%"
-                      }}
-                    >
-                      <i className="fas fa-arrows-alt" />
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div
-                  onMouseOver={this.handleOnMouseOverTool}
-                  style={{ ...handleStyle }}
-                >
-                  <i className="fas fa-ellipsis-h" />
-                </div>
-              )}
-            </div>
-          ) : null}
-          {this.showInner(active)}
-        </div>
-      )
+      <div
+        className="container"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent:
+            this.props.align !== undefined ? this.props.align : "center",
+          position: "relative",
+          padding: "10px",
+          width: "100%",
+          opacity
+        }}
+      >
+        {this.showInner(active)}
+      </div>
     );
   }
 }
 
-export default DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  connectDragPreview: connect.dragPreview(),
-  isDragging: monitor.isDragging()
-}))(Container);
-
-class Button extends Component {
+class Button extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -327,7 +428,7 @@ class Button extends Component {
   }
 }
 
-class Divider extends Component {
+class Divider extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -347,7 +448,7 @@ class Divider extends Component {
   }
 }
 
-class Html extends Component {
+class Html extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -379,7 +480,7 @@ class Html extends Component {
   }
 }
 
-class Image extends Component {
+class Image extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -407,7 +508,7 @@ class Image extends Component {
   }
 }
 
-class Text extends Component {
+class Text extends React.Component {
   constructor(props) {
     super(props);
     this.props = {
@@ -444,7 +545,7 @@ class Text extends Component {
   }
 }
 
-class Video extends Component {
+class Video extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -484,7 +585,7 @@ class Video extends Component {
   }
 }
 
-class Social extends Component {
+class Social extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};

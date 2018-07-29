@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from "react";
 import PropTypes from "prop-types";
-import styles from "./Editor.scss";
 import EditorLeft from "./EditorLeft";
 import EditorRight from "./EditorRight";
 import { DragDropContext } from "react-dnd";
@@ -10,27 +9,52 @@ import Card from "./Card";
 import Column from "./Column";
 import { Button, Icon } from "./Components";
 import EditorTemplates from "./EditorTemplates";
+import styled from "styled-components";
+import EditorDefaults from "./EditorDefaults";
+import JsonView from "./JsonView";
+import UserView from "./UserView";
 const update = require("immutability-helper");
-
-/**
- * Define the default node type.
- *
- * @type {String}
- */
-
 const DEFAULT_NODE = "paragraph";
 
-/**
- * Define hotkey matchers.
- *
- * @type {Function}
- */
+const EditorContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  min-width: $max-page-width;
+  overflow: hidden;
+  position: absolute;
+  top: 100px;
+  bottom: 0px;
+  right: 0;
+  left: 0;
+`;
 
-/**
- * The rich text example.
- *
- * @type {Component}
- */
+const EditorLeftContainer = styled.div`
+  position: relative;
+  width: 75%;
+  overflow: auto;
+`;
+
+const TextEditor = styled.div`
+  position: fixed;
+  padding: 15px 15px;
+  border-bottom: 2px solid #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease;
+  background-color: white;
+  margin-top: 1px;
+  z-index: 200;
+  opacity: ${props => props.opacity};
+`;
+
+const EditorRightContainer = styled.div`
+  outline: 0.05px solid rgb(172, 172, 172);
+  transition: width 1s ease;
+  width: 25%;
+  min-width: 350px;
+`;
 
 class Editor extends Component {
   static propTypes = {
@@ -43,8 +67,9 @@ class Editor extends Component {
     this.moveCard = this.moveCard.bind(this);
     this.state = {
       rightMenu: null,
-      color: { r: "255", g: "255", b: "255", a: "1" },
-      contentWidth: 600,
+      view: EditorDefaults.VIEW,
+      color: EditorDefaults.BACKGROUNDCOLOR,
+      contentWidth: EditorDefaults.WIDTH,
       font: null,
       OnDrag: null,
       hasDropped: false,
@@ -57,19 +82,6 @@ class Editor extends Component {
     };
   }
 
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  /**
-   * Check if the current selection has a mark with `type` in it.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
-
   hasMark = type => {
     if (
       this.state.selectedIndex !== null &&
@@ -77,19 +89,10 @@ class Editor extends Component {
         this.state.selectedContent.content === "BUTTON" ||
         this.state.selectedContent.content === "HTML")
     ) {
-      // console.log(this.state.selectedIndex);
-      // console.log(this.showSelected(this.state.selectedIndex));
       const { value } = this.showSelected(this.state.selectedIndex);
       return value.activeMarks.some(mark => mark.type === type);
     }
   };
-
-  /**
-   * Check if the any of the currently selected blocks are of `type`.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
 
   hasBlock = type => {
     if (
@@ -102,12 +105,6 @@ class Editor extends Component {
       return value.blocks.some(node => node.type === type);
     }
   };
-
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
 
   buttonCallback = (type, dataFromChild) => {
     const { cards, hoveredIndex, selectedIndex } = this.state;
@@ -142,9 +139,6 @@ class Editor extends Component {
     } else if (type === "delete") {
       if (dataFromChild.length === 3) {
         // block
-        // console.log(cards[dataFromChild[0]]);
-        // console.log(cards[dataFromChild[0]].columnListArray);
-        // console.log(cards[dataFromChild[0]].columnListArray[dataFromChild[1]]);
         this.setState(
           {
             selectedIndex: null,
@@ -181,7 +175,6 @@ class Editor extends Component {
       if (!Array.isArray(dataFromChild)) {
         const targetCard = cards[dataFromChild];
         const masterBuilder = { type: "builder" };
-        console.log(masterBuilder);
         this.setState(
           update(this.state, {
             cards: {
@@ -252,7 +245,6 @@ class Editor extends Component {
             }
           })
         );
-        console.log(this.state.cards);
       }
     }
   };
@@ -261,7 +253,6 @@ class Editor extends Component {
   // block on column -> block on column ([1,2,1] > [3,1,1])
   // frame -> frame (5 > 7)
   moveCard = (dragIndex, hoverIndex) => {
-    console.log(`${dragIndex}, ${hoverIndex}`);
     if (dragIndex.length === 3 && hoverIndex.length === 3) {
       // block => block
       const { cards } = this.state;
@@ -308,7 +299,6 @@ class Editor extends Component {
       const { cards } = this.state;
       const dragCard = cards[dragIndex];
       const dragBuilder = { type: "builder" };
-      console.log(dragIndex);
       if (dragIndex < hoverIndex) {
         this.setState(
           update(this.state, {
@@ -344,6 +334,8 @@ class Editor extends Component {
       this.setState({ contentWidth: dataFromChild });
     } else if (type === "font") {
       this.setState({ font: dataFromChild });
+    } else if (type === "view") {
+      this.setState({ view: dataFromChild });
     } else if (type === "OnDrag") {
       this.setState({ OnDrag: dataFromChild });
     } else if (type === "rightMenu") {
@@ -416,9 +408,6 @@ class Editor extends Component {
   };
 
   handleOnChange = ({ value }, index, content, type) => {
-    console.log(value);
-    console.log(index);
-    console.log(content);
     if (content === "BUTTON" || content === "TEXT" || content === "HTML") {
       if (index.length === 2) {
         this.setState(
@@ -446,7 +435,6 @@ class Editor extends Component {
     } else if (content === "IMAGE") {
       if (type === "URL") {
         if (index.length === 2) {
-          console.log(this.state.cards[index[0]]);
           this.setState(
             update(this.state, {
               cards: { [index[0]]: { imageSrc: { $set: value } } }
@@ -471,7 +459,6 @@ class Editor extends Component {
         }
       } else if (type === "ALT") {
         if (index.length === 2) {
-          console.log(this.state.cards[index[0]]);
           this.setState(
             update(this.state, {
               cards: { [index[0]]: { alt: { $set: value } } }
@@ -496,7 +483,6 @@ class Editor extends Component {
         }
       } else if (type === "LINK") {
         if (index.length === 2) {
-          console.log(this.state.cards[index[0]]);
           this.setState(
             update(this.state, {
               cards: { [index[0]]: { link: { $set: value } } }
@@ -523,7 +509,6 @@ class Editor extends Component {
     } else if (content === "VIDEO") {
       if (type === "URL") {
         if (index.length === 2) {
-          console.log(this.state.cards[index[0]]);
           this.setState(
             update(this.state, {
               cards: { [index[0]]: { videoSrc: { $set: value } } }
@@ -569,12 +554,12 @@ class Editor extends Component {
       selectedIndex,
       hoveredIndex,
       selectedContent,
-      contentWidth
+      contentWidth,
+      view
     } = this.state;
 
     const compArray = [];
     cards.map((item, index) => {
-      // console.log(item);
       switch (item.type) {
         case "builder":
           compArray.push(
@@ -629,35 +614,17 @@ class Editor extends Component {
 
     return (
       <Fragment>
-        <div className={styles.editor}>
-          <div
-            style={{
-              backgroundColor: `rgba(${this.state.color.r}, ${
-                this.state.color.g
-              }, ${this.state.color.b}, ${this.state.color.a})`,
-              position: "relative"
-            }}
-            className={styles.left}
-          >
-            <EditorLeft
-              color={this.state.color}
-              contentWidth={this.state.contentWidth}
-              font={this.state.font}
-              greedy={false}
-            >
-              <div
-                style={{
-                  position: "fixed",
-                  padding: "15px 15px",
-                  borderBottom: "2px solid #eee",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  transition: "opacity 0.5s ease",
-                  backgroundColor: "white",
-                  marginTop: "1px",
-                  zIndex: "200",
-                  opacity:
+        <EditorContainer>
+          <EditorLeftContainer>
+            {view === "EDIT" ? (
+              <EditorLeft
+                color={this.state.color}
+                contentWidth={this.state.contentWidth}
+                font={this.state.font}
+                greedy={false}
+              >
+                <TextEditor
+                  opacity={
                     this.state.selectedContent !== null
                       ? (this.state.selectedContent.content === "TEXT") |
                         (this.state.selectedContent.content === "BUTTON") |
@@ -665,41 +632,47 @@ class Editor extends Component {
                         ? "1"
                         : "0"
                       : "0"
-                }}
-              >
-                {this.renderMarkButton("bold", <i className="fas fa-bold" />)}
-                {this.renderMarkButton(
-                  "italic",
-                  <i className="fas fa-italic" />
-                )}
-                {this.renderMarkButton(
-                  "underlined",
-                  <i className="fas fa-underline" />
-                )}
-                {this.renderMarkButton("code", <i className="fas fa-code" />)}
-                {this.renderBlockButton("heading-one", "H1")}
-                {this.renderBlockButton("heading-two", "H2")}
-                {this.renderBlockButton(
-                  "block-quote",
-                  <i className="fas fa-quote-right" />
-                )}
-                {this.renderBlockButton(
-                  "numbered-list",
-                  <i className="fas fa-list-ol" />
-                )}
-                {this.renderBlockButton(
-                  "bulleted-list",
-                  <i className="fas fa-list-ul" />
-                )}
-              </div>
-              <div style={{ marginTop: "60px" }} />
-              {compArray}
-            </EditorLeft>
-          </div>
-          <div className={styles.right}>
+                  }
+                >
+                  {this.renderMarkButton("bold", <i className="fas fa-bold" />)}
+                  {this.renderMarkButton(
+                    "italic",
+                    <i className="fas fa-italic" />
+                  )}
+                  {this.renderMarkButton(
+                    "underlined",
+                    <i className="fas fa-underline" />
+                  )}
+                  {this.renderMarkButton("code", <i className="fas fa-code" />)}
+                  {this.renderBlockButton("heading-one", "H1")}
+                  {this.renderBlockButton("heading-two", "H2")}
+                  {this.renderBlockButton(
+                    "block-quote",
+                    <i className="fas fa-quote-right" />
+                  )}
+                  {this.renderBlockButton(
+                    "numbered-list",
+                    <i className="fas fa-list-ol" />
+                  )}
+                  {this.renderBlockButton(
+                    "bulleted-list",
+                    <i className="fas fa-list-ul" />
+                  )}
+                </TextEditor>
+                <div style={{ marginTop: "60px" }} />
+                {compArray}
+              </EditorLeft>
+            ) : view === "USER" ? (
+              <UserView json={this.state} />
+            ) : view === "JSON" ? (
+              <JsonView json={this.state} />
+            ) : null}
+          </EditorLeftContainer>
+          <EditorRightContainer>
             <EditorRight
               rightMenu={this.state.rightMenu}
               cards={this.state.cards}
+              view={this.state.view}
               selectedIndex={selectedIndex}
               selectedContent={selectedContent}
               masterCallback={this.masterCallback}
@@ -707,8 +680,8 @@ class Editor extends Component {
               showSelected={this.showSelected}
               OnChangeCards={this.OnChangeCards}
             />
-          </div>
-        </div>
+          </EditorRightContainer>
+        </EditorContainer>
       </Fragment>
     );
   }

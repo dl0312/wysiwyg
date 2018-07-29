@@ -6,7 +6,7 @@ import Home from "./components/Home/Home";
 import Board from "./components/Board/Board";
 import Wiki from "./components/Wiki/Wiki";
 import Store from "./components/Store/Store";
-import Editor from "./components/Editor";
+import Editor from "./components/Editor/Editor";
 import Profile from "./components/Profile/Profile";
 import "./App.css";
 

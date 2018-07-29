@@ -10,7 +10,6 @@ const NavContainer = styled.div`
 `;
 
 const Header = styled.header`
-  padding: 0 10px;
   display: flex;
   justify-content: center;
   color: black;

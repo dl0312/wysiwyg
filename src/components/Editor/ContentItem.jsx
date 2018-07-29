@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import styles from "./ContentItem.scss";
 import ItemTypes from "./ItemTypes";
-import BlockDefaults from "./BlockDefaults";
+import EditorDefaults from "./EditorDefaults";
 import { DragSource } from "react-dnd";
 import { Value } from "slate";
 import styled from "styled-components";
@@ -49,12 +48,12 @@ const itemSource = {
     // default block content src, text etc...
     switch (props.item.name) {
       case "IMAGE":
-        item.imageSrc = BlockDefaults.IMG_DEFAULT;
+        item.imageSrc = EditorDefaults.IMG;
         item.fullWidth = false;
         item.alt = "Image";
         break;
       case "VIDEO":
-        item.videoSrc = BlockDefaults.VIDEO_DEFAULT;
+        item.videoSrc = EditorDefaults.VIDEO;
         break;
       case "BUTTON":
         item.value = Value.fromJSON({
@@ -68,7 +67,7 @@ const itemSource = {
                     object: "text",
                     leaves: [
                       {
-                        text: BlockDefaults.BUTTON_DEFAULT
+                        text: EditorDefaults.BUTTON
                       }
                     ]
                   }
@@ -90,7 +89,7 @@ const itemSource = {
                     object: "text",
                     leaves: [
                       {
-                        text: BlockDefaults.TEXT_DEFAULT
+                        text: EditorDefaults.TEXT
                       }
                     ]
                   }
@@ -115,7 +114,7 @@ const itemSource = {
                     object: "text",
                     leaves: [
                       {
-                        text: BlockDefaults.HTML_DEFAULT
+                        text: EditorDefaults.HTML
                       }
                     ]
                   }
