@@ -15,10 +15,9 @@ const Item = styled.li`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: transparent;
   transition: box-shadow 0.2s ease;
   opacity: ${props => props.opacity};
-  background-color: #fafafa;
+  background-color: white;
   &:hover {
     -webkit-box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
     -moz-box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);

@@ -336,7 +336,7 @@ class Divider extends Component {
   render() {
     return (
       <div className="content" style={{ width: "100%", padding: "20px" }}>
-        <divs
+        <div
           style={{
             width: "100%",
             borderBottom: "1px solid black"

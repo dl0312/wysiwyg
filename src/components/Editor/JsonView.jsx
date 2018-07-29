@@ -10,7 +10,7 @@ class JsonView extends React.Component {
   render() {
     return (
       <JsonViewContainer>
-        <ReactJson src={this.props.json} />
+        <ReactJson collapsed={3} src={this.props.json} />
       </JsonViewContainer>
     );
   }

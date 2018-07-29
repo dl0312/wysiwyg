@@ -33,6 +33,11 @@ const EditorLeftContainer = styled.div`
   position: relative;
   width: 75%;
   overflow: auto;
+  background-color: ${props =>
+    `rgba(${props.color.r}, ${props.color.g}, ${props.color.b}, ${
+      props.color.a
+    })`};
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
 `;
 
 const TextEditor = styled.div`
@@ -78,7 +83,7 @@ class Editor extends Component {
       selectedIndex: null,
       hoveredIndex: null,
       selectedContent: null,
-      cards: EditorTemplates.TEMPLATE[1]
+      cards: EditorTemplates.TEMPLATE[0]
     };
   }
 
@@ -615,7 +620,7 @@ class Editor extends Component {
     return (
       <Fragment>
         <EditorContainer>
-          <EditorLeftContainer>
+          <EditorLeftContainer color={this.state.color}>
             {view === "EDIT" ? (
               <EditorLeft
                 color={this.state.color}
@@ -630,8 +635,8 @@ class Editor extends Component {
                         (this.state.selectedContent.content === "BUTTON") |
                         (this.state.selectedContent.content === "HTML")
                         ? "1"
-                        : "0"
-                      : "0"
+                        : "0.5"
+                      : "0.5"
                   }
                 >
                   {this.renderMarkButton("bold", <i className="fas fa-bold" />)}

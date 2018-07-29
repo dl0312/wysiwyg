@@ -5,14 +5,13 @@ import Container from "./Container";
 import styled from "styled-components";
 
 const Column = styled.div`
-  outline: 0.5px dashed #8c7ae6;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   outline: ${props =>
-    props.hasBlock ? "0px solid black" : "0.5px dashed #8c7ae6"};
+    props.hasBlock ? "0px solid black" : "0.5px dashed #2f3542"};
   background-color: ${props => props.bgc};
 `;
 
@@ -23,8 +22,10 @@ const InsertText = styled.div`
   align-items: center;
   justify-content: center;
   margin-top: -10px;
+  font-size: 15px;
   font-weight: 600;
-  color: #5758bb;
+  font-family: "Open Sans", sans-serif;
+  color: #2f3542;
 `;
 
 class ColumnItem extends Component {
@@ -47,10 +48,7 @@ class ColumnItem extends Component {
   render() {
     // 기본상태의 에디터화면 id=container, id=body
     const { greedy, isOver, isOverCurrent, contentWidth, cards } = this.props;
-    let backgroundColor = cards.length === 1 ? "#f6e58d" : "white";
-    if (isOverCurrent || (isOver && greedy)) {
-      backgroundColor = "#b8e994";
-    }
+    let backgroundColor = cards.length === 1 ? "transparent" : "transparent";
 
     const compArray = [];
     cards.map((item, index) => {
