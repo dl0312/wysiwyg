@@ -55,6 +55,9 @@ const itemSource = {
         item.videoSrc = EditorDefaults.VIDEO;
         break;
       case "BUTTON":
+        item.textColor = EditorDefaults.BUTTON_TEXT_COLOR;
+        item.backgroundColor = EditorDefaults.BUTTON_BACKGROUND_COLOR;
+        item.hoverColor = EditorDefaults.BUTTON_HOVER_COLOR;
         item.value = Value.fromJSON({
           document: {
             nodes: [
@@ -77,6 +80,8 @@ const itemSource = {
         });
         break;
       case "TEXT":
+        item.textColor = EditorDefaults.TEXT_TEXT_COLOR;
+        item.backgroundColor = EditorDefaults.TEXT_BACKGROUND_COLOR;
         item.value = Value.fromJSON({
           document: {
             nodes: [

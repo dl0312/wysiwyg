@@ -47,7 +47,7 @@ class ColumnItem extends Component {
 
   render() {
     // 기본상태의 에디터화면 id=container, id=body
-    const { greedy, isOver, isOverCurrent, contentWidth, cards } = this.props;
+    const { contentWidth, cards } = this.props;
     let backgroundColor = cards.length === 1 ? "transparent" : "transparent";
 
     const compArray = [];
@@ -68,20 +68,15 @@ class ColumnItem extends Component {
         case "content":
           compArray.push(
             <Container
-              type={item.type}
-              value={item.value}
-              imageSrc={item.imageSrc}
-              videoSrc={item.videoSrc}
-              content={item.content}
+              item={item}
               callbackfromparent={this.props.callbackfromparent}
               selectedIndex={this.props.selectedIndex}
               hoveredIndex={this.props.hoveredIndex}
               index={this.props.index.concat(index)}
               key={index}
-              align={item.align}
-              fullWidth={item.fullWidth}
               contentWidth={contentWidth}
               onChange={({ value }) => {
+                console.log(value);
                 this.props.handleOnChange(
                   { value },
                   this.props.index.concat(index),

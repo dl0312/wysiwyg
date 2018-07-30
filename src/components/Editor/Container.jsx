@@ -4,55 +4,58 @@ import classnames from "classnames";
 import ItemTypes from "./ItemTypes";
 import PropTypes from "prop-types";
 import { DragSource } from "react-dnd";
+import { Value } from "slate";
+import styled from "styled-components";
+import EditorDefaults from "./EditorDefaults";
 
-const handleStyle = {
-  backgroundColor: "#9c88ff",
-  width: "2rem",
-  height: "2rem",
-  borderTopRightRadius: "100%",
-  borderBottomRightRadius: "100%",
-  marginRight: "0.75rem",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  position: "absolute",
-  zIndex: "100",
-  top: "50%",
-  transform: "translate(44px,-16px)",
-  marginLeft: "-2px",
-  right: "0px"
-};
+const Handle = styled.div`
+  background-color: #9c88ff;
+  width: 2rem;
+  height: 2rem;
+  border-top-right-radius: 100%;
+  border-bottom-right-radius: 100%;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: absolute;
+  top: 50%;
+  right: 0px;
+  margin-left: -2px;
+  z-index: 100;
+  transform: translate(44px, -16px);
+`;
 
-const buttonStyle = {
-  border: "none",
-  outline: "none",
-  backgroundColor: "#9c88ff",
-  color: "white",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "2rem",
-  height: "2rem",
-  marginBottom: "10px",
-  cursor: "pointer"
-};
+const ButtonOption = styled.button`
+  border: none;
+  outline: none;
+  background-color: #9c88ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 10px;
+  cursor: pointer;
+`;
 
-const toolStyle = {
-  display: "flex",
-  zIndex: "100",
-  position: "absolute",
-  marginRight: "0.75rem",
-  cursor: "-webkit-grab",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  top: "50%",
-  transform: "translate(108px,-16px)",
-  marginLeft: "-2px",
-  right: "0px"
-};
+const Tool = styled.div`
+  z-index: 100;
+  display: flex;
+  position: absolute;
+  margin-right: 0.75rem;
+  cursor: -webkit-grab;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  top: 50%;
+  transform: translate(108px, -16px);
+  margin-left: -2px;
+  right: 0px;
+`;
 
 const cardSource = {
   beginDrag(props, monitor, component) {
@@ -83,12 +86,19 @@ class Container extends Component {
   }
 
   showInner = selected => {
-    if (this.props.type === "content") {
-      switch (this.props.content) {
+    if (this.props.item.type === "content") {
+      switch (this.props.item.content) {
         case "BUTTON":
+          let value = null;
+          if (!Value.isValue(this.props.item.value)) {
+            value = Value.fromJSON(this.props.item.value);
+          } else {
+            value = this.props.item.value;
+          }
           return (
             <Button
-              value={this.props.value}
+              item={this.props.item}
+              value={value}
               selected={selected}
               onChange={this.props.onChange}
               onKeyDown={this.props.onKeyDown}
@@ -99,9 +109,14 @@ class Container extends Component {
         case "DIVIDER":
           return <Divider selected={selected} />;
         case "HTML":
+          if (!Value.isValue(this.props.item.value)) {
+            value = Value.fromJSON(this.props.item.value);
+          } else {
+            value = this.props.item.value;
+          }
           return (
             <Html
-              value={this.props.value}
+              value={value}
               selected={selected}
               onChange={this.props.onChange}
               onKeyDown={this.props.onKeyDown}
@@ -113,15 +128,21 @@ class Container extends Component {
           return (
             <Image
               selected={selected}
-              src={this.props.imageSrc}
-              fullWidth={this.props.fullWidth}
+              src={this.props.item.imageSrc}
+              fullWidth={this.props.item.fullWidth}
               contentWidth={this.props.contentWidth}
             />
           );
         case "TEXT":
+          if (!Value.isValue(this.props.item.value)) {
+            value = Value.fromJSON(this.props.item.value);
+          } else {
+            value = this.props.item.value;
+          }
           return (
             <Text
-              value={this.props.value}
+              value={value}
+              item={this.props.item}
               selected={selected}
               onChange={this.props.onChange}
               onKeyDown={this.props.onKeyDown}
@@ -133,8 +154,8 @@ class Container extends Component {
           return (
             <Video
               selected={selected}
-              src={this.props.videoSrc}
-              contentWidth={this.props.contentWidth}
+              src={this.props.item.videoSrc}
+              contentWidth={this.props.item.contentWidth}
             />
           );
         case "SOCIAL":
@@ -213,14 +234,23 @@ class Container extends Component {
             hover ? "blockHover" : null,
             active ? "blockActive" : null
           )}
+          item={this.props.item}
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent:
-              this.props.align !== undefined ? this.props.align : "center",
             position: "relative",
             padding: "10px",
             width: "100%",
+            justifyContent:
+              this.props.item.content === "TEXT" ||
+              this.props.item.content === "BUTTON" ||
+              this.props.item.content === "HTML" ||
+              this.props.item.content === "IMAGE" ||
+              this.props.item.content === "VIDEO"
+                ? this.props.item.align
+                  ? this.props.item.align
+                  : "center"
+                : "center",
             opacity
           }}
           onMouseOver={this.handleOnMouseOver}
@@ -230,31 +260,36 @@ class Container extends Component {
           {hover || active ? (
             <div>
               {this.state.toolHover ? (
-                <div
-                  onMouseLeave={this.handleOnMouseLeaveTool}
-                  style={{ ...toolStyle }}
-                >
-                  <button
+                <Tool onMouseLeave={this.handleOnMouseLeaveTool}>
+                  <ButtonOption
                     onClick={() => {
                       console.log(index);
                       callbackfromparent("delete", index, this);
                     }}
-                    style={{ ...buttonStyle }}
                   >
                     <i className="fas fa-trash-alt" />
-                  </button>
-                  <button
+                  </ButtonOption>
+                  <ButtonOption
                     onClick={() => {
                       callbackfromparent("duplicate", index, this);
                     }}
-                    style={buttonStyle}
                   >
                     <i className="far fa-copy" />
-                  </button>
+                  </ButtonOption>
                   {connectDragSource(
                     <button
                       style={{
-                        ...buttonStyle,
+                        border: "none",
+                        outline: "none",
+                        backgroundColor: "#9c88ff",
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "2rem",
+                        height: "2rem",
+                        marginBottom: "10px",
+                        cursor: "pointer",
                         borderTopRightRadius: "100%",
                         borderBottomRightRadius: "100%"
                       }}
@@ -262,14 +297,11 @@ class Container extends Component {
                       <i className="fas fa-arrows-alt" />
                     </button>
                   )}
-                </div>
+                </Tool>
               ) : (
-                <div
-                  onMouseOver={this.handleOnMouseOverTool}
-                  style={{ ...handleStyle }}
-                >
+                <Handle onMouseOver={this.handleOnMouseOverTool}>
                   <i className="fas fa-ellipsis-h" />
-                </div>
+                </Handle>
               )}
             </div>
           ) : null}
@@ -286,6 +318,34 @@ export default DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
   isDragging: monitor.isDragging()
 }))(Container);
 
+const ButtonContainer = styled.div`
+  color: ${props =>
+    `rgba(${props.textColor.r}, ${props.textColor.g}, ${props.textColor.b}, ${
+      props.textColor.a
+    })`};
+  background-color: ${props =>
+    `rgba(${props.backgroundColor.r}, ${props.backgroundColor.g}, ${
+      props.textColor.b
+    }, ${props.backgroundColor.a})`};
+  &:hover {
+    background-color: ${props =>
+      `rgba(${props.hoverColor.r}, ${props.hoverColor.g}, ${
+        props.hoverColor.b
+      }, ${props.textColor.a})`};
+  }
+  text-align: center;
+  line-height: 120%;
+  border-top: 0 solid transparent;
+  border-right: 0 solid transparent;
+  border-left: 0 solid transparent;
+  border-bottom: 0 solid transparent;
+  border-radius: 4px;
+  padding-top: 10px;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+`;
+
 class Button extends Component {
   constructor(props) {
     super(props);
@@ -293,25 +353,12 @@ class Button extends Component {
   }
 
   render() {
-    // console.log(this.props.selected);
+    console.log(this.props.item);
     return (
-      <div
-        className="content"
-        style={{
-          color: "white",
-          backgroundColor: "#3AAEE0",
-          textAlign: "center",
-          lineHeight: "120%",
-          borderTop: "0 solid transparent",
-          borderRight: "0 solid transparent",
-          borderLeft: "0 solid transparent",
-          borderBottom: "0 solid transparent",
-          borderRadius: "4px",
-          paddingTop: "10px",
-          paddingRight: "20px",
-          paddingLeft: "20px",
-          paddingBottom: "10px"
-        }}
+      <ButtonContainer
+        textColor={this.props.item.textColor}
+        backgroundColor={this.props.item.backgroundColor}
+        hoverColor={this.props.item.hoverColor}
       >
         <Editor
           autoFocus
@@ -322,7 +369,7 @@ class Button extends Component {
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
         />
-      </div>
+      </ButtonContainer>
     );
   }
 }
@@ -407,6 +454,8 @@ class Image extends Component {
   }
 }
 
+const TextContainer = styled.div``;
+
 class Text extends Component {
   constructor(props) {
     super(props);
@@ -422,7 +471,9 @@ class Text extends Component {
         className="content"
         style={{
           color: "black",
-          textAlign: "left",
+          textAlign: this.props.item.textAlign
+            ? this.props.item.textAlign
+            : "left",
           lineHeight: "140%",
           paddingTop: "10px",
           paddingRight: "10px",

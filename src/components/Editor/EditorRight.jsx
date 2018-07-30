@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from "react";
-import reactCSS from "reactcss";
 import ContentItem from "./ContentItem";
 import RowItem from "./RowItem";
-import BlockOptions from "./BlockOptions";
-import { SketchPicker } from "react-color";
+import SketchExample from "./SketchExample";
 import styled from "styled-components";
 import EditorDefaults from "./EditorDefaults";
 
@@ -297,13 +295,6 @@ class EditorRight extends Component {
             </MenuItem>
           </MenuColumn>
           {this.showSection()}
-          <BlockOptions
-            handleOnChange={this.props.handleOnChange}
-            selectedIndex={this.props.selectedIndex}
-            selectedContent={this.props.selectedContent}
-            showSelected={this.props.showSelected}
-            OnChangeCards={this.props.OnChangeCards}
-          />
         </Container>
       </Fragment>
     );
@@ -445,7 +436,11 @@ class Body extends Component {
         <BodyColumn>
           <Item>
             Background Color
-            <SketchExample masterCallback={this.props.masterCallback} />
+            <SketchExample
+              masterCallback={this.props.masterCallback}
+              type="BodyBackgroundColor"
+              color={EditorDefaults.BACKGROUND_COLOR}
+            />
           </Item>
           <Item>
             Content Width
@@ -514,86 +509,6 @@ class Body extends Component {
           </Item>
         </BodyColumn>
       </BodyContainer>
-    );
-  }
-}
-
-class SketchExample extends Component {
-  state = {
-    displayColorPicker: false,
-    color: {
-      r: "255",
-      g: "255",
-      b: "255",
-      a: "1"
-    }
-  };
-
-  handleOnClick = () => {
-    this.setState({ displayColorPicker: !this.state.displayColorPicker });
-    this.props.masterCallback("backgroundColor", this.state.color);
-  };
-
-  handleClose = () => {
-    this.setState({ displayColorPicker: false });
-  };
-
-  handleChange = color => {
-    this.setState({ color: color.rgb }, () =>
-      this.props.masterCallback("backgroundColor", this.state.color)
-    );
-  };
-
-  render() {
-    const styles = reactCSS({
-      default: {
-        color: {
-          width: "36px",
-          height: "14px",
-          borderRadius: "2px",
-          background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${
-            this.state.color.b
-          }, ${this.state.color.a})`
-        },
-        swatch: {
-          padding: "5px",
-          background: "#fff",
-          borderRadius: "1px",
-          boxShadow: "0 0 0 1px rgba(0,0,0,.1)",
-          display: "inline-block",
-          cursor: "pointer"
-        },
-        popover: {
-          position: "absolute",
-          marginTop: "5px",
-          marginLeft: "-175px",
-          zIndex: "2"
-        },
-        cover: {
-          position: "relative",
-          top: "0px",
-          right: "100px",
-          bottom: "0px",
-          left: "0px"
-        }
-      }
-    });
-
-    return (
-      <div>
-        <div style={styles.swatch} onClick={this.handleOnClick}>
-          <div style={styles.color} />
-        </div>
-        {this.state.displayColorPicker ? (
-          <div style={styles.popover}>
-            <div style={styles.cover} onClick={this.handleClose} />
-            <SketchPicker
-              color={this.state.color}
-              onChange={this.handleChange}
-            />
-          </div>
-        ) : null}
-      </div>
     );
   }
 }

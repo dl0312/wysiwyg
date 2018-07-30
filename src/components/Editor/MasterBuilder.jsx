@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import ItemTypes from "./ItemTypes";
-import { DropTarget, ConnectDropTarget, DropTargetMonitor } from "react-dnd";
+import { DropTarget } from "react-dnd";
 
 const barStyle = {
   outline: "darkblue solid 1px"

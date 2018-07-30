@@ -112,7 +112,9 @@ const SlideContainer = styled.div`
 `;
 
 const SlideImage = styled.img`
-  width: 1920px;
+  max-width: 1920px;
+  min-width: 960px;
+  width: 100%;
   position: absolute;
   z-index: 1;
   top: 0px;

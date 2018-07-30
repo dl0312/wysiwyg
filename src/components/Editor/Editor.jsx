@@ -13,6 +13,8 @@ import styled from "styled-components";
 import EditorDefaults from "./EditorDefaults";
 import JsonView from "./JsonView";
 import UserView from "./UserView";
+import BlockOptions from "./BlockOptions";
+import { Value } from "slate";
 const update = require("immutability-helper");
 const DEFAULT_NODE = "paragraph";
 
@@ -73,7 +75,7 @@ class Editor extends Component {
     this.state = {
       rightMenu: null,
       view: EditorDefaults.VIEW,
-      color: EditorDefaults.BACKGROUNDCOLOR,
+      color: EditorDefaults.BACKGROUND_COLOR,
       contentWidth: EditorDefaults.WIDTH,
       font: null,
       OnDrag: null,
@@ -83,7 +85,7 @@ class Editor extends Component {
       selectedIndex: null,
       hoveredIndex: null,
       selectedContent: null,
-      cards: EditorTemplates.TEMPLATE[0]
+      cards: EditorTemplates.TEMPLATE[2]
     };
   }
 
@@ -333,7 +335,7 @@ class Editor extends Component {
   };
 
   masterCallback = (type, dataFromChild) => {
-    if (type === "backgroundColor") {
+    if (type === "BodyBackgroundColor") {
       this.setState({ color: dataFromChild });
     } else if (type === "width") {
       this.setState({ contentWidth: dataFromChild });
@@ -558,7 +560,6 @@ class Editor extends Component {
       cards,
       selectedIndex,
       hoveredIndex,
-      selectedContent,
       contentWidth,
       view
     } = this.state;
@@ -679,11 +680,19 @@ class Editor extends Component {
               cards={this.state.cards}
               view={this.state.view}
               selectedIndex={selectedIndex}
-              selectedContent={selectedContent}
+              selectedContent={this.showSelected(selectedIndex)}
               masterCallback={this.masterCallback}
               handleOnChange={this.handleOnChange}
               showSelected={this.showSelected}
               OnChangeCards={this.OnChangeCards}
+            />
+            <BlockOptions
+              handleOnChange={this.handleOnChange}
+              selectedIndex={selectedIndex}
+              selectedContent={this.showSelected(selectedIndex)}
+              showSelected={this.showSelected}
+              OnChangeCards={this.OnChangeCards}
+              masterCallback={this.masterCallback}
             />
           </EditorRightContainer>
         </EditorContainer>

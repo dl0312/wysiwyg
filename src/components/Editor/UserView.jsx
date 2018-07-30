@@ -133,11 +133,7 @@ class UserColumnItem extends React.Component {
 
   render() {
     // 기본상태의 에디터화면 id=container, id=body
-    const { greedy, isOver, isOverCurrent, contentWidth, cards } = this.props;
-    let backgroundColor = cards.length === 1 ? "#f6e58d" : "white";
-    if (isOverCurrent || (isOver && greedy)) {
-      backgroundColor = "#b8e994";
-    }
+    const { contentWidth, cards } = this.props;
 
     const compArray = [];
     cards.map((item, index) => {
@@ -168,66 +164,6 @@ class UserColumnItem extends React.Component {
     return <Column>{compArray}</Column>;
   }
 }
-
-const handleStyle = {
-  backgroundColor: "#9c88ff",
-  width: "2rem",
-  height: "2rem",
-  borderTopRightRadius: "100%",
-  borderBottomRightRadius: "100%",
-  marginRight: "0.75rem",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  position: "absolute",
-  zIndex: "100",
-  top: "50%",
-  transform: "translate(44px,-16px)",
-  marginLeft: "-2px",
-  right: "0px"
-};
-
-const buttonStyle = {
-  border: "none",
-  outline: "none",
-  backgroundColor: "#9c88ff",
-  color: "white",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "2rem",
-  height: "2rem",
-  marginBottom: "10px",
-  cursor: "pointer"
-};
-
-const toolStyle = {
-  display: "flex",
-  zIndex: "100",
-  position: "absolute",
-  marginRight: "0.75rem",
-  cursor: "-webkit-grab",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  top: "50%",
-  transform: "translate(108px,-16px)",
-  marginLeft: "-2px",
-  right: "0px"
-};
-
-const cardSource = {
-  beginDrag(props, monitor, component) {
-    props.masterCallback("OnDrag", "content");
-    return { index: props.index };
-  },
-  endDrag(props, monitor, component) {
-    props.masterCallback("OnDrag", null);
-    return { index: props.index };
-  }
-};
 
 class UserContainer extends React.Component {
   static propTypes = {
@@ -309,58 +245,8 @@ class UserContainer extends React.Component {
     }
   };
 
-  handleOnMouseOver = event => {
-    event.stopPropagation();
-    this.props.callbackfromparent("mouseover", this.props.index);
-  };
-
-  handleOnMouseOverTool = event => {
-    event.stopPropagation();
-    this.setState({
-      toolHover: true
-    });
-    // console.log(`tool in toolHover true`);
-  };
-
-  handleOnMouseLeaveTool = event => {
-    event.stopPropagation();
-
-    this.setState({
-      toolHover: false
-    });
-    // console.log(`tool out toolHover true`);
-  };
-
-  handleOnMouseDown = event => {
-    event.stopPropagation();
-    this.props.callbackfromparent("select", this.props.index);
-  };
-
-  handleOnMouseLeave = event => {
-    event.stopPropagation();
-    this.props.callbackfromparent("mouseleave", this.props.index);
-  };
-
   render() {
-    const {
-      isDragging,
-      connectDragSource,
-      connectDragPreview,
-      // OnDrag,
-      // content,
-      // id,
-      index,
-      callbackfromparent,
-      hoveredIndex,
-      selectedIndex
-    } = this.props;
-    const opacity = isDragging ? 0.2 : 1;
-    const hover = hoveredIndex
-      ? hoveredIndex.length === index.length &&
-        hoveredIndex.every((v, i) => v === index[i])
-        ? true
-        : false
-      : false;
+    const { index, selectedIndex } = this.props;
     const active = selectedIndex
       ? selectedIndex.length === index.length &&
         selectedIndex.every((v, i) => v === index[i])
@@ -377,8 +263,7 @@ class UserContainer extends React.Component {
             this.props.align !== undefined ? this.props.align : "center",
           position: "relative",
           padding: "10px",
-          width: "100%",
-          opacity
+          width: "100%"
         }}
       >
         {this.showInner(active)}
@@ -417,7 +302,7 @@ class Button extends React.Component {
         <Editor
           autoFocus
           value={this.props.value}
-          readOnly={this.props.selected ? false : true}
+          readOnly={true}
           onChange={this.props.onChange}
           onKeyDown={this.props.onKeyDown}
           renderNode={this.props.renderNode}
@@ -469,7 +354,7 @@ class Html extends React.Component {
         <Editor
           autoFocus
           value={this.props.value}
-          readOnly={false}
+          readOnly={true}
           onChange={this.props.onChange}
           onKeyDown={this.props.onKeyDown}
           renderNode={this.props.renderNode}
@@ -534,7 +419,7 @@ class Text extends React.Component {
         <Editor
           autoFocus
           value={this.props.value}
-          readOnly={this.props.selected ? false : true}
+          readOnly={true}
           onChange={this.props.onChange}
           onKeyDown={this.props.onKeyDown}
           renderNode={this.props.renderNode}

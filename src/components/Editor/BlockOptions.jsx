@@ -1,5 +1,216 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import styles from "./BlockOptions.scss";
+import styled from "styled-components";
+import { SketchPicker } from "react-color";
+import SketchExample from "./SketchExample";
+
+const BlockOptionContainer = styled.div`
+  position: absolute;
+  top: ${props => (props.isSelected ? "900px" : "45px")};
+  bottom: 0px;
+  right: 0px;
+  width: 25%;
+  min-width: 350px;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  color: #505659;
+  transition: top 0.5s ease, opacity 0.5s ease, height 0.5s ease;
+  opacity: ${props => (props.isSelected ? "0" : "1")};
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 15px;
+  height: 45px;
+  box-shadow: 0px 1px 5px #888;
+`;
+
+const ButtonTitle = styled.div`
+  font-weight: 600;
+  font-size: 12px;
+`;
+
+const ButtonColumn = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const Button = styled.button`
+  font-size: 16px;
+  width: 35px;
+  border: none;
+  border-left: 1px solid #e6e6e6;
+  background-color: #fff;
+  height: 45px;
+`;
+
+const OptionRows = styled.div`
+  padding-top: 5px;
+`;
+
+const Option = styled.div``;
+
+const OptionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: rgb(234, 234, 234);
+`;
+
+const OptionTitle = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(81, 97, 103);
+`;
+
+const MinimizeButton = styled.button`
+  border: none;
+  background-color: transparent;
+`;
+
+const FeatureColumn = styled.div`
+  padding: 15px 20px;
+  font-size: 12px;
+`;
+
+const FunctionTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+`;
+
+const FunctionTitle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8f9699;
+  font-weight: 600;
+`;
+
+const UrlColumn = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  width: 100%;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  border: none;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 0 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  &:focus {
+    outline: none;
+  }
+`;
+
+const UrlColumnInput = Input.extend`
+  height: 33px;
+`;
+
+const HtmlInput = styled.textarea`
+  width: 100%;
+  border: none;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  height: 250px;
+  &:focus {
+    outline: none;
+  }
+`;
+
+const FunctionColumn = styled.div`
+  display: flex;
+  flex-direction: ${props => props.dir};
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: ${props => (props.isLast ? null : "1px solid #cacaca")};
+`;
+
+const ActionColumn = styled.div``;
+
+const Align = styled.button`
+  background-color: #fff;
+  border: none;
+  padding: 5px 7px;
+  margin-right: 5px;
+  border-radius: 3px;
+  color: #505659;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+  opacity: ${props => (props.isSelected ? "1" : "0.2")};
+  border: 0.5px solid #8f9699;
+  &:hover {
+    opacity: ${props => (props.isSelected ? null : "0.5")};
+  }
+  &:focus {
+    outline: none;
+  }
+`;
+
+const ToggleContainer = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+`;
+
+const Toggle = styled.input`
+  display: none;
+  &:focus + .slider-round {
+    box-shadow: 0 0 1px #2196f3;
+  }
+  &:checked + .slider-round:before {
+    -webkit-transform: translateX(18px);
+    -ms-transform: translateX(18px);
+    transform: translateX(18px);
+  }
+`;
+
+const ToggleRound = styled.span`
+  border-radius: 34px;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  background-color: ${props => (props.fullWidth ? "#2196f3" : null)};
+  box-shadow: ${props => (props.fullWidth ? "0 0 1px #2196f3" : null)};
+
+  &::before {
+    -webkit-transform: ${props =>
+      props.fullWidth ? "#translateX(18px)" : null};
+    -ms-transform: ${props => (props.fullWidth ? "translateX(18px)" : null)};
+    transform: ${props => (props.fullWidth ? "translateX(18px)" : null)};
+    position: absolute;
+    content: "";
+    height: 15px;
+    width: 15px;
+    left: 4px;
+    bottom: 2.6px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+`;
 
 class BlockOptions extends Component {
   showOptions = () => {
@@ -8,371 +219,450 @@ class BlockOptions extends Component {
       selectedContent,
       showSelected,
       handleOnChange,
-      OnChangeCards,
-      imageSrc
+      OnChangeCards
     } = this.props;
-    // console.log(this.props.selectedContent.content);
     if (selectedIndex.length === 2 || selectedIndex.length === 3) {
       switch (selectedContent.content) {
         case "BUTTON":
           return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>LINK</div>
-                  <button className={styles.btn}>
+            <OptionRows>
+              <Option>
+                <OptionHeader>
+                  <OptionTitle>BUTTON</OptionTitle>
+                  <MinimizeButton>
                     <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Button Link</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input className={styles.input} type="text" />
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>COLORS</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.colorsColumn}>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Text Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Background Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                    <div className={styles.item}>
-                      <div className={styles.title}>Hover Color</div>
-                      <div className={styles.color}>ㅁ</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>SPACING</div>
-                  <button className={styles.btn}>
-                    <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button className={styles.align}>
+                  </MinimizeButton>
+                </OptionHeader>
+                <FeatureColumn>
+                  <FunctionColumn dir={"column"}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Button Link</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      <UrlColumnInput
+                        type="text"
+                        value={selectedContent.link}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "BUTTON",
+                            "LINK"
+                          )
+                        }
+                      />
+                    </UrlColumn>
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Text Color</FunctionTitle>
+                    <SketchExample
+                      masterCallback={this.props.masterCallback}
+                      type="Text"
+                      color={selectedContent.textColor}
+                    />
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Background Color</FunctionTitle>
+                    <SketchExample
+                      masterCallback={this.props.masterCallback}
+                      type="Background"
+                      color={selectedContent.backgroundColor}
+                    />
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Hover Color</FunctionTitle>
+                    <SketchExample
+                      masterCallback={this.props.masterCallback}
+                      type="Hover"
+                      color={selectedContent.hoverColor}
+                    />
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Alignments</FunctionTitle>
+                    <ActionColumn>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-start")
+                        }
+                        isSelected={selectedContent.align === "flex-start"}
+                      >
                         <i className="fas fa-align-left" />
-                      </button>
-                      <button className={styles.align}>
+                      </Align>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "center")
+                        }
+                        isSelected={
+                          selectedContent.align === "center" ||
+                          selectedContent.align === undefined
+                        }
+                      >
                         <i className="fas fa-align-center" />
-                      </button>
-                      <button className={styles.align}>
+                      </Align>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "align", "flex-end")
+                        }
+                        isSelected={selectedContent.align === "flex-end"}
+                      >
                         <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.lineHeightColumn}>
-                    <div className={styles.title}>Line Height</div>
-                    <div className={styles.alignColumn}>
-                      <button className={styles.align}>
+                      </Align>
+                    </ActionColumn>
+                  </FunctionColumn>
+                  <FunctionColumn isLast={true}>
+                    <FunctionTitle>Text Alignments</FunctionTitle>
+                    <ActionColumn>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "textAlign", "left")
+                        }
+                        isSelected={selectedContent.textAlign === "left"}
+                      >
                         <i className="fas fa-align-left" />
-                      </button>
-                      <button className={styles.align}>
+                      </Align>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "textAlign", "center")
+                        }
+                        isSelected={
+                          selectedContent.textAlign === "center" ||
+                          selectedContent.textAlign === undefined
+                        }
+                      >
                         <i className="fas fa-align-center" />
-                      </button>
-                      <button className={styles.align}>
+                      </Align>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "textAlign", "right")
+                        }
+                        isSelected={selectedContent.textAlign === "right"}
+                      >
                         <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>GENERAL</div>
-                  <button className={styles.btn}>
+                      </Align>
+                    </ActionColumn>
+                  </FunctionColumn>
+                </FeatureColumn>
+              </Option>
+            </OptionRows>
+          );
+        case "HTML":
+          return (
+            <OptionRows>
+              <Option>
+                <OptionHeader>
+                  <OptionTitle>HTML</OptionTitle>
+                  <MinimizeButton>
                     <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Button Link</div>
-                    <div className={styles.case}>Same Tag</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input type="text" />
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </MinimizeButton>
+                </OptionHeader>
+                <FeatureColumn>
+                  <FunctionColumn isLast={true} dir={"column"}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Html Code</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      <HtmlInput
+                        style={{ height: "250px" }}
+                        type="text"
+                        value={selectedContent.link}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "BUTTON",
+                            "LINK"
+                          )
+                        }
+                      />
+                    </UrlColumn>
+                  </FunctionColumn>
+                </FeatureColumn>
+              </Option>
+            </OptionRows>
           );
         case "TEXT":
           return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>TEXT</div>
-                  <button className={styles.btn}>
+            <OptionRows>
+              <Option>
+                <OptionHeader>
+                  <OptionTitle>TEXT</OptionTitle>
+                  <MinimizeButton>
                     <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).imageSrc}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "URL")
-                      }
+                  </MinimizeButton>
+                </OptionHeader>
+                <FeatureColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Text Color</FunctionTitle>
+                    <SketchExample
+                      masterCallback={this.props.masterCallback}
+                      type="Text"
+                      color={selectedContent.textColor}
                     />
-                  </div>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Background Color</FunctionTitle>
+                    <SketchExample
+                      masterCallback={this.props.masterCallback}
+                      type="Background"
+                      color={selectedContent.backgroundColor}
+                    />
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Alignments</FunctionTitle>
+                    <ActionColumn>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "flex-start")
                         }
-                        className={styles.align}
+                        isSelected={selectedContent.align === "flex-start"}
                       >
                         <i className="fas fa-align-left" />
-                      </button>
-                      <button
+                      </Align>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "center")
                         }
-                        className={styles.align}
+                        isSelected={
+                          selectedContent.align === "center" ||
+                          selectedContent.align === undefined
+                        }
                       >
                         <i className="fas fa-align-center" />
-                      </button>
-                      <button
+                      </Align>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "flex-end")
                         }
-                        className={styles.align}
+                        isSelected={selectedContent.align === "flex-end"}
                       >
                         <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.fullWidthColumn}>
-                    <div className={styles.title}>Full Width</div>
-                    <div className={styles.buttonColumn}>
-                      <label className={styles.switch}>
-                        <input
-                          onClick={() =>
-                            OnChangeCards(selectedIndex, "fullWidth", "toggle")
-                          }
-                          type="checkbox"
-                        />
-                        <span className={styles.sliderRound} />
-                      </label>
-                    </div>
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Alternate Text</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).alt}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "ALT")
-                      }
-                    />
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).url}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "LINK")
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+                      </Align>
+                    </ActionColumn>
+                  </FunctionColumn>
+                  <FunctionColumn isLast={true}>
+                    <FunctionTitle>Text Alignments</FunctionTitle>
+                    <ActionColumn>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "textAlign", "left")
+                        }
+                        isSelected={selectedContent.textAlign === "left"}
+                      >
+                        <i className="fas fa-align-left" />
+                      </Align>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "textAlign", "center")
+                        }
+                        isSelected={
+                          selectedContent.textAlign === "center" ||
+                          selectedContent.textAlign === undefined
+                        }
+                      >
+                        <i className="fas fa-align-center" />
+                      </Align>
+                      <Align
+                        onClick={() =>
+                          OnChangeCards(selectedIndex, "textAlign", "right")
+                        }
+                        isSelected={selectedContent.textAlign === "right"}
+                      >
+                        <i className="fas fa-align-right" />
+                      </Align>
+                    </ActionColumn>
+                  </FunctionColumn>
+                </FeatureColumn>
+              </Option>
+            </OptionRows>
           );
         case "IMAGE":
+          console.log(selectedContent.align);
           return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>IMAGE</div>
-                  <button className={styles.btn}>
+            <OptionRows>
+              <Option>
+                <OptionHeader>
+                  <OptionTitle>IMAGE</OptionTitle>
+                  <MinimizeButton>
                     <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).imageSrc}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "URL")
-                      }
-                    />
-                  </div>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button
+                  </MinimizeButton>
+                </OptionHeader>
+                <FeatureColumn>
+                  <FunctionColumn dir={"column"}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Image URL</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      <UrlColumnInput
+                        type="text"
+                        value={selectedContent.imageSrc}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "IMAGE",
+                            "URL"
+                          )
+                        }
+                      />
+                    </UrlColumn>
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Alignments</FunctionTitle>
+                    <ActionColumn>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "flex-start")
                         }
-                        className={styles.align}
+                        isSelected={selectedContent.align === "flex-start"}
                       >
                         <i className="fas fa-align-left" />
-                      </button>
-                      <button
+                      </Align>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "center")
                         }
-                        className={styles.align}
+                        isSelected={
+                          selectedContent.align === "center" ||
+                          selectedContent.align === undefined
+                        }
                       >
                         <i className="fas fa-align-center" />
-                      </button>
-                      <button
+                      </Align>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "flex-end")
                         }
-                        className={styles.align}
+                        isSelected={selectedContent.align === "flex-end"}
                       >
                         <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.fullWidthColumn}>
-                    <div className={styles.title}>Full Width</div>
-                    <div className={styles.buttonColumn}>
-                      <label className={styles.switch}>
-                        <input
+                      </Align>
+                    </ActionColumn>
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Full Width</FunctionTitle>
+                    <ActionColumn>
+                      <ToggleContainer>
+                        <Toggle
                           onClick={() =>
                             OnChangeCards(selectedIndex, "fullWidth", "toggle")
                           }
                           type="checkbox"
                         />
-                        <span class={styles.sliderRound} />
-                      </label>
-                    </div>
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Alternate Text</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <input
-                      style={{ borderRadius: "5px" }}
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).alt}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "ALT")
-                      }
-                    />
-                  </div>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Image URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).url}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "IMAGE", "LINK")
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+                        <ToggleRound fullWidth={selectedContent.fullWidth} />
+                      </ToggleContainer>
+                    </ActionColumn>
+                  </FunctionColumn>
+                  <FunctionColumn dir={"column"}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Alternate Text</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      <UrlColumnInput
+                        style={{ borderRadius: "5px" }}
+                        className={styles.input}
+                        type="text"
+                        value={selectedContent.alt}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "IMAGE",
+                            "ALT"
+                          )
+                        }
+                      />
+                    </UrlColumn>
+                  </FunctionColumn>
+                  <FunctionColumn dir={"column"} isLast={"true"}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Image Link</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      {/* <button className={styles.btn}>URL</button> */}
+                      <UrlColumnInput
+                        type="text"
+                        value={selectedContent.url}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "IMAGE",
+                            "LINK"
+                          )
+                        }
+                      />
+                    </UrlColumn>
+                  </FunctionColumn>
+                </FeatureColumn>
+              </Option>
+            </OptionRows>
           );
         case "VIDEO":
           return (
-            <div className={styles.optionRows}>
-              <div className={styles.option}>
-                <div className={styles.optionHeader}>
-                  <div className={styles.optionTitle}>VIDEO</div>
-                  <button className={styles.btn}>
+            <OptionRows>
+              <Option>
+                <OptionHeader>
+                  <OptionTitle>VIDEO</OptionTitle>
+                  <MinimizeButton>
                     <i className="fas fa-angle-up" />
-                  </button>
-                </div>
-                <div className={styles.featureColumn}>
-                  <div className={styles.btnLinkColumn}>
-                    <div className={styles.title}>Video URL</div>
-                  </div>
-                  <div className={styles.urlColumn}>
-                    <button className={styles.btn}>URL</button>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      value={showSelected(selectedIndex).videoSrc}
-                      onChange={e =>
-                        handleOnChange(e.target, selectedIndex, "VIDEO", "URL")
-                      }
-                    />
-                  </div>
-                  <div className={styles.alignmentsColumn}>
-                    <div className={styles.title}>Alignments</div>
-                    <div className={styles.alignColumn}>
-                      <button
+                  </MinimizeButton>
+                </OptionHeader>
+                <FeatureColumn>
+                  <FunctionColumn dir={"column"}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Video URL</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      {/* <button className={styles.btn}>URL</button> */}
+                      <UrlColumnInput
+                        type="text"
+                        value={selectedContent.videoSrc}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "VIDEO",
+                            "URL"
+                          )
+                        }
+                      />
+                    </UrlColumn>
+                  </FunctionColumn>
+                  <FunctionColumn>
+                    <FunctionTitle>Alignments</FunctionTitle>
+                    <ActionColumn>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "flex-start")
                         }
-                        className={styles.align}
+                        isSelected={selectedContent.align === "flex-start"}
                       >
                         <i className="fas fa-align-left" />
-                      </button>
-                      <button
+                      </Align>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "center")
                         }
-                        className={styles.align}
+                        isSelected={
+                          selectedContent.align === "center" ||
+                          selectedContent.align === undefined
+                        }
                       >
                         <i className="fas fa-align-center" />
-                      </button>
-                      <button
+                      </Align>
+                      <Align
                         onClick={() =>
                           OnChangeCards(selectedIndex, "align", "flex-end")
                         }
-                        className={styles.align}
+                        isSelected={selectedContent.align === "flex-end"}
                       >
                         <i className="fas fa-align-right" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                      </Align>
+                    </ActionColumn>
+                  </FunctionColumn>
+                </FeatureColumn>
+              </Option>
+            </OptionRows>
           );
         default:
           return null;
@@ -382,37 +672,28 @@ class BlockOptions extends Component {
 
   render() {
     return (
-      <div
-        style={{
-          top:
-            this.props.selectedContent === null ||
-            this.props.selectedContent === undefined
-              ? "900px"
-              : "45px",
-          opacity:
-            this.props.selectedContent === null ||
-            this.props.selectedContent === undefined
-              ? "0"
-              : "1"
-        }}
-        className={styles.blockOption}
+      <BlockOptionContainer
+        isSelected={
+          this.props.selectedContent === null ||
+          this.props.selectedContent === undefined
+        }
       >
-        <div className={styles.header}>
-          <div className={styles.blockName}>CONTENT</div>
-          <div className={styles.btnColumn}>
-            <button className={styles.btn}>
+        <Header>
+          <ButtonTitle>CONTENT</ButtonTitle>
+          <ButtonColumn>
+            <Button>
               <i className="fas fa-trash-alt" />
-            </button>
-            <button className={styles.btn}>
+            </Button>
+            <Button>
               <i className="fas fa-copy" />
-            </button>
-            <button className={styles.btn}>
+            </Button>
+            <Button>
               <i className="fas fa-angle-down" />
-            </button>
-          </div>
-        </div>
+            </Button>
+          </ButtonColumn>
+        </Header>
         {this.props.selectedContent ? this.showOptions() : null}
-      </div>
+      </BlockOptionContainer>
     );
   }
 }
