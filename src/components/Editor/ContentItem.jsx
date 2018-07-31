@@ -8,7 +8,7 @@ import styled from "styled-components";
 
 const Item = styled.li`
   cursor: -webkit-grab;
-  border: 0.4px solid #d8d8d8;
+  border: 0.5px solid #d8d8d8;
   border-radius: 5px;
   height: 115px;
   display: flex;

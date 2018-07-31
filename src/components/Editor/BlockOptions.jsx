@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import styles from "./BlockOptions.scss";
 import styled from "styled-components";
-import { SketchPicker } from "react-color";
 import SketchExample from "./SketchExample";
 
 const BlockOptionContainer = styled.div`
@@ -10,7 +8,7 @@ const BlockOptionContainer = styled.div`
   bottom: 0px;
   right: 0px;
   width: 25%;
-  min-width: 350px;
+  min-width: 400px;
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   color: #505659;
@@ -217,7 +215,6 @@ class BlockOptions extends Component {
     const {
       selectedIndex,
       selectedContent,
-      showSelected,
       handleOnChange,
       OnChangeCards
     } = this.props;
@@ -256,24 +253,27 @@ class BlockOptions extends Component {
                   <FunctionColumn>
                     <FunctionTitle>Text Color</FunctionTitle>
                     <SketchExample
-                      masterCallback={this.props.masterCallback}
-                      type="Text"
+                      OnChangeCards={OnChangeCards}
+                      selectedIndex={selectedIndex}
+                      type="textColor"
                       color={selectedContent.textColor}
                     />
                   </FunctionColumn>
                   <FunctionColumn>
                     <FunctionTitle>Background Color</FunctionTitle>
                     <SketchExample
-                      masterCallback={this.props.masterCallback}
-                      type="Background"
+                      OnChangeCards={OnChangeCards}
+                      selectedIndex={selectedIndex}
+                      type="backgroundColor"
                       color={selectedContent.backgroundColor}
                     />
                   </FunctionColumn>
                   <FunctionColumn>
                     <FunctionTitle>Hover Color</FunctionTitle>
                     <SketchExample
-                      masterCallback={this.props.masterCallback}
-                      type="Hover"
+                      OnChangeCards={OnChangeCards}
+                      selectedIndex={selectedIndex}
+                      type="hoverColor"
                       color={selectedContent.hoverColor}
                     />
                   </FunctionColumn>
@@ -369,8 +369,8 @@ class BlockOptions extends Component {
                           handleOnChange(
                             e.target,
                             selectedIndex,
-                            "BUTTON",
-                            "LINK"
+                            "HTML",
+                            "CODE"
                           )
                         }
                       />
@@ -559,7 +559,6 @@ class BlockOptions extends Component {
                     <UrlColumn>
                       <UrlColumnInput
                         style={{ borderRadius: "5px" }}
-                        className={styles.input}
                         type="text"
                         value={selectedContent.alt}
                         onChange={e =>

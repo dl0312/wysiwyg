@@ -81,7 +81,7 @@ class ColumnItem extends Component {
                   { value },
                   this.props.index.concat(index),
                   item.content,
-                  "change"
+                  "TEXT_CHANGE"
                 );
               }}
               onKeyDown={this.props.onKeyDown}

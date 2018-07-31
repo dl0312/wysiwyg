@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "react-emotion";
+import { media } from "../../config/_mixin";
 
 export const Button = styled("span")`
   cursor: pointer;
@@ -11,7 +12,11 @@ export const Button = styled("span")`
       : props.active
         ? "black"
         : "#ccc"};
-  margin: 0 30px;
+  margin: 0 20px;
+  transition: margin 0.5s ease;
+  ${media.desktop`margin: 0 10px;`};
+  ${media.tablet`margin: 0 15px;`};
+  ${media.phone`display: none;`};
 `;
 
 export const Icon = styled(({ className, ...rest }) => {

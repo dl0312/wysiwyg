@@ -29,10 +29,10 @@ const MenuItem = styled.li`
 `;
 
 const Icon = styled.i`
-  font-size: 20px;
+  font-size: 15px;
 `;
 
-const Title = styled.div`
+const MenuTitle = styled.div`
   margin-left: 5px;
   font-size: 12px;
   font-weight: 600;
@@ -98,7 +98,7 @@ const Operator = styled.button`
   background-color: #fff;
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
-  border: 0.4px solid #d8d8d8;
+  border: 0.5px solid #d8d8d8;
   outline: none;
 `;
 
@@ -238,6 +238,13 @@ class EditorRight extends Component {
             masterCallback={this.props.masterCallback}
           />
         );
+      case 3:
+        return (
+          <Title
+            title={this.props.title}
+            masterCallback={this.props.masterCallback}
+          />
+        );
       default:
         break;
     }
@@ -261,7 +268,7 @@ class EditorRight extends Component {
               }}
             >
               <Icon className="fas fa-th-large" />
-              <Title>CONTENT</Title>
+              <MenuTitle>CONTENT</MenuTitle>
             </MenuItem>
             <MenuItem
               style={{ background: this.myColor(1), color: this.fontColor(1) }}
@@ -276,7 +283,7 @@ class EditorRight extends Component {
               }}
             >
               <Icon className="fas fa-bars" />
-              <Title>ROW</Title>
+              <MenuTitle>ROW</MenuTitle>
             </MenuItem>
             <MenuItem
               style={{ background: this.myColor(2), color: this.fontColor(2) }}
@@ -291,7 +298,22 @@ class EditorRight extends Component {
               }}
             >
               <Icon className="fas fa-columns" />
-              <Title>BODY</Title>
+              <MenuTitle>BODY</MenuTitle>
+            </MenuItem>
+            <MenuItem
+              style={{ background: this.myColor(3), color: this.fontColor(3) }}
+              onClick={() => {
+                this.toggle(3);
+              }}
+              onMouseOver={() => {
+                this.hover(3);
+              }}
+              onMouseLeave={() => {
+                this.leave(3);
+              }}
+            >
+              <Icon className="fas fa-feather" />
+              <MenuTitle>TITLE</MenuTitle>
             </MenuItem>
           </MenuColumn>
           {this.showSection()}
@@ -507,6 +529,77 @@ class Body extends Component {
               />
             </ViewsContainer>
           </Item>
+        </BodyColumn>
+      </BodyContainer>
+    );
+  }
+}
+
+const FunctionColumn = styled.div`
+  display: flex;
+  flex-direction: ${props => props.dir};
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: ${props => (props.isLast ? null : "1px solid #cacaca")};
+`;
+
+const FunctionTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+`;
+
+const UrlColumn = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  width: 100%;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  border: none;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 0 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  &:focus {
+    outline: none;
+  }
+`;
+
+const UrlColumnInput = Input.extend`
+  height: 33px;
+`;
+
+class Title extends Component {
+  handleOnChange = e => {
+    this.props.masterCallback("Title", e.target.value);
+  };
+
+  render() {
+    return (
+      <BodyContainer>
+        <NavBar>GENERAL</NavBar>
+        <BodyColumn>
+          <FunctionColumn dir={"column"} isLast={true}>
+            <FunctionTitleContainer>
+              <Item style={{ height: "20px" }}>Title</Item>
+            </FunctionTitleContainer>
+            <UrlColumn>
+              <UrlColumnInput
+                type="text"
+                onChange={this.handleOnChange}
+                value={this.props.title}
+              />
+            </UrlColumn>
+          </FunctionColumn>
+          <Item>Category</Item>
         </BodyColumn>
       </BodyContainer>
     );

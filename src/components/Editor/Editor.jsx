@@ -8,16 +8,16 @@ import MasterBuilder from "./MasterBuilder";
 import Card from "./Card";
 import Column from "./Column";
 import { Button, Icon } from "./Components";
-import EditorTemplates from "./EditorTemplates";
+import db from "./db";
 import styled from "styled-components";
 import EditorDefaults from "./EditorDefaults";
 import JsonView from "./JsonView";
 import UserView from "./UserView";
 import BlockOptions from "./BlockOptions";
-import { Value } from "slate";
+import { media } from "../../config/_mixin";
 const update = require("immutability-helper");
 const DEFAULT_NODE = "paragraph";
-
+const DEFAULT_POST = 0;
 const EditorContainer = styled.div`
   width: 100%;
   display: flex;
@@ -34,12 +34,16 @@ const EditorContainer = styled.div`
 const EditorLeftContainer = styled.div`
   position: relative;
   width: 75%;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   background-color: ${props =>
     `rgba(${props.color.r}, ${props.color.g}, ${props.color.b}, ${
       props.color.a
     })`};
   border-right: 1px solid rgba(0, 0, 0, 0.2);
+  transition: width 0.5s ease;
+  ${media.tablet`width: 100%;`};
+  ${media.phone`width: 100%;`};
 `;
 
 const TextEditor = styled.div`
@@ -60,7 +64,9 @@ const EditorRightContainer = styled.div`
   outline: 0.05px solid rgb(172, 172, 172);
   transition: width 1s ease;
   width: 25%;
-  min-width: 350px;
+  min-width: 400px;
+  ${media.tablet`display: none;`};
+  ${media.phone`display: none;`};
 `;
 
 class Editor extends Component {
@@ -85,7 +91,8 @@ class Editor extends Component {
       selectedIndex: null,
       hoveredIndex: null,
       selectedContent: null,
-      cards: EditorTemplates.TEMPLATE[2]
+      title: db.Posts[DEFAULT_POST].title,
+      cards: db.Posts[DEFAULT_POST].body
     };
   }
 
@@ -335,8 +342,11 @@ class Editor extends Component {
   };
 
   masterCallback = (type, dataFromChild) => {
+    console.log(dataFromChild);
     if (type === "BodyBackgroundColor") {
       this.setState({ color: dataFromChild });
+    } else if (type === "Title") {
+      this.setState({ title: dataFromChild });
     } else if (type === "width") {
       this.setState({ contentWidth: dataFromChild });
     } else if (type === "font") {
@@ -415,7 +425,8 @@ class Editor extends Component {
   };
 
   handleOnChange = ({ value }, index, content, type) => {
-    if (content === "BUTTON" || content === "TEXT" || content === "HTML") {
+    console.log(value);
+    if (type === "TEXT_CHANGE") {
       if (index.length === 2) {
         this.setState(
           update(this.state, {
@@ -679,6 +690,7 @@ class Editor extends Component {
               rightMenu={this.state.rightMenu}
               cards={this.state.cards}
               view={this.state.view}
+              title={this.state.title}
               selectedIndex={selectedIndex}
               selectedContent={this.showSelected(selectedIndex)}
               masterCallback={this.masterCallback}

@@ -203,9 +203,6 @@ class Container extends Component {
       isDragging,
       connectDragSource,
       connectDragPreview,
-      // OnDrag,
-      // content,
-      // id,
       index,
       callbackfromparent,
       hoveredIndex,
@@ -325,7 +322,7 @@ const ButtonContainer = styled.div`
     })`};
   background-color: ${props =>
     `rgba(${props.backgroundColor.r}, ${props.backgroundColor.g}, ${
-      props.textColor.b
+      props.backgroundColor.b
     }, ${props.backgroundColor.a})`};
   &:hover {
     background-color: ${props =>

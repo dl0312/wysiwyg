@@ -3,6 +3,8 @@ import EditorLeft from "./EditorLeft";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Editor } from "slate-react";
+import { Value } from "slate";
+import { Link } from "react-router-dom";
 
 class UserView extends React.Component {
   render() {
@@ -141,15 +143,9 @@ class UserColumnItem extends React.Component {
         case "content":
           compArray.push(
             <UserContainer
-              type={item.type}
-              value={item.value}
-              imageSrc={item.imageSrc}
-              videoSrc={item.videoSrc}
-              content={item.content}
+              item={item}
               index={this.props.index.concat(index)}
               key={index}
-              align={item.align}
-              fullWidth={item.fullWidth}
               contentWidth={contentWidth}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}
@@ -183,12 +179,19 @@ class UserContainer extends React.Component {
   }
 
   showInner = selected => {
-    if (this.props.type === "content") {
-      switch (this.props.content) {
+    if (this.props.item.type === "content") {
+      switch (this.props.item.content) {
         case "BUTTON":
+          let value = null;
+          if (!Value.isValue(this.props.item.value)) {
+            value = Value.fromJSON(this.props.item.value);
+          } else {
+            value = this.props.item.value;
+          }
           return (
             <Button
-              value={this.props.value}
+              item={this.props.item}
+              value={value}
               selected={selected}
               onChange={this.props.onChange}
               onKeyDown={this.props.onKeyDown}
@@ -199,9 +202,14 @@ class UserContainer extends React.Component {
         case "DIVIDER":
           return <Divider selected={selected} />;
         case "HTML":
+          if (!Value.isValue(this.props.item.value)) {
+            value = Value.fromJSON(this.props.item.value);
+          } else {
+            value = this.props.item.value;
+          }
           return (
             <Html
-              value={this.props.value}
+              value={value}
               selected={selected}
               onChange={this.props.onChange}
               onKeyDown={this.props.onKeyDown}
@@ -213,15 +221,23 @@ class UserContainer extends React.Component {
           return (
             <Image
               selected={selected}
-              src={this.props.imageSrc}
-              fullWidth={this.props.fullWidth}
+              src={this.props.item.imageSrc}
+              alt={this.props.item.alt}
+              link={this.props.item.link}
+              fullWidth={this.props.item.fullWidth}
               contentWidth={this.props.contentWidth}
             />
           );
         case "TEXT":
+          if (!Value.isValue(this.props.item.value)) {
+            value = Value.fromJSON(this.props.item.value);
+          } else {
+            value = this.props.item.value;
+          }
           return (
             <Text
-              value={this.props.value}
+              value={value}
+              item={this.props.item}
               selected={selected}
               onChange={this.props.onChange}
               onKeyDown={this.props.onKeyDown}
@@ -233,7 +249,7 @@ class UserContainer extends React.Component {
           return (
             <Video
               selected={selected}
-              src={this.props.videoSrc}
+              src={this.props.item.videoSrc}
               contentWidth={this.props.contentWidth}
             />
           );
@@ -260,7 +276,15 @@ class UserContainer extends React.Component {
           display: "flex",
           alignItems: "center",
           justifyContent:
-            this.props.align !== undefined ? this.props.align : "center",
+            this.props.item.content === "TEXT" ||
+            this.props.item.content === "BUTTON" ||
+            this.props.item.content === "HTML" ||
+            this.props.item.content === "IMAGE" ||
+            this.props.item.content === "VIDEO"
+              ? this.props.item.align
+                ? this.props.item.align
+                : "center"
+              : "center",
           position: "relative",
           padding: "10px",
           width: "100%"
@@ -272,6 +296,36 @@ class UserContainer extends React.Component {
   }
 }
 
+const ButtonContainer = styled.div`
+  color: ${props =>
+    `rgba(${props.textColor.r}, ${props.textColor.g}, ${props.textColor.b}, ${
+      props.textColor.a
+    })`};
+  background-color: ${props =>
+    `rgba(${props.backgroundColor.r}, ${props.backgroundColor.g}, ${
+      props.backgroundColor.b
+    }, ${props.backgroundColor.a})`};
+  &:hover {
+    background-color: ${props =>
+      `rgba(${props.hoverColor.r}, ${props.hoverColor.g}, ${
+        props.hoverColor.b
+      }, ${props.textColor.a})`};
+  }
+  transition: background-color 0.5s ease;
+  text-align: center;
+  line-height: 120%;
+  border-top: 0 solid transparent;
+  border-right: 0 solid transparent;
+  border-left: 0 solid transparent;
+  border-bottom: 0 solid transparent;
+  border-radius: 4px;
+  padding-top: 10px;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  cursor: pointer;
+`;
+
 class Button extends React.Component {
   constructor(props) {
     super(props);
@@ -279,25 +333,12 @@ class Button extends React.Component {
   }
 
   render() {
-    // console.log(this.props.selected);
     return (
-      <div
-        className="content"
-        style={{
-          color: "white",
-          backgroundColor: "#3AAEE0",
-          textAlign: "center",
-          lineHeight: "120%",
-          borderTop: "0 solid transparent",
-          borderRight: "0 solid transparent",
-          borderLeft: "0 solid transparent",
-          borderBottom: "0 solid transparent",
-          borderRadius: "4px",
-          paddingTop: "10px",
-          paddingRight: "20px",
-          paddingLeft: "20px",
-          paddingBottom: "10px"
-        }}
+      <ButtonContainer
+        textColor={this.props.item.textColor}
+        backgroundColor={this.props.item.backgroundColor}
+        hoverColor={this.props.item.hoverColor}
+        onClick={() => window.open("http://www.google.com", "_blank")}
       >
         <Editor
           autoFocus
@@ -308,7 +349,7 @@ class Button extends React.Component {
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
         />
-      </div>
+      </ButtonContainer>
     );
   }
 }
@@ -386,7 +427,7 @@ class Image extends React.Component {
             width: this.props.fullWidth ? this.props.contentWidth : "100%"
           }}
           src={this.props.src}
-          alt="logo"
+          alt={this.props.alt}
         />
       </div>
     );

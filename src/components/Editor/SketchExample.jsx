@@ -12,8 +12,19 @@ export default class SketchExample extends React.Component {
   }
 
   handleOnClick = () => {
+    console.log(this.state.color);
+    console.log(this.props.selectedIndex);
+    console.log(this.props.type);
     this.setState({ displayColorPicker: !this.state.displayColorPicker });
-    this.props.masterCallback(this.props.type, this.state.color);
+    if (this.props.type === "BodyBackgroundColor") {
+      this.props.masterCallback(this.props.type, this.state.color);
+    } else {
+      this.props.OnChangeCards(
+        this.props.selectedIndex,
+        this.props.type,
+        this.state.color
+      );
+    }
   };
 
   handleClose = () => {
@@ -21,9 +32,19 @@ export default class SketchExample extends React.Component {
   };
 
   handleChange = color => {
-    this.setState({ color: color.rgb }, () =>
-      this.props.masterCallback(this.props.type, this.state.color)
-    );
+    if (this.props.type === "BodyBackgroundColor") {
+      this.setState({ color: color.rgb }, () =>
+        this.props.masterCallback(this.props.type, this.state.color)
+      );
+    } else {
+      this.setState({ color: color.rgb }, () =>
+        this.props.OnChangeCards(
+          this.props.selectedIndex,
+          this.props.type,
+          this.state.color
+        )
+      );
+    }
   };
 
   render() {
