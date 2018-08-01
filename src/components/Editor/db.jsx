@@ -1915,7 +1915,26 @@ export default {
       view: 1000,
       comment_count: 3,
       time: "July 31, 2018",
-      body: [{ type: "builder" }]
+      body: [
+        {
+          type: "builder"
+        },
+        {
+          type: "columnList",
+          OnDrag: "columnList",
+          content: [1],
+          columnListArray: [
+            [
+              {
+                type: "builder"
+              }
+            ]
+          ]
+        },
+        {
+          type: "builder"
+        }
+      ]
     },
     {
       category: {

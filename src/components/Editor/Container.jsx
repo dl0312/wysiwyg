@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 import { DragSource } from "react-dnd";
 import { Value } from "slate";
 import styled from "styled-components";
-import EditorDefaults from "./EditorDefaults";
 
 const Handle = styled.div`
   background-color: #9c88ff;
@@ -85,29 +84,36 @@ class Container extends Component {
     };
   }
 
-  showInner = selected => {
+  showInner = active => {
     if (this.props.item.type === "content") {
       switch (this.props.item.content) {
         case "BUTTON":
           let value = null;
           if (!Value.isValue(this.props.item.value)) {
             value = Value.fromJSON(this.props.item.value);
+            this.props.handleOnChange(
+              { value },
+              this.props.index,
+              "BUTTON",
+              "TEXT_CHANGE"
+            );
           } else {
             value = this.props.item.value;
           }
           return (
             <Button
               item={this.props.item}
+              index={this.props.index}
               value={value}
-              selected={selected}
-              onChange={this.props.onChange}
+              active={active}
+              handleOnChange={this.props.handleOnChange}
               onKeyDown={this.props.onKeyDown}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}
             />
           );
         case "DIVIDER":
-          return <Divider selected={selected} />;
+          return <Divider active={active} />;
         case "HTML":
           if (!Value.isValue(this.props.item.value)) {
             value = Value.fromJSON(this.props.item.value);
@@ -117,8 +123,9 @@ class Container extends Component {
           return (
             <Html
               value={value}
-              selected={selected}
-              onChange={this.props.onChange}
+              index={this.props.index}
+              active={active}
+              handleOnChange={this.props.handleOnChange}
               onKeyDown={this.props.onKeyDown}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}
@@ -127,7 +134,7 @@ class Container extends Component {
         case "IMAGE":
           return (
             <Image
-              selected={selected}
+              active={active}
               src={this.props.item.imageSrc}
               fullWidth={this.props.item.fullWidth}
               contentWidth={this.props.contentWidth}
@@ -142,9 +149,10 @@ class Container extends Component {
           return (
             <Text
               value={value}
+              index={this.props.index}
               item={this.props.item}
-              selected={selected}
-              onChange={this.props.onChange}
+              active={active}
+              handleOnChange={this.props.handleOnChange}
               onKeyDown={this.props.onKeyDown}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}
@@ -153,13 +161,13 @@ class Container extends Component {
         case "VIDEO":
           return (
             <Video
-              selected={selected}
+              active={active}
               src={this.props.item.videoSrc}
               contentWidth={this.props.item.contentWidth}
             />
           );
         case "SOCIAL":
-          return <Social selected={selected} />;
+          return <Social active={active} />;
         default:
           break;
       }
@@ -324,11 +332,11 @@ const ButtonContainer = styled.div`
     `rgba(${props.backgroundColor.r}, ${props.backgroundColor.g}, ${
       props.backgroundColor.b
     }, ${props.backgroundColor.a})`};
-  &:hover {
+  /* &:hover {
     background-color: ${props =>
       `rgba(${props.hoverColor.r}, ${props.hoverColor.g}, ${
         props.hoverColor.b
-      }, ${props.textColor.a})`};
+      }, ${props.textColor.a})`}; */
   }
   text-align: center;
   line-height: 120%;
@@ -349,8 +357,16 @@ class Button extends Component {
     this.state = {};
   }
 
+  onChange = ({ value }) => {
+    this.props.handleOnChange(
+      { value },
+      this.props.index,
+      "BUTTON",
+      "TEXT_CHANGE"
+    );
+  };
+
   render() {
-    console.log(this.props.item);
     return (
       <ButtonContainer
         textColor={this.props.item.textColor}
@@ -358,14 +374,34 @@ class Button extends Component {
         hoverColor={this.props.item.hoverColor}
       >
         <Editor
-          autoFocus
           value={this.props.value}
-          readOnly={this.props.selected ? false : true}
-          onChange={this.props.onChange}
-          onKeyDown={this.props.onKeyDown}
+          readOnly={this.props.active ? false : true}
+          onChange={this.onChange}
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
+          autoCorrect={false}
+          spellCheck={false}
         />
+        {/* {this.props.active ? (
+          <Editor
+            value={this.props.value}
+            readOnly={this.props.active ? false : true}
+            onChange={this.onChange}
+            renderNode={this.props.renderNode}
+            renderMark={this.props.renderMark}
+            autoCorrect={false}
+            spellCheck={false}
+          />
+        ) : (
+          <Editor
+            value={this.props.value}
+            readOnly={true}
+            renderNode={this.props.renderNode}
+            renderMark={this.props.renderMark}
+            autoCorrect={false}
+            spellCheck={false}
+          />
+        )} */}
       </ButtonContainer>
     );
   }
@@ -410,7 +446,6 @@ class Html extends Component {
         }}
       >
         <Editor
-          autoFocus
           value={this.props.value}
           readOnly={false}
           onChange={this.props.onChange}
@@ -457,7 +492,7 @@ class Text extends Component {
   constructor(props) {
     super(props);
     this.props = {
-      selected: false
+      active: false
     };
     this.state = {};
   }
@@ -479,11 +514,16 @@ class Text extends Component {
         }}
       >
         <Editor
-          autoFocus
           value={this.props.value}
-          readOnly={this.props.selected ? false : true}
-          onChange={this.props.onChange}
-          onKeyDown={this.props.onKeyDown}
+          readOnly={this.props.active ? false : true}
+          onChange={({ value }) => {
+            this.props.handleOnChange(
+              { value },
+              this.props.index,
+              "BUTTON",
+              "TEXT_CHANGE"
+            );
+          }}
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
         />

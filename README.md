@@ -45,7 +45,9 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
     - [ ] Menu Option
       - [ ] CSS
 
-### 고쳐야할 것
+### 고쳐야할 것 ( BUG )
 
-- [ ] 복사했을 때 Text 수정
-- [ ] default 로 만들었을 때 Text 수정
+- [ ] 복사했을 때 복사한 text 수정불가 + 원본 수정시 이상
+- [ ] default 로 만들었을 때 Text 수정 ( 아래 버그 수정시 해결 )
+- [ ] 아래 위치한 block 의 text 수정시 위 text 수정불가
+- [ ] 갑자기 다른 위치로 스크롤바이동

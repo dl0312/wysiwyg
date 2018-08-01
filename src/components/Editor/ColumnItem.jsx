@@ -75,15 +75,7 @@ class ColumnItem extends Component {
               index={this.props.index.concat(index)}
               key={index}
               contentWidth={contentWidth}
-              onChange={({ value }) => {
-                console.log(value);
-                this.props.handleOnChange(
-                  { value },
-                  this.props.index.concat(index),
-                  item.content,
-                  "TEXT_CHANGE"
-                );
-              }}
+              handleOnChange={this.props.handleOnChange}
               onKeyDown={this.props.onKeyDown}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}

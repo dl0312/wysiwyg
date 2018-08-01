@@ -17,7 +17,7 @@ import BlockOptions from "./BlockOptions";
 import { media } from "../../config/_mixin";
 const update = require("immutability-helper");
 const DEFAULT_NODE = "paragraph";
-const DEFAULT_POST = 0;
+const DEFAULT_POST = 1;
 const EditorContainer = styled.div`
   width: 100%;
   display: flex;
@@ -248,18 +248,6 @@ class Editor extends Component {
           })
         );
       }
-    } else {
-      // on frame
-      if (!!hoverItem) {
-        const builder = { type: "builder" };
-        this.setState(
-          update(this.state, {
-            cards: {
-              $splice: [[hoverIndex, 0, hoverItem], [hoverIndex, 0, builder]]
-            }
-          })
-        );
-      }
     }
   };
 
@@ -274,40 +262,51 @@ class Editor extends Component {
         cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2]];
       const dragBuilder =
         cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2] - 1];
-
+      console.log(dragIndex);
+      console.log(hoverIndex);
       this.setState({
         selectedIndex: null,
         selectedContent: null
       });
-      this.setState(
-        update(this.state, {
-          cards: {
-            [dragIndex[0]]: {
-              columnListArray: {
-                [dragIndex[1]]: {
-                  $splice: [[dragIndex[2] - 1, 2]]
+      if (
+        (dragIndex[0] === hoverIndex[0] &&
+          dragIndex[1] === hoverIndex[1] &&
+          dragIndex[2] === hoverIndex[2] + 1) ||
+        (dragIndex[0] === hoverIndex[0] &&
+          dragIndex[1] === hoverIndex[1] &&
+          dragIndex[2] === hoverIndex[2] - 1)
+      ) {
+      } else {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [dragIndex[0]]: {
+                columnListArray: {
+                  [dragIndex[1]]: {
+                    $splice: [[dragIndex[2] - 1, 2]]
+                  }
                 }
               }
             }
-          }
-        })
-      );
-      this.setState(
-        update(this.state, {
-          cards: {
-            [hoverIndex[0]]: {
-              columnListArray: {
-                [hoverIndex[1]]: {
-                  $splice: [
-                    [hoverIndex[2], 0, dragCard],
-                    [hoverIndex[2], 0, dragBuilder]
-                  ]
+          })
+        );
+        this.setState(
+          update(this.state, {
+            cards: {
+              [hoverIndex[0]]: {
+                columnListArray: {
+                  [hoverIndex[1]]: {
+                    $splice: [
+                      [hoverIndex[2], 0, dragCard],
+                      [hoverIndex[2], 0, dragBuilder]
+                    ]
+                  }
                 }
               }
             }
-          }
-        })
-      );
+          })
+        );
+      }
     } else if (!Array.isArray(dragIndex) && !Array.isArray(hoverIndex)) {
       // frame => frame
       const { cards } = this.state;
@@ -425,7 +424,6 @@ class Editor extends Component {
   };
 
   handleOnChange = ({ value }, index, content, type) => {
-    console.log(value);
     if (type === "TEXT_CHANGE") {
       if (index.length === 2) {
         this.setState(
@@ -449,6 +447,9 @@ class Editor extends Component {
             }
           })
         );
+        // let cards = this.state.cards.slice();
+        // cards[index[0]].columnListArray[index[1]][index[2]].value = value;
+        // this.setState({ cards });
       }
     } else if (content === "IMAGE") {
       if (type === "URL") {
@@ -612,7 +613,6 @@ class Editor extends Component {
                 handleDrop={this.handleDrop}
                 moveCard={this.moveCard}
                 handleOnChange={this.handleOnChange}
-                onKeyDown={this.onKeyDown}
                 renderNode={this.renderNode}
                 renderMark={this.renderMark}
                 selectedIndex={selectedIndex}
@@ -850,7 +850,12 @@ class Editor extends Component {
     ) {
       const { value } = this.showSelected(this.state.selectedIndex);
       const change = value.change().toggleMark(type);
-      this.handleOnChange(change, this.state.selectedIndex, "TEXT", "change");
+      this.handleOnChange(
+        change,
+        this.state.selectedIndex,
+        "TEXT",
+        "TEXT_CHANGE"
+      );
     }
   };
 
@@ -912,7 +917,12 @@ class Editor extends Component {
           change.setBlocks("list-item").wrapBlock(type);
         }
       }
-      this.handleOnChange(change, this.state.selectedIndex, "TEXT", "change");
+      this.handleOnChange(
+        change,
+        this.state.selectedIndex,
+        "TEXT",
+        "TEXT_CHANGE"
+      );
     }
   };
 }
