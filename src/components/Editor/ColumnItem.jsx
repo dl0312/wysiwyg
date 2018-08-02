@@ -50,47 +50,40 @@ class ColumnItem extends Component {
     const { contentWidth, cards } = this.props;
     let backgroundColor = cards.length === 1 ? "transparent" : "transparent";
 
-    const compArray = [];
-    cards.map((item, index) => {
-      switch (item.type) {
-        case "builder":
-          compArray.push(
-            <Builder
-              id={item.id}
-              index={this.props.index.concat(index)}
-              moveCard={this.props.moveCard}
-              handleDrop={this.props.handleDrop}
-              OnDrag={this.props.OnDrag}
-              masterCallback={this.props.masterCallback}
-            />
-          );
-          break;
-        case "content":
-          compArray.push(
-            <Container
-              item={item}
-              callbackfromparent={this.props.callbackfromparent}
-              selectedIndex={this.props.selectedIndex}
-              hoveredIndex={this.props.hoveredIndex}
-              index={this.props.index.concat(index)}
-              key={index}
-              contentWidth={contentWidth}
-              handleOnChange={this.props.handleOnChange}
-              onKeyDown={this.props.onKeyDown}
-              renderNode={this.props.renderNode}
-              renderMark={this.props.renderMark}
-              masterCallback={this.props.masterCallback}
-            />
-          );
-          break;
-        default:
-          break;
-      }
-    });
-
     return (
       <Column hasBlock={cards.length !== 1} bgc={backgroundColor}>
-        {compArray}
+        {cards.map((item, index) => {
+          if (item.type === "builder") {
+            return (
+              <Builder
+                id={item.id}
+                index={this.props.index.concat(index)}
+                moveCard={this.props.moveCard}
+                handleDrop={this.props.handleDrop}
+                OnDrag={this.props.OnDrag}
+                masterCallback={this.props.masterCallback}
+              />
+            );
+          } else if (item.type === "content") {
+            return (
+              <Container
+                item={item}
+                callbackfromparent={this.props.callbackfromparent}
+                selectedIndex={this.props.selectedIndex}
+                hoveredIndex={this.props.hoveredIndex}
+                index={this.props.index.concat(index)}
+                key={index}
+                contentWidth={contentWidth}
+                handleOnChange={this.props.handleOnChange.bind(this)}
+                renderNode={this.props.renderNode}
+                renderMark={this.props.renderMark}
+                masterCallback={this.props.masterCallback}
+              />
+            );
+          } else {
+            return null;
+          }
+        })}
         {cards.length !== 1 ? null : (
           <InsertText>
             INSERT<br />CONTENT

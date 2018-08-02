@@ -117,6 +117,12 @@ class Container extends Component {
         case "HTML":
           if (!Value.isValue(this.props.item.value)) {
             value = Value.fromJSON(this.props.item.value);
+            this.props.handleOnChange(
+              { value },
+              this.props.index,
+              "BUTTON",
+              "TEXT_CHANGE"
+            );
           } else {
             value = this.props.item.value;
           }
@@ -143,6 +149,12 @@ class Container extends Component {
         case "TEXT":
           if (!Value.isValue(this.props.item.value)) {
             value = Value.fromJSON(this.props.item.value);
+            this.props.handleOnChange(
+              { value },
+              this.props.index,
+              "BUTTON",
+              "TEXT_CHANGE"
+            );
           } else {
             value = this.props.item.value;
           }
@@ -336,8 +348,8 @@ const ButtonContainer = styled.div`
     background-color: ${props =>
       `rgba(${props.hoverColor.r}, ${props.hoverColor.g}, ${
         props.hoverColor.b
-      }, ${props.textColor.a})`}; */
-  }
+      }, ${props.textColor.a})`};
+  } */
   text-align: center;
   line-height: 120%;
   border-top: 0 solid transparent;

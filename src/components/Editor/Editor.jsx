@@ -248,6 +248,18 @@ class Editor extends Component {
           })
         );
       }
+    } else {
+      // on frame
+      if (!!hoverItem) {
+        const builder = { type: "builder" };
+        this.setState(
+          update(this.state, {
+            cards: {
+              $splice: [[hoverIndex, 0, hoverItem], [hoverIndex, 0, builder]]
+            }
+          })
+        );
+      }
     }
   };
 
@@ -576,59 +588,6 @@ class Editor extends Component {
       view
     } = this.state;
 
-    const compArray = [];
-    cards.map((item, index) => {
-      switch (item.type) {
-        case "builder":
-          compArray.push(
-            <MasterBuilder
-              key={index}
-              index={index}
-              moveCard={this.moveCard}
-              handleDrop={this.handleDrop}
-              contentWidth={contentWidth}
-              OnDrag={this.state.OnDrag}
-              masterCallback={this.masterCallback}
-            />
-          );
-          break;
-        case "columnList":
-          compArray.push(
-            <Card
-              inColumn={false}
-              cards={this.state.cards.length}
-              key={index}
-              index={index}
-              moveCard={this.moveCard}
-              callbackfromparent={this.buttonCallback}
-              selectedIndex={selectedIndex}
-              hoveredIndex={hoveredIndex}
-              masterCallback={this.masterCallback}
-            >
-              <Column
-                columnArray={item.content}
-                columnListArray={item.columnListArray}
-                index={[index, 0, 0]}
-                callbackfromparent={this.buttonCallback}
-                handleDrop={this.handleDrop}
-                moveCard={this.moveCard}
-                handleOnChange={this.handleOnChange}
-                renderNode={this.renderNode}
-                renderMark={this.renderMark}
-                selectedIndex={selectedIndex}
-                hoveredIndex={hoveredIndex}
-                contentWidth={contentWidth}
-                OnDrag={this.state.OnDrag}
-                masterCallback={this.masterCallback}
-              />
-            </Card>
-          );
-          break;
-        default:
-          break;
-      }
-    });
-
     return (
       <Fragment>
         <EditorContainer>
@@ -677,7 +636,54 @@ class Editor extends Component {
                   )}
                 </TextEditor>
                 <div style={{ marginTop: "60px" }} />
-                {compArray}
+                {cards.map((item, index) => {
+                  if (item.type === "builder") {
+                    return (
+                      <MasterBuilder
+                        key={index}
+                        index={index}
+                        moveCard={this.moveCard}
+                        handleDrop={this.handleDrop}
+                        contentWidth={contentWidth}
+                        OnDrag={this.state.OnDrag}
+                        masterCallback={this.masterCallback}
+                      />
+                    );
+                  } else if (item.type === "columnList") {
+                    return (
+                      <Card
+                        inColumn={false}
+                        cards={this.state.cards.length}
+                        key={index}
+                        index={index}
+                        moveCard={this.moveCard}
+                        callbackfromparent={this.buttonCallback}
+                        selectedIndex={selectedIndex}
+                        hoveredIndex={hoveredIndex}
+                        masterCallback={this.masterCallback}
+                      >
+                        <Column
+                          columnArray={item.content}
+                          columnListArray={item.columnListArray}
+                          index={[index, 0, 0]}
+                          callbackfromparent={this.buttonCallback}
+                          handleDrop={this.handleDrop}
+                          moveCard={this.moveCard}
+                          handleOnChange={this.handleOnChange.bind(this)}
+                          renderNode={this.renderNode}
+                          renderMark={this.renderMark}
+                          selectedIndex={selectedIndex}
+                          hoveredIndex={hoveredIndex}
+                          contentWidth={contentWidth}
+                          OnDrag={this.state.OnDrag}
+                          masterCallback={this.masterCallback}
+                        />
+                      </Card>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
               </EditorLeft>
             ) : view === "USER" ? (
               <UserView json={this.state} />

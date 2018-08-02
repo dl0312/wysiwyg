@@ -24,8 +24,7 @@ export default class Column extends Component {
             callbackfromparent={this.props.callbackfromparent}
             handleDrop={this.props.handleDrop}
             moveCard={this.props.moveCard}
-            handleOnChange={this.props.handleOnChange}
-            onKeyDown={this.props.onKeyDown}
+            handleOnChange={this.props.handleOnChange.bind(this)}
             renderNode={this.props.renderNode}
             renderMark={this.props.renderMark}
             selectedIndex={this.props.selectedIndex}
