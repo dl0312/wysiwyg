@@ -17,7 +17,7 @@ import BlockOptions from "./BlockOptions";
 import { media } from "../../config/_mixin";
 const update = require("immutability-helper");
 const DEFAULT_NODE = "paragraph";
-const DEFAULT_POST = 1;
+const DEFAULT_POST = 0;
 const EditorContainer = styled.div`
   width: 100%;
   display: flex;
@@ -92,7 +92,7 @@ class Editor extends Component {
       hoveredIndex: null,
       selectedContent: null,
       title: db.Posts[DEFAULT_POST].title,
-      cards: db.Posts[DEFAULT_POST].body
+      cards: db.Posts[DEFAULT_POST].cards
     };
   }
 
@@ -214,6 +214,7 @@ class Editor extends Component {
           cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
             dataFromChild[2]
           ];
+        console.log(targetCard);
         const blockBuilder = { type: "builder" };
         this.setState(
           update(this.state, {
@@ -231,6 +232,19 @@ class Editor extends Component {
             }
           })
         );
+        // this.setState(
+        //   update(this.state, {
+        //     cards: {
+        //       [dataFromChild[0]]: {
+        //         columnListArray: {
+        //           [dataFromChild[1]]: {
+        //             $set: { [dataFromChild[2] + 1]: targetCard }
+        //           }
+        //         }
+        //       }
+        //     }
+        //   })
+        // );
       }
     }
   };
@@ -523,30 +537,30 @@ class Editor extends Component {
             })
           );
         }
-      } else if (type === "LINK") {
-        if (index.length === 2) {
-          this.setState(
-            update(this.state, {
-              cards: { [index[0]]: { link: { $set: value } } }
-            })
-          );
-        } else if (index.length === 3) {
-          this.setState(
-            update(this.state, {
-              cards: {
-                [index[0]]: {
-                  columnListArray: {
-                    [index[1]]: {
-                      [index[2]]: {
-                        link: { $set: value }
-                      }
+      }
+    } else if (type === "LINK") {
+      if (index.length === 2) {
+        this.setState(
+          update(this.state, {
+            cards: { [index[0]]: { link: { $set: value } } }
+          })
+        );
+      } else if (index.length === 3) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [index[0]]: {
+                columnListArray: {
+                  [index[1]]: {
+                    [index[2]]: {
+                      link: { $set: value }
                     }
                   }
                 }
               }
-            })
-          );
-        }
+            }
+          })
+        );
       }
     } else if (content === "VIDEO") {
       if (type === "URL") {

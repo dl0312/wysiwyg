@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import db from "../Editor/db";
 
@@ -7,41 +8,49 @@ const BoardContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 30px;
+  padding: 30px;
   font-family: "Open Sans", sans-serif;
+  background-color: white;
 `;
 
 const TH = styled.th`
   border: 2px solid black;
   vertical-align: middle;
   text-align: center;
+  border-radius: 3px;
+  background-color: white;
 `;
 
 const TD = styled.td`
-  border: 2px solid black;
+  border: 1px solid black;
   vertical-align: middle;
   text-align: center;
+  border-radius: 3px;
+  background-color: white;
 `;
 
 const BoardBox = styled.div`
   width: 700px;
   max-width: 960px;
-  border-radius: 3px;
-  border: 1px solid #8a0808;
 `;
 
 const CategoryImg = styled.img`
-  width: 60px;
-  height: 60px;
+  width: 100%;
   display: block;
 `;
 
 const Table = styled.table`
   width: 100%;
-  border: 1px solid black;
+  display: grid;
+  grid-gap: 2px;
+  grid-template-rows: 60px;
 `;
 
-const TableRow = styled.tr``;
+const TableRow = styled.tr`
+  display: grid;
+  grid-template-columns: 60px auto 120px;
+  grid-gap: 2px;
+`;
 
 const CategoryHeader = TH.extend`
   width: 60px;
@@ -93,10 +102,10 @@ const Comment = styled.span`
 
 const Title = styled.div`
   color: white;
-  font-size: 20px;
+  font-size: 15px;
   float: left;
   width: 100%;
-  font-weight: 300;
+  font-weight: bolder;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -120,9 +129,14 @@ const TitleRow = TD.extend`
   vertical-align: top;
 `;
 const CountRow = TD.extend`
+  width: 120px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`;
+
+const CountTitle = styled.div`
+  font-size: 10px;
 `;
 
 const Indicator = styled.div`
@@ -135,6 +149,7 @@ const Indicator = styled.div`
 `;
 
 const FlexBox = styled.div`
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,7 +166,7 @@ class Board extends Component {
       <BoardContainer>
         <BoardBox>
           <Table>
-            {db.Posts.map(post => (
+            {db.Posts.map((post, index) => (
               <TableRow>
                 <CategoryData>
                   <CategoryImg
@@ -161,7 +176,12 @@ class Board extends Component {
                 </CategoryData>
                 <TitleRow>
                   <Title>
-                    {post.title}
+                    <Link
+                      to={`/read/${index}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      {post.title}
+                    </Link>
                     <Comment>[{post.comment_count}]</Comment>
                   </Title>
                   <SubTitle>
@@ -170,9 +190,9 @@ class Board extends Component {
                 </TitleRow>
                 <CountRow>
                   <FlexBox>
-                    <div>CLAPS: {post.clap_count}</div>
+                    <CountTitle>CLAPS: {post.clap_count}</CountTitle>
                     <Indicator />
-                    <div>VIEWS: {post.view}</div>
+                    <CountTitle>VIEWS: {post.view}</CountTitle>
                   </FlexBox>
                 </CountRow>
               </TableRow>

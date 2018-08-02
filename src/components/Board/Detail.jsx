@@ -1,14 +1,21 @@
 import React from "react";
-import EditorLeft from "./EditorLeft";
+import EditorLeft from "../Editor/EditorLeft";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Editor } from "slate-react";
 import { Value } from "slate";
 import { Link } from "react-router-dom";
+import db from "../Editor/db";
 
-class UserView extends React.Component {
+const DetailContainer = styled.div`
+  width: 100%;
+`;
+
+class Detail extends React.Component {
   render() {
-    const { json } = this.props;
+    console.log(this.props.match.params.post_id);
+    console.log(db.Posts[this.props.match.params.post_id]);
+    const json = db.Posts[this.props.match.params.post_id];
     const compArray = [];
     json.cards.map((item, index) => {
       switch (item.type) {
@@ -36,19 +43,21 @@ class UserView extends React.Component {
       }
     });
     return (
-      <EditorLeft
-        color={json.color}
-        contentWidth={json.contentWidth}
-        font={json.font}
-      >
-        <div style={{ marginTop: "30px" }} />
-        {compArray}
-      </EditorLeft>
+      <DetailContainer>
+        <EditorLeft
+          color={json.color}
+          contentWidth={json.contentWidth}
+          font={json.font}
+        >
+          <div style={{ marginTop: "30px" }} />
+          {compArray}
+        </EditorLeft>
+      </DetailContainer>
     );
   }
 }
 
-export default UserView;
+export default Detail;
 
 const style = {
   backgroundColor: "transparent",

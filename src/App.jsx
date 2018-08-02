@@ -8,6 +8,8 @@ import Wiki from "./components/Wiki/Wiki";
 import Store from "./components/Store/Store";
 import Editor from "./components/Editor/Editor";
 import Profile from "./components/Profile/Profile";
+import Detail from "./components/Board/Detail";
+import db from "./components/Editor/db";
 import "./App.css";
 
 const App = () => {
@@ -20,6 +22,8 @@ const App = () => {
         <Route exact path="/wiki" component={Wiki} />
         <Route exact path="/store" component={Store} />
         <Route exact path="/editor" component={Editor} />
+        <Route exact path="/editor/:post_id" component={Editor} />
+        <Route exact path="/read/:post_id" component={Detail} />
         <Route exact path="/profile" component={Profile} />
       </div>
     </div>
