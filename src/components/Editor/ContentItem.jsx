@@ -58,6 +58,7 @@ const itemSource = {
         item.textColor = EditorDefaults.BUTTON_TEXT_COLOR;
         item.backgroundColor = EditorDefaults.BUTTON_BACKGROUND_COLOR;
         item.hoverColor = EditorDefaults.BUTTON_HOVER_COLOR;
+        item.link = "http://localhost:3000";
         item.value = Value.fromJSON({
           document: {
             nodes: [

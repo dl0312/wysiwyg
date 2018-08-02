@@ -4,7 +4,7 @@ import SketchExample from "./SketchExample";
 
 const BlockOptionContainer = styled.div`
   position: absolute;
-  top: ${props => (props.isSelected ? "900px" : "45px")};
+  top: ${props => (props.isSelected ? "45px" : "900px")};
   bottom: 0px;
   right: 0px;
   width: 25%;
@@ -13,7 +13,7 @@ const BlockOptionContainer = styled.div`
   background-color: #fff;
   color: #505659;
   transition: top 0.5s ease, opacity 0.5s ease, height 0.5s ease;
-  opacity: ${props => (props.isSelected ? "0" : "1")};
+  opacity: ${props => (props.isSelected ? "1" : "0")};
 `;
 
 const Header = styled.div`
@@ -101,7 +101,6 @@ const UrlColumn = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  border: none;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   padding: 0 10px;
@@ -110,6 +109,10 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
+`;
+
+const ImageSrc = Input.extend`
+  height: 33px;
 `;
 
 const UrlColumnInput = Input.extend`
@@ -446,7 +449,10 @@ class BlockOptions extends Component {
                         onClick={() =>
                           OnChangeCards(selectedIndex, "textAlign", "left")
                         }
-                        isSelected={selectedContent.textAlign === "left"}
+                        isSelected={
+                          selectedContent.textAlign === "left" ||
+                          selectedContent.textAlign === undefined
+                        }
                       >
                         <i className="fas fa-align-left" />
                       </Align>
@@ -454,10 +460,7 @@ class BlockOptions extends Component {
                         onClick={() =>
                           OnChangeCards(selectedIndex, "textAlign", "center")
                         }
-                        isSelected={
-                          selectedContent.textAlign === "center" ||
-                          selectedContent.textAlign === undefined
-                        }
+                        isSelected={selectedContent.textAlign === "center"}
                       >
                         <i className="fas fa-align-center" />
                       </Align>
@@ -492,7 +495,7 @@ class BlockOptions extends Component {
                       <FunctionTitle>Image URL</FunctionTitle>
                     </FunctionTitleContainer>
                     <UrlColumn>
-                      <UrlColumnInput
+                      <ImageSrc
                         type="text"
                         value={selectedContent.imageSrc}
                         onChange={e =>
@@ -580,7 +583,7 @@ class BlockOptions extends Component {
                       {/* <button className={styles.btn}>URL</button> */}
                       <UrlColumnInput
                         type="text"
-                        value={selectedContent.url}
+                        value={selectedContent.link}
                         onChange={e =>
                           handleOnChange(
                             e.target,
@@ -673,8 +676,8 @@ class BlockOptions extends Component {
     return (
       <BlockOptionContainer
         isSelected={
-          this.props.selectedContent === null ||
-          this.props.selectedContent === undefined
+          // this.props.selectedContent !== null ||
+          this.props.selectedContent !== undefined
         }
       >
         <Header>

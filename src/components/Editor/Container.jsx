@@ -189,14 +189,15 @@ class Container extends Component {
   handleOnMouseOver = event => {
     event.stopPropagation();
     this.props.callbackfromparent("mouseover", this.props.index);
+    console.log(`Hover true`);
   };
 
   handleOnMouseOverTool = event => {
-    event.stopPropagation();
+    // event.stopPropagation();
     this.setState({
       toolHover: true
     });
-    // console.log(`tool in toolHover true`);
+    console.log(`tool in toolHover true`);
   };
 
   handleOnMouseLeaveTool = event => {
@@ -205,12 +206,13 @@ class Container extends Component {
     this.setState({
       toolHover: false
     });
-    // console.log(`tool out toolHover true`);
+    console.log(`tool out toolHover true`);
   };
 
   handleOnMouseDown = event => {
     event.stopPropagation();
     this.props.callbackfromparent("select", this.props.index);
+    console.log(`tool in toolHover true`);
   };
 
   handleOnMouseLeave = event => {
@@ -361,6 +363,7 @@ const ButtonContainer = styled.div`
   padding-right: 20px;
   padding-left: 20px;
   padding-bottom: 10px;
+  pointer-events: text;
 `;
 
 class Button extends Component {
@@ -369,9 +372,11 @@ class Button extends Component {
     this.state = {};
   }
 
-  onChange = ({ value }) => {
+  onChange = change => {
+    const operation = change.operations.toJS();
+    console.log(operation);
     this.props.handleOnChange(
-      { value },
+      change,
       this.props.index,
       "BUTTON",
       "TEXT_CHANGE"
@@ -387,33 +392,13 @@ class Button extends Component {
       >
         <Editor
           value={this.props.value}
-          readOnly={this.props.active ? false : true}
+          readOnly={false}
           onChange={this.onChange}
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
           autoCorrect={false}
           spellCheck={false}
         />
-        {/* {this.props.active ? (
-          <Editor
-            value={this.props.value}
-            readOnly={this.props.active ? false : true}
-            onChange={this.onChange}
-            renderNode={this.props.renderNode}
-            renderMark={this.props.renderMark}
-            autoCorrect={false}
-            spellCheck={false}
-          />
-        ) : (
-          <Editor
-            value={this.props.value}
-            readOnly={true}
-            renderNode={this.props.renderNode}
-            renderMark={this.props.renderMark}
-            autoCorrect={false}
-            spellCheck={false}
-          />
-        )} */}
       </ButtonContainer>
     );
   }
@@ -498,48 +483,43 @@ class Image extends Component {
   }
 }
 
-const TextContainer = styled.div``;
+const TextContainer = styled.div`
+  color: black;
+  text-align: ${props => props.textAlign};
+  line-height: 140%;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+`;
 
 class Text extends Component {
   constructor(props) {
     super(props);
-    this.props = {
-      active: false
-    };
     this.state = {};
   }
 
+  onChange = change => {
+    const operation = change.operations.toJS();
+    console.log(operation);
+    this.props.handleOnChange(change, this.props.index, "TEXT", "TEXT_CHANGE");
+  };
+
   render() {
     return (
-      <div
-        className="content"
-        style={{
-          color: "black",
-          textAlign: this.props.item.textAlign
-            ? this.props.item.textAlign
-            : "left",
-          lineHeight: "140%",
-          paddingTop: "10px",
-          paddingRight: "10px",
-          paddingLeft: "10px",
-          paddingBottom: "10px"
-        }}
+      <TextContainer
+        textAlign={
+          this.props.item.textAlign ? this.props.item.textAlign : "left"
+        }
       >
         <Editor
           value={this.props.value}
           readOnly={this.props.active ? false : true}
-          onChange={({ value }) => {
-            this.props.handleOnChange(
-              { value },
-              this.props.index,
-              "BUTTON",
-              "TEXT_CHANGE"
-            );
-          }}
+          onChange={this.onChange}
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
         />
-      </div>
+      </TextContainer>
     );
   }
 }
@@ -565,6 +545,7 @@ class Video extends Component {
         }}
       >
         <iframe
+          title="youtube"
           style={{
             position: "absolute",
             top: "0",

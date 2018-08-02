@@ -22,7 +22,7 @@ const EditorContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-  min-width: $max-page-width;
+  /* min-width: $max-page-width; */
   overflow: hidden;
   position: absolute;
   top: 100px;
@@ -138,12 +138,22 @@ class Editor extends Component {
         ) {
         } else {
           this.setState({
+            selectedIndex: undefined,
+            selectedContent: undefined,
+            rightMenu: null
+          });
+          this.setState({
             selectedIndex: dataFromChild,
             selectedContent: this.showSelected(dataFromChild),
             rightMenu: null
           });
         }
       } else {
+        this.setState({
+          selectedIndex: undefined,
+          selectedContent: undefined,
+          rightMenu: null
+        });
         this.setState({
           selectedIndex: dataFromChild,
           selectedContent: this.showSelected(dataFromChild),
@@ -436,6 +446,7 @@ class Editor extends Component {
   };
 
   handleOnChange = ({ value }, index, content, type) => {
+    console.log(index);
     if (type === "TEXT_CHANGE") {
       if (index.length === 2) {
         this.setState(
