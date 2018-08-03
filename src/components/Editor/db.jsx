@@ -1,7 +1,68 @@
 import { Value } from "slate";
 
 export default {
-  Category: [],
+  Category: [
+    {
+      name: "AHRI",
+      img: "https://www.mobafire.com/images/avatars/ahri-midnight.png"
+    },
+    {
+      name: "Jinx",
+      img: "https://www.mobafire.com/images/avatars/jinx-ambitious-elf.png"
+    },
+    {
+      name: "Ryze",
+      img: "https://www.mobafire.com/images/avatars/ryze-professor.png"
+    },
+    {
+      name: "Nar",
+      img: "https://www.mobafire.com/images/avatars/gnar-dino.png"
+    },
+    {
+      name: "Teemo",
+      img: "https://www.mobafire.com/images/avatars/teemo-classic.png"
+    },
+    {
+      name: "Jhin",
+      img: "https://www.mobafire.com/images/avatars/jhin-classic.png"
+    },
+    {
+      name: "Janna",
+      img: "https://www.mobafire.com/images/avatars/janna-frost-queen.png"
+    },
+    {
+      name: "Thresh",
+      img: "https://www.mobafire.com/images/avatars/thresh-classic.png"
+    },
+    {
+      name: "Alistar",
+      img: "https://www.mobafire.com/images/avatars/alistar-unchained.png"
+    },
+    {
+      name: "Blitzcrank",
+      img: "https://www.mobafire.com/images/avatars/blitzcrank-classic.png"
+    },
+    {
+      name: "Aatrox",
+      img: "https://www.mobafire.com/images/avatars/aatrox-classic.png"
+    },
+    {
+      name: "Quinn",
+      img: "https://www.mobafire.com/images/avatars/quinn-woad-scout.png"
+    },
+    {
+      name: "Singed",
+      img: "https://www.mobafire.com/images/avatars/singed-classic.png"
+    },
+    {
+      name: "Sona",
+      img: "https://www.mobafire.com/images/avatars/sona-silent-night.png"
+    },
+    {
+      name: "Vi",
+      img: "https://www.mobafire.com/images/avatars/vi-classic.png"
+    }
+  ],
   Templates: [
     {
       category: {
@@ -28,7 +89,9 @@ export default {
       view: 0,
       comment_count: 0,
       time: "?",
-      rightMenu: null,
+
+      rightMenu: 2,
+      view: "JSON",
       color: {
         r: "255",
         g: "255",
@@ -61,7 +124,19 @@ export default {
               {
                 type: "content",
                 OnDrag: "content",
-                content: "HTML",
+                content: "TEXT",
+                textColor: {
+                  r: "255",
+                  g: "255",
+                  b: "255",
+                  a: "1"
+                },
+                backgroundColor: {
+                  r: "255",
+                  g: "255",
+                  b: "255",
+                  a: "0"
+                },
                 value: {
                   object: "value",
                   document: {
@@ -79,7 +154,7 @@ export default {
                             leaves: [
                               {
                                 object: "leaf",
-                                text: "Hello, world!",
+                                text: "A line of text in a paragraph.",
                                 marks: []
                               }
                             ]
@@ -89,27 +164,6 @@ export default {
                     ]
                   }
                 }
-              },
-              {
-                type: "builder"
-              },
-              {
-                type: "content",
-                OnDrag: "content",
-                content: "IMAGE",
-                imageSrc:
-                  "https://media.giphy.com/media/A6aHBCFqlE0Rq/giphy.gif",
-                fullWidth: false,
-                alt: "Image"
-              },
-              {
-                type: "builder"
-              },
-              {
-                type: "content",
-                OnDrag: "content",
-                content: "VIDEO",
-                videoSrc: "TRmdXDH9b1s"
               },
               {
                 type: "builder"

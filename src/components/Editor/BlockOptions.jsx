@@ -70,7 +70,7 @@ const MinimizeButton = styled.button`
 `;
 
 const FeatureColumn = styled.div`
-  padding: 15px 20px;
+  padding: 0 20px;
   font-size: 12px;
 `;
 
@@ -101,8 +101,6 @@ const UrlColumn = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
   padding: 0 10px;
   border: 1px solid #ced4da;
   border-radius: 5px;
@@ -117,6 +115,8 @@ const ImageSrc = Input.extend`
 
 const UrlColumnInput = Input.extend`
   height: 33px;
+  border-top-right-radius: ${props => (props.hasRightButton ? 0 : null)};
+  border-bottom-right-radius: ${props => (props.hasRightButton ? 0 : null)};
 `;
 
 const HtmlInput = styled.textarea`
@@ -137,7 +137,7 @@ const FunctionColumn = styled.div`
   display: flex;
   flex-direction: ${props => props.dir};
   justify-content: space-between;
-  padding: 15px 0;
+  padding: 10px 0;
   border-bottom: ${props => (props.isLast ? null : "1px solid #cacaca")};
 `;
 
@@ -210,6 +210,23 @@ const ToggleRound = styled.span`
     -webkit-transition: 0.4s;
     transition: 0.4s;
     border-radius: 50%;
+  }
+`;
+
+const SearchButton = styled.button`
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  height: 33px;
+  width: 35px;
+  transition: font-size 0.2s ease, box-shadow 0.2s ease;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-left: none;
+  &:hover {
+    font-size: 14px;
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
   }
 `;
 
@@ -402,14 +419,14 @@ class BlockOptions extends Component {
                       color={selectedContent.textColor}
                     />
                   </FunctionColumn>
-                  <FunctionColumn>
+                  {/* <FunctionColumn>
                     <FunctionTitle>Background Color</FunctionTitle>
                     <SketchExample
                       masterCallback={this.props.masterCallback}
                       type="Background"
                       color={selectedContent.backgroundColor}
                     />
-                  </FunctionColumn>
+                  </FunctionColumn> */}
                   <FunctionColumn>
                     <FunctionTitle>Alignments</FunctionTitle>
                     <ActionColumn>
@@ -442,7 +459,7 @@ class BlockOptions extends Component {
                       </Align>
                     </ActionColumn>
                   </FunctionColumn>
-                  <FunctionColumn isLast={true}>
+                  <FunctionColumn>
                     <FunctionTitle>Text Alignments</FunctionTitle>
                     <ActionColumn>
                       <Align
@@ -473,6 +490,29 @@ class BlockOptions extends Component {
                         <i className="fas fa-align-right" />
                       </Align>
                     </ActionColumn>
+                  </FunctionColumn>
+                  <FunctionColumn dir={"column"} isLast={true}>
+                    <FunctionTitleContainer>
+                      <FunctionTitle>Wiki Search</FunctionTitle>
+                    </FunctionTitleContainer>
+                    <UrlColumn>
+                      <UrlColumnInput
+                        type="text"
+                        value={selectedContent.link}
+                        onChange={e =>
+                          handleOnChange(
+                            e.target,
+                            selectedIndex,
+                            "BUTTON",
+                            "LINK"
+                          )
+                        }
+                        hasRightButton="true"
+                      />
+                      <SearchButton>
+                        <i className="fas fa-search" />
+                      </SearchButton>
+                    </UrlColumn>
                   </FunctionColumn>
                 </FeatureColumn>
               </Option>
