@@ -15,7 +15,9 @@ import JsonView from "./JsonView";
 import UserView from "./UserView";
 import BlockOptions from "./BlockOptions";
 import { media } from "../../config/_mixin";
+import { resetKeyGenerator, setKeyGenerator, Value } from "slate";
 const update = require("immutability-helper");
+var cloneDeep = require("lodash.clonedeep");
 const DEFAULT_NODE = "paragraph";
 const DEFAULT_POST = 0;
 const EditorContainer = styled.div`
@@ -197,7 +199,7 @@ class Editor extends Component {
       }
     } else if (type === "duplicate") {
       if (!Array.isArray(dataFromChild)) {
-        const targetCard = cards[dataFromChild];
+        let targetCard = cards[dataFromChild];
         const masterBuilder = { type: "builder" };
         this.setState(
           update(this.state, {
@@ -210,11 +212,16 @@ class Editor extends Component {
           })
         );
       } else {
-        const targetCard =
-          cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
-            dataFromChild[2]
-          ];
-        console.log(targetCard);
+        let targetCard = JSON.parse(
+          JSON.stringify(
+            cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
+              dataFromChild[2]
+            ]
+          )
+        );
+        // console.log(targetCard.value);
+        // targetCard.value = Value.fromJSON(targetCard.value.toJSON);
+        // console.log(targetCard.value);
         const blockBuilder = { type: "builder" };
         this.setState(
           update(this.state, {
@@ -739,6 +746,12 @@ class Editor extends Component {
             />
           </EditorRightContainer>
         </EditorContainer>
+        <button
+          style={{ position: "fixed" }}
+          onClick={() => resetKeyGenerator()}
+        >
+          fake button
+        </button>
       </Fragment>
     );
   }
@@ -775,18 +788,18 @@ class Editor extends Component {
   renderBlockButton = (type, icon) => {
     let isActive = this.hasBlock(type);
 
-    if (["numbered-list", "bulleted-list"].includes(type)) {
-      if (
-        this.state.selectedIndex !== null &&
-        (this.state.selectedContent.content === "TEXT" ||
-          this.state.selectedContent.content === "BUTTON" ||
-          this.state.selectedContent.content === "HTML")
-      ) {
-        const { value } = this.showSelected(this.state.selectedIndex);
-        const parent = value.document.getParent(value.blocks.first().key);
-        isActive = this.hasBlock("list-item") && parent && parent.type === type;
-      }
-    }
+    // if (["numbered-list", "bulleted-list"].includes(type)) {
+    //   if (
+    //     this.state.selectedIndex !== null &&
+    //     (this.state.selectedContent.content === "TEXT" ||
+    //       this.state.selectedContent.content === "BUTTON" ||
+    //       this.state.selectedContent.content === "HTML")
+    //   ) {
+    //     const { value } = this.showSelected(this.state.selectedIndex);
+    //     const parent = value.document.getParent(value.blocks.first().key);
+    //     isActive = this.hasBlock("list-item") && parent && parent.type === type;
+    //   }
+    // }
 
     return (
       <Button
