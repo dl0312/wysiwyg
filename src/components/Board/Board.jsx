@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { Query } from "react-apollo";
+import { POSTS } from "../../queries";
+import ImagePopup from "../../utility/ImagePopup";
 import styled from "styled-components";
-import db from "../Editor/db";
 
 const BoardContainer = styled.div`
   width: 100%;
@@ -159,78 +162,79 @@ const FlexBox = styled.div`
 class Board extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      hoverImgUrl: null
+    };
   }
+
+  handleOnMouseOver = hoverImgUrl => {};
+
   render() {
     return (
-      <BoardContainer>
-        <BoardBox>
-          <Table>
-            {db.Posts.map((post, index) => (
-              <TableRow>
-                <CategoryData>
-                  <CategoryImg
-                    src={post.category.img}
-                    alt={post.category.name}
-                  />
-                </CategoryData>
-                <TitleRow>
-                  <Title>
-                    <Link
-                      to={`/read/${index}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      {post.title}
-                    </Link>
-                    <Comment>[{post.comment_count}]</Comment>
-                  </Title>
-                  <SubTitle>
-                    Guide by {post.username} updated {post.time}
-                  </SubTitle>
-                </TitleRow>
-                <CountRow>
-                  <FlexBox>
-                    <CountTitle>CLAPS: {post.clap_count}</CountTitle>
-                    <Indicator />
-                    <CountTitle>VIEWS: {post.view}</CountTitle>
-                  </FlexBox>
-                </CountRow>
-              </TableRow>
-            ))}
-          </Table>
-        </BoardBox>
-      </BoardContainer>
+      <Query query={POSTS}>
+        {({ loading, data, error }) => {
+          if (loading) return "loading";
+          if (error) return "something happened";
+          return (
+            <React.Fragment>
+              <BoardContainer>
+                <BoardBox>
+                  <Table>
+                    <Helmet>
+                      <title>Board</title>
+                    </Helmet>
+                    {data.GetAllPosts.posts.map((post, index) => (
+                      <TableRow>
+                        <CategoryData>
+                          <CategoryImg
+                            src={post.category.wikiImages[0].shownImage.url}
+                            alt={post.category.name}
+                            onMouseOver={() =>
+                              this.setState({
+                                hoverImgUrl:
+                                  post.category.wikiImages[0].hoverImage.url
+                              })
+                            }
+                            onMouseOut={() => {
+                              this.setState({
+                                hoverImgUrl: null
+                              });
+                            }}
+                          />
+                        </CategoryData>
+                        <TitleRow>
+                          <Title>
+                            <Link
+                              to={`/read/${index}`}
+                              style={{ textDecoration: "none" }}
+                            >
+                              {post.title}
+                            </Link>
+                            <Comment>[{post.commentsCount}]</Comment>
+                          </Title>
+                          <SubTitle>
+                            Guide by {post.user.fullName} updated{" "}
+                            {post.createdAt}
+                          </SubTitle>
+                        </TitleRow>
+                        <CountRow>
+                          <FlexBox>
+                            <CountTitle>CLAPS: {post.clapsCount}</CountTitle>
+                            <Indicator />
+                            <CountTitle>VIEWS: {post.view}</CountTitle>
+                          </FlexBox>
+                        </CountRow>
+                      </TableRow>
+                    ))}
+                  </Table>
+                </BoardBox>
+              </BoardContainer>
+              <ImagePopup left="0" top="0" url={this.state.hoverImgUrl} />
+            </React.Fragment>
+          );
+        }}
+      </Query>
     );
-
-    // <BoardContainer>
-    //   <BoardBox>
-    //     <Table>
-    //       <TableRow>
-    //         <CategoryHeader>CATEGORY</CategoryHeader>
-    //         <TitleHeader>TITLE</TitleHeader>
-    //         <CreatorHeader>CREATOR</CreatorHeader>
-    //         <ClapHeader>CLAP</ClapHeader>
-    //         <DateHeader>DATE</DateHeader>
-    //       </TableRow>
-    //       {this.state.posts.map(post => (
-    //         <TableRow>
-    //           <CategoryData>
-    //             <CategoryImg
-    //               src={post.category.img}
-    //               alt={post.category.name}
-    //             />
-    //           </CategoryData>
-    //           <TitleData>
-    //             {post.title} <Comment>[{post.comment_count}]</Comment>
-    //           </TitleData>
-    //           <CreatorData>{post.username}</CreatorData>
-    //           <ClapData>{post.clap_count}</ClapData>
-    //           <DateData>{post.time}</DateData>
-    //         </TableRow>
-    //       ))}
-    //     </Table>
-    //   </BoardBox>
-    // </BoardContainer>
   }
 }
 

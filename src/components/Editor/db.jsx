@@ -89,9 +89,7 @@ export default {
       view: 0,
       comment_count: 0,
       time: "?",
-
       rightMenu: 2,
-      view: "JSON",
       color: {
         r: "255",
         g: "255",

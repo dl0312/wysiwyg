@@ -3,9 +3,12 @@ import { Editor } from "slate-react";
 import classnames from "classnames";
 import ItemTypes from "./ItemTypes";
 import PropTypes from "prop-types";
-import { DragSource } from "react-dnd";
-import { Value } from "slate";
+import { DragSource, DropTarget } from "react-dnd";
+import { Value, Block } from "slate";
 import styled from "styled-components";
+import { findDOMNode } from "react-dom";
+import { LAST_CHILD_TYPE_INVALID } from "slate-schema-violations";
+import flow from "lodash.flow";
 
 const Handle = styled.div`
   background-color: #9c88ff;
@@ -66,6 +69,90 @@ const cardSource = {
     return { index: props.index };
   }
 };
+
+// const cardTarget = {
+//   drop(props, monitor) {
+//     // const type = monitor.getItemType();
+//     // props.masterCallback("OnDrag", null);
+//     // if (type === ItemTypes.CARD) {
+//     //   props.moveCard(monitor.getItem().index, props.index);
+//     // } else if (type === ItemTypes.CONTENT) {
+//     //   props.handleDrop(monitor.getItem(), props.index);
+//     // }
+//   }
+// };
+
+const cardTarget = {
+  hover(props, monitor, component) {
+    const isJustOverThisOne = monitor.isOver({ shallow: true });
+    if (isJustOverThisOne) {
+      const item = monitor.getItem();
+      let dragIndex = monitor.getItem().index;
+      if (item.isNew && monitor.getItem().index === undefined) {
+        console.log(`added!`);
+        dragIndex = props.cards - 1;
+      }
+      const hoverIndex = props.index;
+      console.log(item.isNew + ", " + monitor.getItem().index);
+
+      console.log(dragIndex + ", " + hoverIndex);
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+
+      // Determine rectangle on screen
+      const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+
+      // Get vertical middle
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+
+      // Get pixels to the top
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+
+      // // Time to actually perform the action
+      // props.moveCard(dragIndex, hoverIndex);
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      monitor.getItem().index = hoverIndex;
+    }
+  }
+};
+
+// const schema = {
+//   document: {
+//     last: { type: "paragraph" },
+//     normalize: (change, reason, { node, child }) => {
+//       switch (reason) {
+//         case LAST_CHILD_TYPE_INVALID: {
+//           const paragraph = Block.create("paragraph");
+//           return change.insertNodeByKey(node.key, node.nodes.size, paragraph);
+//         }
+//       }
+//     }
+//   }
+// };
 
 class Container extends Component {
   static propTypes = {
@@ -161,10 +248,12 @@ class Container extends Component {
           return (
             <Text
               value={value}
+              // schema={schema}
               index={this.props.index}
               item={this.props.item}
               active={active}
               handleOnChange={this.props.handleOnChange}
+              // onDropOrPaste={this.props.onDropOrPaste}
               onKeyDown={this.props.onKeyDown}
               renderNode={this.props.renderNode}
               renderMark={this.props.renderMark}
@@ -225,6 +314,7 @@ class Container extends Component {
       isDragging,
       connectDragSource,
       connectDragPreview,
+      connectDropTarget,
       index,
       callbackfromparent,
       hoveredIndex,
@@ -244,98 +334,108 @@ class Container extends Component {
         : false
       : false;
     return (
-      connectDragPreview &&
       connectDragSource &&
-      connectDragPreview(
-        <div
-          className={classnames(
-            "container",
-            hover ? "blockHover" : null,
-            active ? "blockActive" : null
-          )}
-          item={this.props.item}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            position: "relative",
-            padding: "10px",
-            width: "100%",
-            justifyContent:
-              this.props.item.content === "TEXT" ||
-              this.props.item.content === "BUTTON" ||
-              this.props.item.content === "HTML" ||
-              this.props.item.content === "IMAGE" ||
-              this.props.item.content === "VIDEO"
-                ? this.props.item.align
-                  ? this.props.item.align
-                  : "center"
-                : "center",
-            opacity
-          }}
-          onMouseOver={this.handleOnMouseOver}
-          onMouseDown={this.handleOnMouseDown}
-          onMouseLeave={this.handleOnMouseLeave}
-        >
-          {hover || active ? (
-            <div>
-              {this.state.toolHover ? (
-                <Tool onMouseLeave={this.handleOnMouseLeaveTool}>
-                  <ButtonOption
-                    onClick={() => {
-                      console.log(index);
-                      callbackfromparent("delete", index, this);
-                    }}
-                  >
-                    <i className="fas fa-trash-alt" />
-                  </ButtonOption>
-                  <ButtonOption
-                    onClick={() => {
-                      callbackfromparent("duplicate", index, this);
-                    }}
-                  >
-                    <i className="far fa-copy" />
-                  </ButtonOption>
-                  {connectDragSource(
-                    <button
-                      style={{
-                        border: "none",
-                        outline: "none",
-                        backgroundColor: "#9c88ff",
-                        color: "white",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "2rem",
-                        height: "2rem",
-                        marginBottom: "10px",
-                        cursor: "pointer",
-                        borderTopRightRadius: "100%",
-                        borderBottomRightRadius: "100%"
-                      }}
-                    >
-                      <i className="fas fa-arrows-alt" />
-                    </button>
-                  )}
-                </Tool>
-              ) : (
-                <Handle onMouseOver={this.handleOnMouseOverTool}>
-                  <i className="fas fa-ellipsis-h" />
-                </Handle>
+      connectDropTarget &&
+      connectDropTarget(
+        connectDragSource(
+          connectDragPreview(
+            <div
+              className={classnames(
+                "container",
+                hover ? "blockHover" : null,
+                active ? "blockActive" : null
               )}
+              item={this.props.item}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                position: "relative",
+                padding: "10px",
+                width: "100%",
+                justifyContent:
+                  this.props.item.content === "TEXT" ||
+                  this.props.item.content === "BUTTON" ||
+                  this.props.item.content === "HTML" ||
+                  this.props.item.content === "IMAGE" ||
+                  this.props.item.content === "VIDEO"
+                    ? this.props.item.align
+                      ? this.props.item.align
+                      : "center"
+                    : "center",
+                opacity
+              }}
+              onMouseOver={this.handleOnMouseOver}
+              onMouseDown={this.handleOnMouseDown}
+              onMouseLeave={this.handleOnMouseLeave}
+            >
+              {hover || active ? (
+                <div>
+                  {this.state.toolHover ? (
+                    <Tool onMouseLeave={this.handleOnMouseLeaveTool}>
+                      <ButtonOption
+                        onClick={() => {
+                          console.log(index);
+                          callbackfromparent("delete", index, this);
+                        }}
+                      >
+                        <i className="fas fa-trash-alt" />
+                      </ButtonOption>
+                      <ButtonOption
+                        onClick={() => {
+                          callbackfromparent("duplicate", index, this);
+                        }}
+                      >
+                        <i className="far fa-copy" />
+                      </ButtonOption>
+                      {connectDragSource(
+                        <button
+                          style={{
+                            border: "none",
+                            outline: "none",
+                            backgroundColor: "#9c88ff",
+                            color: "white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "2rem",
+                            height: "2rem",
+                            marginBottom: "10px",
+                            cursor: "pointer",
+                            borderTopRightRadius: "100%",
+                            borderBottomRightRadius: "100%"
+                          }}
+                        >
+                          <i className="fas fa-arrows-alt" />
+                        </button>
+                      )}
+                    </Tool>
+                  ) : (
+                    <Handle onMouseOver={this.handleOnMouseOverTool}>
+                      <i className="fas fa-ellipsis-h" />
+                    </Handle>
+                  )}
+                </div>
+              ) : null}
+              {this.showInner(active)}
             </div>
-          ) : null}
-          {this.showInner(active)}
-        </div>
+          )
+        )
       )
     );
   }
 }
 
-export default DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  connectDragPreview: connect.dragPreview(),
-  isDragging: monitor.isDragging()
-}))(Container);
+export default flow(
+  DropTarget(ItemTypes.CARD, cardTarget, (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  })),
+  DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
+    connectDragSource: connect.dragSource(),
+    connectDragPreview: connect.dragPreview(),
+    isDragging: monitor.isDragging()
+  }))
+)(Container);
 
 const ButtonContainer = styled.div`
   color: ${props =>
@@ -513,9 +613,12 @@ class Text extends Component {
         }
       >
         <Editor
+          schema={this.props.schema}
           value={this.props.value}
           readOnly={this.props.active ? false : true}
           onChange={this.onChange}
+          // onDrop={this.props.onDropOrPaste}
+          // onPaste={this.props.onDropOrPaste}
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
         />

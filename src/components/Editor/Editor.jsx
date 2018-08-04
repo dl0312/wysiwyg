@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import EditorLeft from "./EditorLeft";
 import EditorRight from "./EditorRight";
 import { DragDropContext } from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
+import HTML5Backend, { NativeTypes } from "react-dnd-html5-backend";
 import MasterBuilder from "./MasterBuilder";
 import Card from "./Card";
 import Column from "./Column";
@@ -15,7 +15,10 @@ import JsonView from "./JsonView";
 import UserView from "./UserView";
 import BlockOptions from "./BlockOptions";
 import { media } from "../../config/_mixin";
-import { resetKeyGenerator, setKeyGenerator, Value } from "slate";
+import imageExtensions from "image-extensions";
+import isUrl from "is-url";
+import { resetKeyGenerator } from "slate";
+import { getEventRange, getEventTransfer } from "slate-react";
 const update = require("immutability-helper");
 var cloneDeep = require("lodash.clonedeep");
 const DEFAULT_NODE = "paragraph";
@@ -71,6 +74,22 @@ const EditorRightContainer = styled.div`
   ${media.phone`display: none;`};
 `;
 
+function isImage(url) {
+  return !!imageExtensions.find(url.endsWith);
+}
+
+function insertImage(change, src, target) {
+  if (target) {
+    change.select(target);
+  }
+
+  change.insertBlock({
+    type: "image",
+    isVoid: true,
+    data: { src }
+  });
+}
+
 class Editor extends Component {
   static propTypes = {
     connectDropTarget: PropTypes.func,
@@ -93,34 +112,11 @@ class Editor extends Component {
       selectedIndex: null,
       hoveredIndex: null,
       selectedContent: null,
+      hoverImgUrl: null,
       title: db.Posts[DEFAULT_POST].title,
       cards: db.Posts[DEFAULT_POST].cards
     };
   }
-
-  hasMark = type => {
-    if (
-      this.state.selectedIndex !== null &&
-      (this.state.selectedContent.content === "TEXT" ||
-        this.state.selectedContent.content === "BUTTON" ||
-        this.state.selectedContent.content === "HTML")
-    ) {
-      const { value } = this.showSelected(this.state.selectedIndex);
-      return value.activeMarks.some(mark => mark.type === type);
-    }
-  };
-
-  hasBlock = type => {
-    if (
-      this.state.selectedIndex !== null &&
-      (this.state.selectedContent.content === "TEXT" ||
-        this.state.selectedContent.content === "BUTTON" ||
-        this.state.selectedContent.content === "HTML")
-    ) {
-      const { value } = this.showSelected(this.state.selectedIndex);
-      return value.blocks.some(node => node.type === type);
-    }
-  };
 
   buttonCallback = (type, dataFromChild) => {
     const { cards, hoveredIndex, selectedIndex } = this.state;
@@ -466,13 +462,13 @@ class Editor extends Component {
     }
   };
 
-  handleOnChange = ({ value }, index, content, type) => {
+  handleOnChange = (value, index, content, type) => {
     console.log(index);
     if (type === "TEXT_CHANGE") {
       if (index.length === 2) {
         this.setState(
           update(this.state, {
-            cards: { [index[0]]: { value: { $set: value } } }
+            cards: { [index[0]]: { value: { $set: value.value } } }
           })
         );
       } else if (index.length === 3) {
@@ -483,7 +479,7 @@ class Editor extends Component {
                 columnListArray: {
                   [index[1]]: {
                     [index[2]]: {
-                      value: { $set: value }
+                      value: { $set: value.value }
                     }
                   }
                 }
@@ -709,6 +705,7 @@ class Editor extends Component {
                           contentWidth={contentWidth}
                           OnDrag={this.state.OnDrag}
                           masterCallback={this.masterCallback}
+                          onDropOrPaste={this.onDropOrPaste}
                         />
                       </Card>
                     );
@@ -755,6 +752,30 @@ class Editor extends Component {
       </Fragment>
     );
   }
+
+  hasMark = type => {
+    if (
+      this.state.selectedIndex !== null &&
+      (this.state.selectedContent.content === "TEXT" ||
+        this.state.selectedContent.content === "BUTTON" ||
+        this.state.selectedContent.content === "HTML")
+    ) {
+      const { value } = this.showSelected(this.state.selectedIndex);
+      return value.activeMarks.some(mark => mark.type === type);
+    }
+  };
+
+  hasBlock = type => {
+    if (
+      this.state.selectedIndex !== null &&
+      (this.state.selectedContent.content === "TEXT" ||
+        this.state.selectedContent.content === "BUTTON" ||
+        this.state.selectedContent.content === "HTML")
+    ) {
+      const { value } = this.showSelected(this.state.selectedIndex);
+      return value.blocks.some(node => node.type === type);
+    }
+  };
 
   /**
    * Render a mark-toggling toolbar button.
@@ -967,6 +988,36 @@ class Editor extends Component {
         "TEXT",
         "TEXT_CHANGE"
       );
+    }
+  };
+
+  onDropOrPaste = (event, change, editor) => {
+    const target = getEventRange(event, change.value);
+    if (!target && event.type === "drop") return;
+
+    const transfer = getEventTransfer(event);
+    const { type, text, files } = transfer;
+
+    if (type === "files") {
+      for (const file of files) {
+        const reader = new FileReader();
+        const [mime] = file.type.split("/");
+        if (mime !== "image") continue;
+
+        reader.addEventListener("load", () => {
+          editor.change(c => {
+            c.call(insertImage, reader.result, target);
+          });
+        });
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    if (type === "text") {
+      if (!isUrl(text)) return;
+      if (!isImage(text)) return;
+      change.call(insertImage, text, target);
     }
   };
 }

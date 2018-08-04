@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import SketchExample from "./SketchExample";
+import ImagePopup from "../../utility/ImagePopup";
+import { CATEGORIES } from "../../queries";
+import Wiki from "./MiniWiki";
 
 const BlockOptionContainer = styled.div`
   position: absolute;
@@ -261,7 +264,7 @@ class BlockOptions extends Component {
                         value={selectedContent.link}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "BUTTON",
                             "LINK"
@@ -387,7 +390,7 @@ class BlockOptions extends Component {
                         value={selectedContent.link}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "HTML",
                             "CODE"
@@ -491,7 +494,8 @@ class BlockOptions extends Component {
                       </Align>
                     </ActionColumn>
                   </FunctionColumn>
-                  <FunctionColumn dir={"column"} isLast={true}>
+                  <Wiki />
+                  {/* <FunctionColumn dir={"column"} isLast={true}>
                     <FunctionTitleContainer>
                       <FunctionTitle>Wiki Search</FunctionTitle>
                     </FunctionTitleContainer>
@@ -501,7 +505,7 @@ class BlockOptions extends Component {
                         value={selectedContent.link}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "BUTTON",
                             "LINK"
@@ -513,7 +517,7 @@ class BlockOptions extends Component {
                         <i className="fas fa-search" />
                       </SearchButton>
                     </UrlColumn>
-                  </FunctionColumn>
+                  </FunctionColumn> */}
                 </FeatureColumn>
               </Option>
             </OptionRows>
@@ -540,7 +544,7 @@ class BlockOptions extends Component {
                         value={selectedContent.imageSrc}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "IMAGE",
                             "URL"
@@ -606,7 +610,7 @@ class BlockOptions extends Component {
                         value={selectedContent.alt}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "IMAGE",
                             "ALT"
@@ -626,7 +630,7 @@ class BlockOptions extends Component {
                         value={selectedContent.link}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "IMAGE",
                             "LINK"
@@ -661,7 +665,7 @@ class BlockOptions extends Component {
                         value={selectedContent.videoSrc}
                         onChange={e =>
                           handleOnChange(
-                            e.target,
+                            e.target.value,
                             selectedIndex,
                             "VIDEO",
                             "URL"

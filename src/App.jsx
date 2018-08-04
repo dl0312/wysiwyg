@@ -1,6 +1,8 @@
 import React from "react";
-import { Route, withRouter } from "react-router-dom";
 import styles from "./App.scss";
+import { HashRouter as Router, Route, withRouter } from "react-router-dom";
+import { ApolloProvider } from "react-apollo";
+import client from "./apolloClient";
 import Navigation from "./components/Navigation/Navigation";
 import Home from "./components/Home/Home";
 import Board from "./components/Board/Board";
@@ -14,19 +16,23 @@ import "./App.css";
 
 const App = () => {
   return (
-    <div className={styles.app}>
-      <Navigation />
-      <div className={styles.content}>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/guide" component={Board} />
-        <Route exact path="/wiki" component={Wiki} />
-        <Route exact path="/store" component={Store} />
-        <Route exact path="/editor" component={Editor} />
-        <Route exact path="/editor/:post_id" component={Editor} />
-        <Route exact path="/read/:post_id" component={Detail} />
-        <Route exact path="/profile" component={Profile} />
-      </div>
-    </div>
+    <ApolloProvider client={client}>
+      <Router>
+        <div className={styles.app}>
+          <Navigation />
+          <div className={styles.content}>
+            <Route exact path="/" component={Home} />
+            <Route exact path="/guide" component={Board} />
+            <Route exact path="/wiki" component={Wiki} />
+            <Route exact path="/store" component={Store} />
+            <Route exact path="/editor" component={Editor} />
+            <Route exact path="/editor/:post_id" component={Editor} />
+            <Route exact path="/read/:post_id" component={Detail} />
+            <Route exact path="/profile" component={Profile} />
+          </div>
+        </div>
+      </Router>
+    </ApolloProvider>
   );
 };
 

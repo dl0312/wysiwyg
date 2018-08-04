@@ -22,13 +22,13 @@ const SearchInput = styled.input`
 const ListContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: 200px;
+  grid-template-rows: 100px;
   grid-gap: 10px;
 `;
 
 const WikiImage = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
 `;
 
 const DataContainer = styled.div`
@@ -41,9 +41,10 @@ const DataContainer = styled.div`
 const CategoryName = styled.div`
   margin: 5px 0;
   text-transform: uppercase;
+  font-size: 10px;
 `;
 
-class Wiki extends React.Component {
+class MiniWiki extends React.Component {
   state = {
     keyword: "",
     hoverImgUrl: null
@@ -112,4 +113,4 @@ class Wiki extends React.Component {
     );
   }
 }
-export default Wiki;
+export default MiniWiki;

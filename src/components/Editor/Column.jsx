@@ -32,6 +32,7 @@ export default class Column extends Component {
             contentWidth={this.props.contentWidth}
             OnDrag={this.props.OnDrag}
             masterCallback={this.props.masterCallback}
+            onDropOrPaste={this.props.onDropOrPaste}
           />
         ))}
       </div>

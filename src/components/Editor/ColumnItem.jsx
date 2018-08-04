@@ -78,6 +78,7 @@ class ColumnItem extends Component {
                 renderNode={this.props.renderNode}
                 renderMark={this.props.renderMark}
                 masterCallback={this.props.masterCallback}
+                onDropOrPaste={this.props.onDropOrPaste}
               />
             );
           } else {
