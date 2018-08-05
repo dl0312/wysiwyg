@@ -214,7 +214,7 @@ class Board extends Component {
                         <TitleRow>
                           <Title>
                             <Link
-                              to={`/read/${index}`}
+                              to={`/read/${post.id}`}
                               style={{ textDecoration: "none" }}
                             >
                               {post.title}

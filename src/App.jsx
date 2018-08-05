@@ -26,8 +26,8 @@ const App = () => {
             <Route exact path="/wiki" component={Wiki} />
             <Route exact path="/store" component={Store} />
             <Route exact path="/editor" component={Editor} />
-            <Route exact path="/editor/:post_id" component={Editor} />
-            <Route exact path="/read/:post_id" component={Detail} />
+            <Route exact path="/editor/:postId" component={Editor} />
+            <Route exact path="/read/:postId" component={Detail} />
             <Route exact path="/profile" component={Profile} />
           </div>
         </div>

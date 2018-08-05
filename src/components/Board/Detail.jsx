@@ -1,58 +1,157 @@
 import React from "react";
-import EditorLeft from "../Editor/EditorLeft";
 import styled from "styled-components";
-import PropTypes from "prop-types";
+import { Helmet } from "react-helmet";
+import { Query } from "react-apollo";
 import { Editor } from "slate-react";
 import { Value } from "slate";
-import { Link } from "react-router-dom";
-import db from "../Editor/db";
+import { POST } from "../../queries";
+import PropTypes from "prop-types";
+import EditorLeft from "../Editor/EditorLeft";
+import ImagePopup from "../../utility/ImagePopup";
+import Pos from "../../utility/Pos";
 
 const DetailContainer = styled.div`
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+`;
+
+const PostContainer = styled.div`
+  width: 960px;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid black;
+`;
+
+const Title = styled.div`
+  /* width: 100%; */
+`;
+
+const CountContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CountText = styled.div`
+  /* width: 100%; */
+`;
+
+const BodyContainer = styled.div`
+  /* width: 100%; */
+`;
+
+const CommentsListContainer = styled.div`
+  width: 100%;
+`;
+
+const CommentContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
 `;
 
 class Detail extends React.Component {
+  state = {};
+
   render() {
-    console.log(this.props.match.params.post_id);
-    console.log(db.Posts[this.props.match.params.post_id]);
-    const json = db.Posts[this.props.match.params.post_id];
-    const compArray = [];
-    json.cards.map((item, index) => {
-      switch (item.type) {
-        case "columnList":
-          compArray.push(
-            <UserCard
-              inColumn={false}
-              cards={json.cards.length}
-              key={index}
-              hoveredIndex={json.hoveredIndex}
-            >
-              <UserColumn
-                columnArray={item.content}
-                columnListArray={item.columnListArray}
-                index={[index, 0, 0]}
-                renderNode={this.renderNode}
-                renderMark={this.renderMark}
-                contentWidth={json.contentWidth}
-              />
-            </UserCard>
-          );
-          break;
-        default:
-          break;
-      }
-    });
+    console.log(this.props.match.params.postId);
     return (
-      <DetailContainer>
-        <EditorLeft
-          color={json.color}
-          contentWidth={json.contentWidth}
-          font={json.font}
+      <React.Fragment>
+        <Query
+          query={POST}
+          variables={{ postId: this.props.match.params.postId }}
         >
-          <div style={{ marginTop: "30px" }} />
-          {compArray}
-        </EditorLeft>
-      </DetailContainer>
+          {({ loading, data, error }) => {
+            console.log(loading);
+            console.log(error);
+            if (loading) return "loading";
+            if (error) return `${error.message}`;
+            console.log(data);
+            const post = data.GetPostById.post;
+            console.log(
+              post.body
+                .slice(1, -1)
+                .split(",")
+                .map(block => JSON.parse(block))
+            );
+            return (
+              <React.Fragment>
+                <Helmet>
+                  <title>Detail</title>
+                </Helmet>
+                <DetailContainer>
+                  <PostContainer>
+                    <TitleContainer>
+                      <Title>{post.title}</Title>
+                      <CountContainer>
+                        <CountText>{post.view}</CountText>
+                        <CountText>{post.commentsCount}</CountText>
+                        <CountText>{post.clapsCount}</CountText>
+                      </CountContainer>
+                    </TitleContainer>
+                    <BodyContainer>
+                      <EditorLeft
+                        color={
+                          post.color
+                            ? post.color
+                            : { r: "255", g: "255", b: "255", a: "1" }
+                        }
+                        contentWidth={
+                          post.contentWidth ? post.contentWidth : null
+                        }
+                        font={post.font ? post.font : null}
+                      >
+                        <div style={{ marginTop: "30px" }} />
+                        {JSON.parse(post.body).map((item, index) => {
+                          if (item.type === "columnList") {
+                            return (
+                              <UserCard
+                                inColumn={false}
+                                cards={post.cards.length}
+                                key={index}
+                              >
+                                <UserColumn
+                                  columnArray={item.content}
+                                  columnListArray={item.columnListArray}
+                                  index={[index, 0, 0]}
+                                  renderNode={this.renderNode}
+                                  renderMark={this.renderMark}
+                                  contentWidth={post.contentWidth}
+                                />
+                              </UserCard>
+                            );
+                          } else {
+                            return null;
+                          }
+                        })}
+                      </EditorLeft>
+                    </BodyContainer>
+                    <CommentsListContainer>
+                      {post.comments.map(comment => (
+                        <CommentContainer>
+                          <div>{comment.user.fullName}</div>
+                          <div>{comment.body}</div>
+                          <div>{comment.createdAt}</div>
+                        </CommentContainer>
+                      ))}
+                    </CommentsListContainer>
+                  </PostContainer>
+                </DetailContainer>
+              </React.Fragment>
+            );
+          }}
+        </Query>
+      </React.Fragment>
     );
   }
 }

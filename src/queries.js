@@ -1,12 +1,41 @@
 import gql from "graphql-tag";
 
-export const HOME_PAGE = gql`
-  {
-    movies(limit: 50, rating: 7) {
-      id
-      title
-      rating
-      medium_cover_image
+export const POST = gql`
+  query GetPostById($postId: Int!) {
+    GetPostById(postId: $postId) {
+      ok
+      error
+      post {
+        title
+        body
+        category {
+          wikiImages {
+            name
+            shownImage {
+              url
+            }
+            hoverImage {
+              url
+            }
+          }
+        }
+        font
+        contentWidth
+        view
+        user {
+          fullName
+        }
+        clapsCount
+        commentsCount
+        comments {
+          user {
+            fullName
+          }
+          body
+          createdAt
+        }
+        createdAt
+      }
     }
   }
 `;
@@ -40,6 +69,7 @@ export const POSTS = gql`
       error
       posts {
         title
+        id
         user {
           fullName
         }
@@ -60,25 +90,6 @@ export const POSTS = gql`
         view
         createdAt
       }
-    }
-  }
-`;
-
-export const MOVIE_DETAILS = gql`
-  query getMovieDetails($movieId: Int!) {
-    movie(id: $movieId) {
-      medium_cover_image
-      title
-      rating
-      description_intro
-      language
-      genres
-    }
-    suggestions(id: $movieId) {
-      id
-      title
-      rating
-      medium_cover_image
     }
   }
 `;
