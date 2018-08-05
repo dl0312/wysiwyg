@@ -16,11 +16,14 @@ import UserView from "./UserView";
 import BlockOptions from "./BlockOptions";
 import { media } from "../../config/_mixin";
 import imageExtensions from "image-extensions";
+import ImagePopup from "../../utility/ImagePopup";
+import { Value } from "slate";
 import isUrl from "is-url";
 import { resetKeyGenerator } from "slate";
 import { getEventRange, getEventTransfer } from "slate-react";
+import _ from "lodash";
+
 const update = require("immutability-helper");
-var cloneDeep = require("lodash.clonedeep");
 const DEFAULT_NODE = "paragraph";
 const DEFAULT_POST = 0;
 const EditorContainer = styled.div`
@@ -78,17 +81,13 @@ function isImage(url) {
   return !!imageExtensions.find(url.endsWith);
 }
 
-function insertImage(change, src, target) {
-  if (target) {
-    change.select(target);
-  }
-
-  change.insertBlock({
-    type: "image",
-    isVoid: true,
-    data: { src }
-  });
-}
+const Image = styled.img`
+  /* display: inline; */
+  width: ${props => (props.small ? "20px" : null)};
+  max-width: 100%;
+  max-height: 20em;
+  box-shadow: ${props => (props.selected ? "0 0 0 2px blue;" : "none")};
+`;
 
 class Editor extends Component {
   static propTypes = {
@@ -208,6 +207,11 @@ class Editor extends Component {
           })
         );
       } else {
+        console.log(
+          cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
+            dataFromChild[2]
+          ]
+        );
         let targetCard = JSON.parse(
           JSON.stringify(
             cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
@@ -215,6 +219,8 @@ class Editor extends Component {
             ]
           )
         );
+        targetCard.value = Value.fromJSON(targetCard.value);
+        console.log(targetCard);
         // console.log(targetCard.value);
         // targetCard.value = Value.fromJSON(targetCard.value.toJSON);
         // console.log(targetCard.value);
@@ -743,12 +749,7 @@ class Editor extends Component {
             />
           </EditorRightContainer>
         </EditorContainer>
-        <button
-          style={{ position: "fixed" }}
-          onClick={() => resetKeyGenerator()}
-        >
-          fake button
-        </button>
+        <ImagePopup left="0" top="0" url={this.state.hoverImgUrl} />
       </Fragment>
     );
   }
@@ -809,18 +810,18 @@ class Editor extends Component {
   renderBlockButton = (type, icon) => {
     let isActive = this.hasBlock(type);
 
-    // if (["numbered-list", "bulleted-list"].includes(type)) {
-    //   if (
-    //     this.state.selectedIndex !== null &&
-    //     (this.state.selectedContent.content === "TEXT" ||
-    //       this.state.selectedContent.content === "BUTTON" ||
-    //       this.state.selectedContent.content === "HTML")
-    //   ) {
-    //     const { value } = this.showSelected(this.state.selectedIndex);
-    //     const parent = value.document.getParent(value.blocks.first().key);
-    //     isActive = this.hasBlock("list-item") && parent && parent.type === type;
-    //   }
-    // }
+    if (["numbered-list", "bulleted-list"].includes(type)) {
+      if (
+        this.state.selectedIndex !== null &&
+        (this.state.selectedContent.content === "TEXT" ||
+          this.state.selectedContent.content === "BUTTON" ||
+          this.state.selectedContent.content === "HTML")
+      ) {
+        const { value } = this.showSelected(this.state.selectedIndex);
+        const parent = value.document.getParent(value.blocks.first().key);
+        isActive = this.hasBlock("list-item") && parent && parent.type === type;
+      }
+    }
 
     return (
       <Button
@@ -840,7 +841,7 @@ class Editor extends Component {
    */
 
   renderNode = props => {
-    const { attributes, children, node } = props;
+    const { attributes, children, node, isFocused } = props;
 
     switch (node.type) {
       case "block-quote":
@@ -855,6 +856,54 @@ class Editor extends Component {
         return <li {...attributes}>{children}</li>;
       case "numbered-list":
         return <ol {...attributes}>{children}</ol>;
+      case "clap-image": {
+        const represent_src = node.data.get("represent");
+        const hover_src = node.data.get("hover");
+        const type = node.data.get("type");
+        switch (type) {
+          case "TEXT":
+            break;
+          case "MINI_IMG":
+            return (
+              <Image
+                small={true}
+                src={represent_src}
+                alt={"hover"}
+                selected={isFocused}
+                onMouseOver={() =>
+                  this.setState({
+                    hoverImgUrl: hover_src
+                  })
+                }
+                onMouseOut={() => {
+                  this.setState({ hoverImgUrl: null });
+                }}
+                {...attributes}
+              />
+            );
+          case "NORMAL_IMG":
+            return (
+              <Image
+                src={represent_src}
+                alt={"hover"}
+                selected={isFocused}
+                onMouseOver={() =>
+                  this.setState({
+                    hoverImgUrl: hover_src
+                  })
+                }
+                onMouseOut={() => {
+                  this.setState({
+                    hoverImgUrl: null
+                  });
+                }}
+                {...attributes}
+              />
+            );
+          default:
+            break;
+        }
+      }
       default:
         return;
     }
@@ -991,35 +1040,35 @@ class Editor extends Component {
     }
   };
 
-  onDropOrPaste = (event, change, editor) => {
-    const target = getEventRange(event, change.value);
-    if (!target && event.type === "drop") return;
+  // onDropOrPaste = (event, change, editor) => {
+  //   const target = getEventRange(event, change.value);
+  //   if (!target && event.type === "drop") return;
 
-    const transfer = getEventTransfer(event);
-    const { type, text, files } = transfer;
+  //   const transfer = getEventTransfer(event);
+  //   const { type, text, files } = transfer;
 
-    if (type === "files") {
-      for (const file of files) {
-        const reader = new FileReader();
-        const [mime] = file.type.split("/");
-        if (mime !== "image") continue;
+  //   if (type === "files") {
+  //     for (const file of files) {
+  //       const reader = new FileReader();
+  //       const [mime] = file.type.split("/");
+  //       if (mime !== "image") continue;
 
-        reader.addEventListener("load", () => {
-          editor.change(c => {
-            c.call(insertImage, reader.result, target);
-          });
-        });
+  //       reader.addEventListener("load", () => {
+  //         editor.change(c => {
+  //           c.call(insertImage, reader.result, target);
+  //         });
+  //       });
 
-        reader.readAsDataURL(file);
-      }
-    }
+  //       reader.readAsDataURL(file);
+  //     }
+  //   }
 
-    if (type === "text") {
-      if (!isUrl(text)) return;
-      if (!isImage(text)) return;
-      change.call(insertImage, text, target);
-    }
-  };
+  //   if (type === "text") {
+  //     if (!isUrl(text)) return;
+  //     if (!isImage(text)) return;
+  //     change.call(insertImage, text, target);
+  //   }
+  // };
 }
 
 export default DragDropContext(HTML5Backend)(Editor);

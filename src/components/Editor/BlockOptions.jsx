@@ -494,7 +494,11 @@ class BlockOptions extends Component {
                       </Align>
                     </ActionColumn>
                   </FunctionColumn>
-                  <Wiki />
+                  <Wiki
+                    handleOnChange={handleOnChange}
+                    selectedIndex={selectedIndex}
+                    selectedContent={selectedContent}
+                  />
                   {/* <FunctionColumn dir={"column"} isLast={true}>
                     <FunctionTitleContainer>
                       <FunctionTitle>Wiki Search</FunctionTitle>

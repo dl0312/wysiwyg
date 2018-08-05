@@ -22,7 +22,7 @@ const SearchInput = styled.input`
 const ListContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: 200px;
+  grid-template-rows: auto;
   grid-gap: 10px;
 `;
 
