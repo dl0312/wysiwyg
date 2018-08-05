@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { Query } from "react-apollo";
 import ImagePopup from "../../utility/ImagePopup";
 import { CATEGORIES } from "../../queries";
+import Pos from "../../utility/Pos";
 
 const WikiContainer = styled.div`
   padding-top: 15px;
@@ -76,7 +77,7 @@ const CategoryName = styled.div`
   text-align: center;
 `;
 
-function insertImage(change, represent, hover, type, target) {
+function insertImage(change, represent, hover, name, type, target) {
   if (target) {
     change.select(target);
   }
@@ -84,7 +85,7 @@ function insertImage(change, represent, hover, type, target) {
   change.insertInline({
     type: "clap-image",
     isVoid: true,
-    data: { represent, hover, type }
+    data: { represent, hover, name, type }
   });
 }
 
@@ -92,7 +93,14 @@ class MiniWiki extends React.Component {
   state = {
     keyword: "",
     hoverImgUrl: null,
+    pos: new Pos(0, 0),
     inputType: "MINI_IMG"
+  };
+
+  getPos = e => {
+    const pos = new Pos(e.clientX - 1450, e.clientY - 200);
+    console.log(pos);
+    this.setState({ pos });
   };
 
   render() {
@@ -162,6 +170,7 @@ class MiniWiki extends React.Component {
                                       category.wikiImages[0].hoverImage.url
                                   })
                                 }
+                                onMouseMove={this.getPos}
                                 onMouseOut={() => {
                                   this.setState({
                                     hoverImgUrl: null
@@ -179,6 +188,7 @@ class MiniWiki extends React.Component {
                                       insertImage,
                                       represent,
                                       hover,
+                                      category.name,
                                       this.state.inputType
                                     );
                                   console.log(change);
@@ -208,7 +218,7 @@ class MiniWiki extends React.Component {
               );
             }}
           </Query>
-          <ImagePopup left="0" top="0" url={this.state.hoverImgUrl} />
+          <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
         </WikiContainer>
       </React.Fragment>
     );

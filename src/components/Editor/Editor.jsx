@@ -17,6 +17,7 @@ import BlockOptions from "./BlockOptions";
 import { media } from "../../config/_mixin";
 import imageExtensions from "image-extensions";
 import ImagePopup from "../../utility/ImagePopup";
+import Pos from "../../utility/Pos";
 import { Value } from "slate";
 import isUrl from "is-url";
 import { resetKeyGenerator } from "slate";
@@ -82,11 +83,24 @@ function isImage(url) {
 }
 
 const Image = styled.img`
-  /* display: inline; */
   width: ${props => (props.small ? "20px" : null)};
+  margin-left: ${props => (props.small ? "2px" : null)};
+  margin-right: ${props => (props.small ? "2px" : null)};
   max-width: 100%;
   max-height: 20em;
+  margin-bottom: ${props => (props.small ? "-4px" : null)};
   box-shadow: ${props => (props.selected ? "0 0 0 2px blue;" : "none")};
+`;
+
+const ClapImageContainer = styled.span`
+  margin-left: ${props => (props.small ? "2px" : null)};
+  margin-right: ${props => (props.small ? "2px" : null)};
+  cursor: pointer;
+`;
+
+const ClapImageText = styled.span`
+  font-weight: bolder;
+  color: #dbb74c;
 `;
 
 class Editor extends Component {
@@ -112,10 +126,17 @@ class Editor extends Component {
       hoveredIndex: null,
       selectedContent: null,
       hoverImgUrl: null,
+      pos: new Pos(0, 0),
       title: db.Posts[DEFAULT_POST].title,
       cards: db.Posts[DEFAULT_POST].cards
     };
   }
+
+  getPos = e => {
+    const pos = new Pos(e.clientX, e.clientY - 100);
+    console.log(pos);
+    this.setState({ pos });
+  };
 
   buttonCallback = (type, dataFromChild) => {
     const { cards, hoveredIndex, selectedIndex } = this.state;
@@ -194,7 +215,7 @@ class Editor extends Component {
       }
     } else if (type === "duplicate") {
       if (!Array.isArray(dataFromChild)) {
-        let targetCard = cards[dataFromChild];
+        let targetCard = JSON.parse(JSON.stringify(cards[dataFromChild]));
         const masterBuilder = { type: "builder" };
         this.setState(
           update(this.state, {
@@ -207,11 +228,6 @@ class Editor extends Component {
           })
         );
       } else {
-        console.log(
-          cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
-            dataFromChild[2]
-          ]
-        );
         let targetCard = JSON.parse(
           JSON.stringify(
             cards[dataFromChild[0]].columnListArray[dataFromChild[1]][
@@ -220,10 +236,6 @@ class Editor extends Component {
           )
         );
         targetCard.value = Value.fromJSON(targetCard.value);
-        console.log(targetCard);
-        // console.log(targetCard.value);
-        // targetCard.value = Value.fromJSON(targetCard.value.toJSON);
-        // console.log(targetCard.value);
         const blockBuilder = { type: "builder" };
         this.setState(
           update(this.state, {
@@ -749,7 +761,7 @@ class Editor extends Component {
             />
           </EditorRightContainer>
         </EditorContainer>
-        <ImagePopup left="0" top="0" url={this.state.hoverImgUrl} />
+        <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
       </Fragment>
     );
   }
@@ -856,56 +868,79 @@ class Editor extends Component {
         return <li {...attributes}>{children}</li>;
       case "numbered-list":
         return <ol {...attributes}>{children}</ol>;
-      case "clap-image": {
-        const represent_src = node.data.get("represent");
-        const hover_src = node.data.get("hover");
-        const type = node.data.get("type");
-        switch (type) {
-          case "TEXT":
-            break;
-          case "MINI_IMG":
-            return (
-              <Image
-                small={true}
-                src={represent_src}
-                alt={"hover"}
-                selected={isFocused}
-                onMouseOver={() =>
-                  this.setState({
-                    hoverImgUrl: hover_src
-                  })
-                }
-                onMouseOut={() => {
-                  this.setState({ hoverImgUrl: null });
-                }}
-                {...attributes}
-              />
-            );
-          case "NORMAL_IMG":
-            return (
-              <Image
-                src={represent_src}
-                alt={"hover"}
-                selected={isFocused}
-                onMouseOver={() =>
-                  this.setState({
-                    hoverImgUrl: hover_src
-                  })
-                }
-                onMouseOut={() => {
-                  this.setState({
-                    hoverImgUrl: null
-                  });
-                }}
-                {...attributes}
-              />
-            );
-          default:
-            break;
+      case "clap-image":
+        {
+          const represent_src = node.data.get("represent");
+          const hover_src = node.data.get("hover");
+          const name = node.data.get("name");
+          const type = node.data.get("type");
+          switch (type) {
+            case "TEXT":
+              return (
+                <ClapImageContainer
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgUrl: hover_src
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ hoverImgUrl: null });
+                  }}
+                  small={true}
+                >
+                  <ClapImageText>{name}</ClapImageText>
+                </ClapImageContainer>
+              );
+            case "MINI_IMG":
+              return (
+                <ClapImageContainer
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgUrl: hover_src
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ hoverImgUrl: null });
+                  }}
+                  small={true}
+                >
+                  <Image
+                    small={true}
+                    src={represent_src}
+                    alt={"hover"}
+                    selected={isFocused}
+                    {...attributes}
+                  />
+                  <ClapImageText>{name}</ClapImageText>
+                </ClapImageContainer>
+              );
+            case "NORMAL_IMG":
+              return (
+                <Image
+                  src={represent_src}
+                  alt={"hover"}
+                  selected={isFocused}
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgUrl: hover_src
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ hoverImgUrl: null });
+                  }}
+                  {...attributes}
+                />
+              );
+            default:
+              break;
+          }
         }
-      }
+        break;
       default:
-        return;
+        break;
     }
   };
 

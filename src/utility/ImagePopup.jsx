@@ -4,8 +4,9 @@ import styled from "styled-components";
 const PopupContainer = styled.div`
   display: ${props => (props.hover ? null : "none")};
   position: absolute;
-  left: ${props => props.left};
-  top: ${props => props.height};
+  z-index: 999;
+  left: ${props => props.left + 50}px;
+  top: ${props => props.top}px;
   height: 350px;
 `;
 
@@ -16,8 +17,8 @@ class ImagePopup extends React.Component {
     return (
       <PopupContainer
         hover={this.props.url ? true : false}
-        left={this.props.left}
-        top={this.props.height}
+        left={this.props.pos.x}
+        top={this.props.pos.y}
       >
         <PopupImage src={this.props.url} />
       </PopupContainer>

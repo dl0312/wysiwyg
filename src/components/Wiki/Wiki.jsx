@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Helmet } from "react-helmet";
 import { Query } from "react-apollo";
 import ImagePopup from "../../utility/ImagePopup";
+import Pos from "../../utility/Pos";
 import { CATEGORIES } from "../../queries";
 
 const WikiContainer = styled.div`
@@ -46,7 +47,14 @@ const CategoryName = styled.div`
 class Wiki extends React.Component {
   state = {
     keyword: "",
-    hoverImgUrl: null
+    hoverImgUrl: null,
+    pos: new Pos(0, 0)
+  };
+
+  getPos = e => {
+    const pos = new Pos(e.clientX, e.clientY - 100);
+    console.log(pos);
+    this.setState({ pos });
   };
 
   render() {
@@ -83,6 +91,7 @@ class Wiki extends React.Component {
                                       category.wikiImages[0].hoverImage.url
                                   })
                                 }
+                                onMouseMove={this.getPos}
                                 onMouseOut={() => {
                                   this.setState({
                                     hoverImgUrl: null
@@ -106,7 +115,7 @@ class Wiki extends React.Component {
               );
             }}
           </Query>
-          <ImagePopup left="0" top="0" url={this.state.hoverImgUrl} />
+          <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
         </WikiContainer>
       </React.Fragment>
     );

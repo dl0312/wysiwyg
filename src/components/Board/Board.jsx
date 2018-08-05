@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import { Query } from "react-apollo";
 import { POSTS } from "../../queries";
 import ImagePopup from "../../utility/ImagePopup";
+import Pos from "../../utility/Pos";
 import styled from "styled-components";
 
 const BoardContainer = styled.div`
@@ -163,11 +164,18 @@ class Board extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      hoverImgUrl: null
+      hoverImgUrl: null,
+      pos: new Pos(0, 0)
     };
   }
 
   handleOnMouseOver = hoverImgUrl => {};
+
+  getPos = e => {
+    const pos = new Pos(e.clientX, e.clientY - 100);
+    console.log(pos);
+    this.setState({ pos });
+  };
 
   render() {
     return (
@@ -195,6 +203,7 @@ class Board extends Component {
                                   post.category.wikiImages[0].hoverImage.url
                               })
                             }
+                            onMouseMove={this.getPos}
                             onMouseOut={() => {
                               this.setState({
                                 hoverImgUrl: null
@@ -229,7 +238,7 @@ class Board extends Component {
                   </Table>
                 </BoardBox>
               </BoardContainer>
-              <ImagePopup left="0" top="0" url={this.state.hoverImgUrl} />
+              <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
             </React.Fragment>
           );
         }}
