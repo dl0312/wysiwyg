@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Query } from "react-apollo";
 import ImagePopup from "../../utility/ImagePopup";
@@ -30,6 +31,7 @@ const ListContainer = styled.div`
 const WikiImage = styled.img`
   width: 100px;
   height: 100px;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
 `;
 
 const DataContainer = styled.div`
@@ -47,7 +49,7 @@ const CategoryName = styled.div`
 class Wiki extends React.Component {
   state = {
     keyword: "",
-    hoverImgUrl: null,
+    hoverImgJson: null,
     pos: new Pos(0, 0)
   };
 
@@ -70,7 +72,7 @@ class Wiki extends React.Component {
           <Query query={CATEGORIES} variables={{ keyword: this.state.keyword }}>
             {({ loading, data, error }) => {
               if (loading) return "loading";
-              if (error) return "something happened";
+              if (error) return `${error.message}`;
               return (
                 <React.Fragment>
                   <Helmet>
@@ -80,33 +82,38 @@ class Wiki extends React.Component {
                     {data.GetCategoriesByKeyword.categories.map(
                       (category, index) => (
                         <React.Fragment>
-                          <DataContainer>
-                            {category.wikiImages[0] ? (
-                              <WikiImage
-                                src={category.wikiImages[0].shownImage.url}
-                                alt={category.name}
-                                onMouseOver={() =>
-                                  this.setState({
-                                    hoverImgUrl:
-                                      category.wikiImages[0].hoverImage.url
-                                  })
-                                }
-                                onMouseMove={this.getPos}
-                                onMouseOut={() => {
-                                  this.setState({
-                                    hoverImgUrl: null
-                                  });
-                                }}
-                              />
-                            ) : (
-                              <WikiImage
-                                src={
-                                  "https://image.freepik.com/free-icon/question-mark-inside-a-box-outline_318-51427.jpg"
-                                }
-                              />
-                            )}
-                            <CategoryName>{category.name}</CategoryName>
-                          </DataContainer>
+                          <Link
+                            to={`/category/${category.id}`}
+                            style={{ textDecoration: "none" }}
+                          >
+                            <DataContainer>
+                              {category.wikiImages[0] ? (
+                                <WikiImage
+                                  src={category.wikiImages[0].shownImage.url}
+                                  alt={category.name}
+                                  onMouseOver={() =>
+                                    this.setState({
+                                      hoverImgJson:
+                                        category.wikiImages[0].hoverImage
+                                    })
+                                  }
+                                  onMouseMove={this.getPos}
+                                  onMouseOut={() => {
+                                    this.setState({
+                                      hoverImgJson: null
+                                    });
+                                  }}
+                                />
+                              ) : (
+                                <WikiImage
+                                  src={
+                                    "https://image.freepik.com/free-icon/question-mark-inside-a-box-outline_318-51427.jpg"
+                                  }
+                                />
+                              )}
+                              <CategoryName>{category.name}</CategoryName>
+                            </DataContainer>
+                          </Link>
                         </React.Fragment>
                       )
                     )}
@@ -115,7 +122,14 @@ class Wiki extends React.Component {
               );
             }}
           </Query>
-          <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
+          <ImagePopup
+            pos={this.state.pos}
+            json={
+              this.state.hoverImgJson
+                ? this.state.hoverImgJson.slice(1, -1)
+                : null
+            }
+          />
         </WikiContainer>
       </React.Fragment>
     );

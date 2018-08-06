@@ -6,43 +6,177 @@ import { Editor } from "slate-react";
 import { Value } from "slate";
 import { Link } from "react-router-dom";
 
+const ClapImage = styled.img`
+  width: ${props => (props.small ? "20px" : null)};
+  margin-left: ${props => (props.small ? "2px" : null)};
+  margin-right: ${props => (props.small ? "2px" : null)};
+  max-width: 100%;
+  max-height: 20em;
+  margin-bottom: ${props => (props.small ? "-4px" : null)};
+  box-shadow: ${props => (props.selected ? "0 0 0 2px blue;" : "none")};
+`;
+
+const ClapImageContainer = styled.span`
+  margin-left: ${props => (props.small ? "2px" : null)};
+  margin-right: ${props => (props.small ? "2px" : null)};
+  cursor: pointer;
+`;
+
+const ClapImageText = styled.span`
+  font-weight: bolder;
+  color: #dbb74c;
+`;
+
 class UserView extends React.Component {
+  renderNode = props => {
+    const { attributes, children, node, isFocused } = props;
+
+    switch (node.type) {
+      case "block-quote":
+        return <blockquote {...attributes}>{children}</blockquote>;
+      case "bulleted-list":
+        return <ul {...attributes}>{children}</ul>;
+      case "heading-one":
+        return <h1 {...attributes}>{children}</h1>;
+      case "heading-two":
+        return <h2 {...attributes}>{children}</h2>;
+      case "list-item":
+        return <li {...attributes}>{children}</li>;
+      case "numbered-list":
+        return <ol {...attributes}>{children}</ol>;
+      case "clap-image":
+        {
+          const represent_src = node.data.get("represent");
+          const hover_src = node.data.get("hover");
+          const name = node.data.get("name");
+          const type = node.data.get("type");
+          switch (type) {
+            case "TEXT":
+              return (
+                <ClapImageContainer
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgJson: hover_src
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ hoverImgJson: null });
+                  }}
+                  small={true}
+                >
+                  <ClapImageText>{name}</ClapImageText>
+                </ClapImageContainer>
+              );
+            case "MINI_IMG":
+              return (
+                <ClapImageContainer
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgJson: hover_src
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ hoverImgJson: null });
+                  }}
+                  small={true}
+                >
+                  <ClapImage
+                    small={true}
+                    src={represent_src}
+                    alt={"hover"}
+                    selected={isFocused}
+                    {...attributes}
+                  />
+                  <ClapImageText>{name}</ClapImageText>
+                </ClapImageContainer>
+              );
+            case "NORMAL_IMG":
+              return (
+                <ClapImage
+                  src={represent_src}
+                  alt={"hover"}
+                  selected={isFocused}
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgJson: hover_src
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ hoverImgJson: null });
+                  }}
+                  {...attributes}
+                />
+              );
+            default:
+              break;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = props => {
+    const { children, mark, attributes } = props;
+
+    switch (mark.type) {
+      case "bold":
+        return <strong {...attributes}>{children}</strong>;
+      case "code":
+        return <code {...attributes}>{children}</code>;
+      case "italic":
+        return <em {...attributes}>{children}</em>;
+      case "underlined":
+        return <u {...attributes}>{children}</u>;
+      default:
+        return;
+    }
+  };
+
   render() {
     const { json } = this.props;
-    const compArray = [];
-    json.cards.map((item, index) => {
-      switch (item.type) {
-        case "columnList":
-          compArray.push(
-            <UserCard
-              inColumn={false}
-              cards={json.cards.length}
-              key={index}
-              hoveredIndex={json.hoveredIndex}
-            >
-              <UserColumn
-                columnArray={item.content}
-                columnListArray={item.columnListArray}
-                index={[index, 0, 0]}
-                renderNode={this.renderNode}
-                renderMark={this.renderMark}
-                contentWidth={json.contentWidth}
-              />
-            </UserCard>
-          );
-          break;
-        default:
-          break;
-      }
-    });
+    console.log(json);
+
     return (
       <EditorLeft
         color={json.color}
         contentWidth={json.contentWidth}
         font={json.font}
       >
-        <div style={{ marginTop: "30px" }} />
-        {compArray}
+        {json.cards.map((item, index) => {
+          if (item.type === "columnList") {
+            return (
+              <UserCard
+                inColumn={false}
+                cards={json.cards.length}
+                key={index}
+                hoveredIndex={json.hoveredIndex}
+              >
+                <UserColumn
+                  columnArray={item.content}
+                  columnListArray={item.columnListArray}
+                  index={[index, 0, 0]}
+                  renderNode={this.renderNode}
+                  renderMark={this.renderMark}
+                  contentWidth={json.contentWidth}
+                />
+              </UserCard>
+            );
+          } else {
+            return null;
+          }
+        })}
       </EditorLeft>
     );
   }

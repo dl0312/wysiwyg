@@ -164,12 +164,12 @@ class Board extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      hoverImgUrl: null,
+      hoverImgJson: null,
       pos: new Pos(0, 0)
     };
   }
 
-  handleOnMouseOver = hoverImgUrl => {};
+  handleOnMouseOver = hoverImgJson => {};
 
   getPos = e => {
     const pos = new Pos(e.clientX, e.clientY - 100);
@@ -199,14 +199,14 @@ class Board extends Component {
                             alt={post.category.name}
                             onMouseOver={() =>
                               this.setState({
-                                hoverImgUrl:
+                                hoverImgJson:
                                   post.category.wikiImages[0].hoverImage.url
                               })
                             }
                             onMouseMove={this.getPos}
                             onMouseOut={() => {
                               this.setState({
-                                hoverImgUrl: null
+                                hoverImgJson: null
                               });
                             }}
                           />
@@ -238,7 +238,7 @@ class Board extends Component {
                   </Table>
                 </BoardBox>
               </BoardContainer>
-              <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
+              <ImagePopup pos={this.state.pos} json={this.state.hoverImgJson} />
             </React.Fragment>
           );
         }}

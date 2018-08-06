@@ -11,7 +11,7 @@ import Store from "./components/Store/Store";
 import Editor from "./components/Editor/Editor";
 import Profile from "./components/Profile/Profile";
 import Detail from "./components/Board/Detail";
-import db from "./components/Editor/db";
+import WikiDetail from "./components/Wiki/WikiDetail";
 import "./App.css";
 
 const App = () => {
@@ -28,6 +28,7 @@ const App = () => {
             <Route exact path="/editor" component={Editor} />
             <Route exact path="/editor/:postId" component={Editor} />
             <Route exact path="/read/:postId" component={Detail} />
+            <Route exact path="/category/:categoryId" component={WikiDetail} />
             <Route exact path="/profile" component={Profile} />
           </div>
         </div>

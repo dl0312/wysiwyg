@@ -78,12 +78,7 @@ class Detail extends React.Component {
             if (error) return `${error.message}`;
             console.log(data);
             const post = data.GetPostById.post;
-            console.log(
-              post.body
-                .slice(1, -1)
-                .split(",")
-                .map(block => JSON.parse(block))
-            );
+            console.log(JSON.parse(post.body.slice(1, -1)));
             return (
               <React.Fragment>
                 <Helmet>
@@ -112,28 +107,30 @@ class Detail extends React.Component {
                         font={post.font ? post.font : null}
                       >
                         <div style={{ marginTop: "30px" }} />
-                        {JSON.parse(post.body).map((item, index) => {
-                          if (item.type === "columnList") {
-                            return (
-                              <UserCard
-                                inColumn={false}
-                                cards={post.cards.length}
-                                key={index}
-                              >
-                                <UserColumn
-                                  columnArray={item.content}
-                                  columnListArray={item.columnListArray}
-                                  index={[index, 0, 0]}
-                                  renderNode={this.renderNode}
-                                  renderMark={this.renderMark}
-                                  contentWidth={post.contentWidth}
-                                />
-                              </UserCard>
-                            );
-                          } else {
-                            return null;
+                        {JSON.parse(post.body.slice(1, -1)).map(
+                          (item, index) => {
+                            if (item.type === "columnList") {
+                              return (
+                                <UserCard
+                                  inColumn={false}
+                                  cards={post.cards.length}
+                                  key={index}
+                                >
+                                  <UserColumn
+                                    columnArray={item.content}
+                                    columnListArray={item.columnListArray}
+                                    index={[index, 0, 0]}
+                                    renderNode={this.renderNode}
+                                    renderMark={this.renderMark}
+                                    contentWidth={post.contentWidth}
+                                  />
+                                </UserCard>
+                              );
+                            } else {
+                              return null;
+                            }
                           }
-                        })}
+                        )}
                       </EditorLeft>
                     </BodyContainer>
                     <CommentsListContainer>

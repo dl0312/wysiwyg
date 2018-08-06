@@ -54,24 +54,25 @@ const InputIcon = styled.i`
 const ListContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(5, 70px);
+  grid-template-rows: repeat(6, 75px);
   grid-gap: 10px;
 `;
 
 const WikiImage = styled.img`
   width: 50px;
   height: 50px;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
 `;
 
 const DataContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
 `;
 
 const CategoryName = styled.div`
-  margin: 5px 0;
+  margin-top: 5px;
   text-transform: uppercase;
   font-size: 10px;
   text-align: center;
@@ -92,13 +93,13 @@ function insertImage(change, represent, hover, name, type, target) {
 class MiniWiki extends React.Component {
   state = {
     keyword: "",
-    hoverImgUrl: null,
+    hoverImgJson: null,
     pos: new Pos(0, 0),
     inputType: "MINI_IMG"
   };
 
   getPos = e => {
-    const pos = new Pos(e.clientX - 1450, e.clientY - 200);
+    const pos = new Pos(e.clientX - 1050, e.clientY - 100);
     console.log(pos);
     this.setState({ pos });
   };
@@ -166,21 +167,21 @@ class MiniWiki extends React.Component {
                                 alt={category.name}
                                 onMouseOver={() =>
                                   this.setState({
-                                    hoverImgUrl:
-                                      category.wikiImages[0].hoverImage.url
+                                    hoverImgJson:
+                                      category.wikiImages[0].hoverImage
                                   })
                                 }
                                 onMouseMove={this.getPos}
                                 onMouseOut={() => {
                                   this.setState({
-                                    hoverImgUrl: null
+                                    hoverImgJson: null
                                   });
                                 }}
                                 onClick={() => {
                                   const represent =
                                     category.wikiImages[0].shownImage.url;
                                   const hover =
-                                    category.wikiImages[0].hoverImage.url;
+                                    category.wikiImages[0].hoverImage;
                                   console.log(this.props);
                                   let change = this.props.selectedContent.value
                                     .change()
@@ -218,7 +219,14 @@ class MiniWiki extends React.Component {
               );
             }}
           </Query>
-          <ImagePopup pos={this.state.pos} url={this.state.hoverImgUrl} />
+          <ImagePopup
+            pos={this.state.pos}
+            json={
+              this.state.hoverImgJson
+                ? this.state.hoverImgJson.slice(1, -1)
+                : null
+            }
+          />
         </WikiContainer>
       </React.Fragment>
     );

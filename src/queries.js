@@ -14,9 +14,7 @@ export const POST = gql`
             shownImage {
               url
             }
-            hoverImage {
-              url
-            }
+            hoverImage
           }
         }
         font
@@ -40,28 +38,6 @@ export const POST = gql`
   }
 `;
 
-export const CATEGORIES = gql`
-  query GetCategoriesByKeyword($keyword: String!) {
-    GetCategoriesByKeyword(keyword: $keyword) {
-      ok
-      error
-      categories {
-        id
-        name
-        wikiImages {
-          id
-          shownImage {
-            url
-          }
-          hoverImage {
-            url
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const POSTS = gql`
   {
     GetAllPosts(limit: 20) {
@@ -80,15 +56,72 @@ export const POSTS = gql`
             shownImage {
               url
             }
-            hoverImage {
-              url
-            }
+            hoverImage
           }
         }
         commentsCount
         clapsCount
         view
         createdAt
+      }
+    }
+  }
+`;
+
+export const CATEGORIES = gql`
+  query GetCategoriesByKeyword($keyword: String!) {
+    GetCategoriesByKeyword(keyword: $keyword) {
+      ok
+      error
+      categories {
+        id
+        name
+        wikiImages {
+          id
+          shownImage {
+            url
+          }
+          hoverImage
+        }
+      }
+    }
+  }
+`;
+
+export const CATEGORY = gql`
+  query GetCategoryById($categoryId: Int!) {
+    GetCategoryById(categoryId: $categoryId) {
+      ok
+      error
+      category {
+        id
+        name
+        wikiImages {
+          shownImage {
+            url
+          }
+          hoverImage
+        }
+        parent {
+          name
+          id
+          wikiImages {
+            shownImage {
+              url
+            }
+            hoverImage
+          }
+        }
+        children {
+          name
+          id
+          wikiImages {
+            shownImage {
+              url
+            }
+            hoverImage
+          }
+        }
       }
     }
   }
