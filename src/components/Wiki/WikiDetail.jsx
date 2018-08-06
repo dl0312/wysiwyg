@@ -99,6 +99,8 @@ const ChildName = styled.div`
   text-align: center;
 `;
 
+const CurrentHoverImg = styled.div``;
+
 class WikiDetail extends React.Component {
   constructor(props) {
     super(props);
@@ -117,9 +119,6 @@ class WikiDetail extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Helmet>
-          <title>WikiDetail</title>
-        </Helmet>
         <Query
           query={CATEGORY}
           variables={{ categoryId: this.props.match.params.categoryId }}
@@ -130,6 +129,9 @@ class WikiDetail extends React.Component {
             const category = data.GetCategoryById.category;
             return (
               <React.Fragment>
+                <Helmet>
+                  <title>Wiki Detail: {category.name}</title>
+                </Helmet>
                 <PageContainer>
                   <WikiDetailContainer>
                     <CurrentCategoryContainer>
@@ -139,7 +141,7 @@ class WikiDetail extends React.Component {
                           alt={category.name}
                           onMouseOver={() =>
                             this.setState({
-                              hoverImgJson: category.wikiImages[0].hoverImage.url
+                              hoverImgJson: category.wikiImages[0].hoverImage
                             })
                           }
                           onMouseMove={this.getPos}
@@ -188,7 +190,6 @@ class WikiDetail extends React.Component {
                                     this.setState({
                                       hoverImgJson:
                                         category.parent.wikiImages[0].hoverImage
-                                          .url
                                     })
                                   }
                                   onMouseMove={this.getPos}
@@ -259,12 +260,27 @@ class WikiDetail extends React.Component {
                       </ChildrenContainer>
                     </ParentChildrenContainer>
                   </WikiDetailContainer>
+                  {category.wikiImages[0] !== undefined ? (
+                    <ImagePopup
+                      follow={false}
+                      json={category.wikiImages[0].hoverImage.slice(1, -1)}
+                    />
+                  ) : (
+                    <div>no hover image</div>
+                  )}
                 </PageContainer>
               </React.Fragment>
             );
           }}
         </Query>
-        <ImagePopup pos={this.state.pos} json={this.state.hoverImgJson} />
+        <ImagePopup
+          pos={this.state.pos}
+          json={
+            this.state.hoverImgJson
+              ? this.state.hoverImgJson.slice(1, -1)
+              : null
+          }
+        />
       </React.Fragment>
     );
   }
