@@ -91,7 +91,7 @@ class BlockBuilder extends Component {
       connectDropTarget(
         <div style={{ width: "100%" }}>
           <BuilderContainer opacity={opacity}>
-            <Builder>Block Here {this.props.id}</Builder>
+            <Builder>BLOCK HERE</Builder>
             <Bar />
           </BuilderContainer>
         </div>

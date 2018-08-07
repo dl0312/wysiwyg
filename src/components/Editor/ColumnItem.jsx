@@ -55,14 +55,15 @@ class ColumnItem extends Component {
         {cards.map((item, index) => {
           if (item.type === "builder") {
             return (
-              <Builder
-                id={item.id}
-                index={this.props.index.concat(index)}
-                moveCard={this.props.moveCard}
-                handleDrop={this.props.handleDrop}
-                OnDrag={this.props.OnDrag}
-                masterCallback={this.props.masterCallback}
-              />
+              // <Builder
+              //   id={item.id}
+              //   index={this.props.index.concat(index)}
+              //   moveCard={this.props.moveCard}
+              //   handleDrop={this.props.handleDrop}
+              //   OnDrag={this.props.OnDrag}
+              //   masterCallback={this.props.masterCallback}
+              // />
+              null
             );
           } else if (item.type === "content") {
             return (
@@ -78,6 +79,9 @@ class ColumnItem extends Component {
                 renderNode={this.props.renderNode}
                 renderMark={this.props.renderMark}
                 masterCallback={this.props.masterCallback}
+                moveCard={this.props.moveCard}
+                handleDrop={this.props.handleDrop}
+                OnDrag={this.props.OnDrag}
                 onDropOrPaste={this.props.onDropOrPaste}
               />
             );

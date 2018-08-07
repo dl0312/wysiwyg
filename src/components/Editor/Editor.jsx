@@ -43,7 +43,7 @@ const EditorContainer = styled.div`
 const EditorLeftContainer = styled.div`
   position: relative;
   width: 75%;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   background-color: ${props =>
     `rgba(${props.color.r}, ${props.color.g}, ${props.color.b}, ${
@@ -56,7 +56,6 @@ const EditorLeftContainer = styled.div`
 `;
 
 const TextEditor = styled.div`
-  position: fixed;
   padding: 15px 15px;
   border-bottom: 2px solid #eee;
   display: flex;
@@ -276,17 +275,13 @@ class Editor extends Component {
     // on column
     if (hoverIndex.length === 3) {
       if (!!hoverItem) {
-        const builder = { type: "builder" };
         this.setState(
           update(this.state, {
             cards: {
               [hoverIndex[0]]: {
                 columnListArray: {
                   [hoverIndex[1]]: {
-                    $splice: [
-                      [hoverIndex[2], 0, hoverItem],
-                      [hoverIndex[2], 0, builder]
-                    ]
+                    $splice: [[hoverIndex[2], 0, hoverItem]]
                   }
                 }
               }
@@ -318,8 +313,6 @@ class Editor extends Component {
       const { cards } = this.state;
       const dragCard =
         cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2]];
-      const dragBuilder =
-        cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2] - 1];
       console.log(dragIndex);
       console.log(hoverIndex);
       this.setState({
@@ -335,35 +328,61 @@ class Editor extends Component {
           dragIndex[2] === hoverIndex[2] - 1)
       ) {
       } else {
-        this.setState(
-          update(this.state, {
-            cards: {
-              [dragIndex[0]]: {
-                columnListArray: {
-                  [dragIndex[1]]: {
-                    $splice: [[dragIndex[2] - 1, 2]]
+        if (dragIndex[2] < hoverIndex[2]) {
+          this.setState(
+            update(this.state, {
+              cards: {
+                [dragIndex[0]]: {
+                  columnListArray: {
+                    [dragIndex[1]]: {
+                      $splice: [[dragIndex[2], 1]]
+                    }
                   }
                 }
               }
-            }
-          })
-        );
-        this.setState(
-          update(this.state, {
-            cards: {
-              [hoverIndex[0]]: {
-                columnListArray: {
-                  [hoverIndex[1]]: {
-                    $splice: [
-                      [hoverIndex[2], 0, dragCard],
-                      [hoverIndex[2], 0, dragBuilder]
-                    ]
+            })
+          );
+          this.setState(
+            update(this.state, {
+              cards: {
+                [hoverIndex[0]]: {
+                  columnListArray: {
+                    [hoverIndex[1]]: {
+                      $splice: [[hoverIndex[2] - 1, 0, dragCard]]
+                    }
                   }
                 }
               }
-            }
-          })
-        );
+            })
+          );
+        } else {
+          this.setState(
+            update(this.state, {
+              cards: {
+                [dragIndex[0]]: {
+                  columnListArray: {
+                    [dragIndex[1]]: {
+                      $splice: [[dragIndex[2], 1]]
+                    }
+                  }
+                }
+              }
+            })
+          );
+          this.setState(
+            update(this.state, {
+              cards: {
+                [hoverIndex[0]]: {
+                  columnListArray: {
+                    [hoverIndex[1]]: {
+                      $splice: [[hoverIndex[2] + 1, 0, dragCard]]
+                    }
+                  }
+                }
+              }
+            })
+          );
+        }
       }
     } else if (!Array.isArray(dragIndex) && !Array.isArray(hoverIndex)) {
       // frame => frame
@@ -643,12 +662,7 @@ class Editor extends Component {
         <EditorContainer>
           <EditorLeftContainer color={this.state.color}>
             {view === "EDIT" ? (
-              <EditorLeft
-                color={this.state.color}
-                contentWidth={this.state.contentWidth}
-                font={this.state.font}
-                greedy={false}
-              >
+              <React.Fragment>
                 <TextEditor
                   opacity={
                     this.state.selectedContent !== null
@@ -660,6 +674,14 @@ class Editor extends Component {
                       : "0.5"
                   }
                 >
+                  {this.renderMarkButton(
+                    "font-family",
+                    <i className="fas fa-font" />
+                  )}
+                  {this.renderMarkButton(
+                    "font-size",
+                    <i className="fas fa-font" />
+                  )}
                   {this.renderMarkButton("bold", <i className="fas fa-bold" />)}
                   {this.renderMarkButton(
                     "italic",
@@ -670,8 +692,6 @@ class Editor extends Component {
                     <i className="fas fa-underline" />
                   )}
                   {this.renderMarkButton("code", <i className="fas fa-code" />)}
-                  {this.renderBlockButton("heading-one", "H1")}
-                  {this.renderBlockButton("heading-two", "H2")}
                   {this.renderBlockButton(
                     "block-quote",
                     <i className="fas fa-quote-right" />
@@ -685,57 +705,62 @@ class Editor extends Component {
                     <i className="fas fa-list-ul" />
                   )}
                 </TextEditor>
-                <div style={{ marginTop: "60px" }} />
-                {cards.map((item, index) => {
-                  if (item.type === "builder") {
-                    return (
-                      <MasterBuilder
-                        key={index}
-                        index={index}
-                        moveCard={this.moveCard}
-                        handleDrop={this.handleDrop}
-                        contentWidth={contentWidth}
-                        OnDrag={this.state.OnDrag}
-                        masterCallback={this.masterCallback}
-                      />
-                    );
-                  } else if (item.type === "columnList") {
-                    return (
-                      <Card
-                        inColumn={false}
-                        cards={this.state.cards.length}
-                        key={index}
-                        index={index}
-                        moveCard={this.moveCard}
-                        callbackfromparent={this.buttonCallback}
-                        selectedIndex={selectedIndex}
-                        hoveredIndex={hoveredIndex}
-                        masterCallback={this.masterCallback}
-                      >
-                        <Column
-                          columnArray={item.content}
-                          columnListArray={item.columnListArray}
-                          index={[index, 0, 0]}
-                          callbackfromparent={this.buttonCallback}
-                          handleDrop={this.handleDrop}
+                <EditorLeft
+                  color={this.state.color}
+                  contentWidth={this.state.contentWidth}
+                  font={this.state.font}
+                >
+                  {cards.map((item, index) => {
+                    if (item.type === "builder") {
+                      return (
+                        <MasterBuilder
+                          key={index}
+                          index={index}
                           moveCard={this.moveCard}
-                          handleOnChange={this.handleOnChange.bind(this)}
-                          renderNode={this.renderNode}
-                          renderMark={this.renderMark}
-                          selectedIndex={selectedIndex}
-                          hoveredIndex={hoveredIndex}
+                          handleDrop={this.handleDrop}
                           contentWidth={contentWidth}
                           OnDrag={this.state.OnDrag}
                           masterCallback={this.masterCallback}
-                          onDropOrPaste={this.onDropOrPaste}
                         />
-                      </Card>
-                    );
-                  } else {
-                    return null;
-                  }
-                })}
-              </EditorLeft>
+                      );
+                    } else if (item.type === "columnList") {
+                      return (
+                        <Card
+                          inColumn={false}
+                          cards={this.state.cards.length}
+                          key={index}
+                          index={index}
+                          moveCard={this.moveCard}
+                          callbackfromparent={this.buttonCallback}
+                          selectedIndex={selectedIndex}
+                          hoveredIndex={hoveredIndex}
+                          masterCallback={this.masterCallback}
+                        >
+                          <Column
+                            columnArray={item.content}
+                            columnListArray={item.columnListArray}
+                            index={[index, 0, 0]}
+                            callbackfromparent={this.buttonCallback}
+                            handleDrop={this.handleDrop}
+                            moveCard={this.moveCard}
+                            handleOnChange={this.handleOnChange.bind(this)}
+                            renderNode={this.renderNode}
+                            renderMark={this.renderMark}
+                            selectedIndex={selectedIndex}
+                            hoveredIndex={hoveredIndex}
+                            contentWidth={contentWidth}
+                            OnDrag={this.state.OnDrag}
+                            masterCallback={this.masterCallback}
+                            onDropOrPaste={this.onDropOrPaste}
+                          />
+                        </Card>
+                      );
+                    } else {
+                      return null;
+                    }
+                  })}
+                </EditorLeft>
+              </React.Fragment>
             ) : view === "USER" ? (
               <UserView
                 renderNode={this.renderNode}
@@ -872,10 +897,6 @@ class Editor extends Component {
         return <blockquote {...attributes}>{children}</blockquote>;
       case "bulleted-list":
         return <ul {...attributes}>{children}</ul>;
-      case "heading-one":
-        return <h1 {...attributes}>{children}</h1>;
-      case "heading-two":
-        return <h2 {...attributes}>{children}</h2>;
       case "list-item":
         return <li {...attributes}>{children}</li>;
       case "numbered-list":

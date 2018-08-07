@@ -3,6 +3,7 @@ import { graphql, Mutation } from "react-apollo";
 import { CATEGORY } from "../../queries";
 import { Helmet } from "react-helmet";
 import ImagePopup from "../../utility/ImagePopup";
+import WikiEditor from "./WikiEditor";
 import Pos from "../../utility/Pos";
 import styled from "styled-components";
 
@@ -154,6 +155,7 @@ class WikiEdit extends React.Component {
           <ParentOrChildrenContainer>
             <Subtitle>CHILDREN</Subtitle>
           </ParentOrChildrenContainer>
+          {/* <WikiEditor style={{ gridColumnStart: "1", gridColumnEnd: "3" }} /> */}
         </WikiEditContainer>
       </React.Fragment>
     ) : null;

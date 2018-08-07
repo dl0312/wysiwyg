@@ -59,6 +59,20 @@ const Tool = styled.div`
   right: 0px;
 `;
 
+const Builder = styled.div`
+  display: ${props => (props.display ? "block" : "none")};
+  position: absolute;
+  top: ${props => (props.position === "over" ? "-9px" : null)};
+  bottom: ${props => (props.position === "under" ? "-7px" : null)};
+  text-align: center;
+  color: white;
+  background-color: darkblue;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 2px 10px;
+  opacity: ${props => props.opacity};
+`;
+
 const cardSource = {
   beginDrag(props, monitor, component) {
     props.masterCallback("OnDrag", "content");
@@ -70,32 +84,22 @@ const cardSource = {
   }
 };
 
-// const cardTarget = {
-//   drop(props, monitor) {
-//     // const type = monitor.getItemType();
-//     // props.masterCallback("OnDrag", null);
-//     // if (type === ItemTypes.CARD) {
-//     //   props.moveCard(monitor.getItem().index, props.index);
-//     // } else if (type === ItemTypes.CONTENT) {
-//     //   props.handleDrop(monitor.getItem(), props.index);
-//     // }
-//   }
-// };
-
 const cardTarget = {
   hover(props, monitor, component) {
     const isJustOverThisOne = monitor.isOver({ shallow: true });
     if (isJustOverThisOne) {
       const item = monitor.getItem();
       let dragIndex = monitor.getItem().index;
-      if (item.isNew && monitor.getItem().index === undefined) {
-        console.log(`added!`);
+      if (
+        monitor.getItemType() === "content" &&
+        monitor.getItem().index === undefined
+      ) {
         dragIndex = props.cards - 1;
       }
       const hoverIndex = props.index;
-      console.log(item.isNew + ", " + monitor.getItem().index);
+      // console.log(item.isNew + ", " + monitor.getItem().index);
 
-      console.log(dragIndex + ", " + hoverIndex);
+      // console.log(dragIndex + ", " + hoverIndex);
 
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
@@ -115,6 +119,15 @@ const cardTarget = {
       // Get pixels to the top
       const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
+      const position =
+        clientOffset.y < hoverBoundingRect.y + hoverMiddleY ? "over" : "under";
+
+      if (position === "over") {
+        component.setState({ hoverPosition: "over" });
+      } else if (position === "under") {
+        component.setState({ hoverPosition: "under" });
+      }
+
       // Only perform the move when the mouse has crossed half of the items height
       // When dragging downwards, only move when the cursor is below 50%
       // When dragging upwards, only move when the cursor is above 50%
@@ -128,14 +141,56 @@ const cardTarget = {
         return;
       }
 
-      // // Time to actually perform the action
+      // Time to actually perform the action
       // props.moveCard(dragIndex, hoverIndex);
 
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      monitor.getItem().index = hoverIndex;
+      // // Note: we're mutating the monitor item here!
+      // // Generally it's better to avoid mutations,
+      // // but it's good here for the sake of performance
+      // // to avoid expensive index searches.
+      // monitor.getItem().index = hoverIndex;
+    }
+  },
+
+  drop(props, monitor, component) {
+    component.setState({ hoverPosition: null });
+    // Determine rectangle on screen
+    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
+
+    // Get vertical middle
+    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+    // Determine mouse position
+    const clientOffset = monitor.getClientOffset();
+
+    const dropPosition =
+      clientOffset.y < hoverBoundingRect.y + hoverMiddleY ? "over" : "under";
+    console.log(clientOffset.y < hoverBoundingRect.y + hoverMiddleY);
+
+    const type = monitor.getItemType();
+
+    props.masterCallback("OnDrag", null);
+    if (type === ItemTypes.CARD) {
+      const index = props.index;
+      if (dropPosition === "over") {
+        index[2] -= 1;
+        props.moveCard(monitor.getItem().index, index);
+      } else if (dropPosition === "under") {
+        index[2] += 1;
+        props.moveCard(monitor.getItem().index, index);
+      }
+    } else if (type === ItemTypes.CONTENT) {
+      const index = props.index;
+      console.log(index);
+      if (dropPosition === "over") {
+        index[2] -= 1;
+        console.log(index);
+        props.handleDrop(monitor.getItem(), index);
+      } else if (dropPosition === "under") {
+        index[2] += 1;
+        console.log(index);
+        props.handleDrop(monitor.getItem(), index);
+      }
     }
   }
 };
@@ -165,6 +220,7 @@ class Container extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      hoverPosition: null,
       hover: false,
       active: false,
       toolHover: false
@@ -314,11 +370,12 @@ class Container extends Component {
       isDragging,
       connectDragSource,
       connectDragPreview,
-      // connectDropTarget,
+      connectDropTarget,
       index,
       callbackfromparent,
       hoveredIndex,
-      selectedIndex
+      selectedIndex,
+      isOver
     } = this.props;
     const opacity = isDragging ? 0.2 : 1;
     const hover = hoveredIndex
@@ -334,8 +391,9 @@ class Container extends Component {
         : false
       : false;
     return (
-      connectDragPreview &&
-      connectDragSource(
+      connectDragSource &&
+      connectDropTarget &&
+      connectDropTarget(
         connectDragPreview(
           <div
             className={classnames(
@@ -360,12 +418,34 @@ class Container extends Component {
                     ? this.props.item.align
                     : "center"
                   : "center",
-              opacity
+              opacity,
+              border: hover ? "2px solid grey" : "2px solid transparent",
+              borderTop:
+                this.state.hoverPosition === "over" && isOver
+                  ? "2px solid darkblue"
+                  : "2px solid transparent",
+              borderBottom:
+                this.state.hoverPosition === "under" && isOver
+                  ? "2px solid darkblue"
+                  : "2px solid transparent"
             }}
             onMouseOver={this.handleOnMouseOver}
             onMouseDown={this.handleOnMouseDown}
             onMouseLeave={this.handleOnMouseLeave}
           >
+            <Builder
+              display={this.props.OnDrag === "content"}
+              opacity={
+                this.props.OnDrag === "content"
+                  ? this.state.hoverPosition === "over" && isOver
+                    ? "1"
+                    : "0.5"
+                  : "0"
+              }
+              position="over"
+            >
+              BLOCK HERE
+            </Builder>
             {hover || active ? (
               <div>
                 {this.state.toolHover ? (
@@ -415,6 +495,19 @@ class Container extends Component {
               </div>
             ) : null}
             {this.showInner(active)}
+            <Builder
+              display={this.props.OnDrag === "content"}
+              opacity={
+                this.props.OnDrag === "content"
+                  ? this.state.hoverPosition === "under"
+                    ? "1"
+                    : "0.5"
+                  : "0"
+              }
+              position="under"
+            >
+              BLOCK HERE
+            </Builder>
           </div>
         )
       )
@@ -423,10 +516,14 @@ class Container extends Component {
 }
 
 export default flow(
-  // DropTarget(ItemTypes.CARD, cardTarget, (connect, monitor) => ({
-  //   connectDropTarget: connect.dropTarget(),
-  //   isOver: monitor.isOver()
-  // })),
+  DropTarget(
+    [ItemTypes.CARD, ItemTypes.CONTENT],
+    cardTarget,
+    (connect, monitor) => ({
+      connectDropTarget: connect.dropTarget(),
+      isOver: monitor.isOver()
+    })
+  ),
   DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),

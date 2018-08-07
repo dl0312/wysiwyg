@@ -69,6 +69,7 @@
     "reset-css": "^3.0.0",
     "resolve": "1.6.0",
     "slate": "^0.33.6",
+    "slate-edit-table": "^0.17.0",
     "slate-react": "^0.12.6",
     "slate-schema-violations": "^0.1.25",
     "style-loader": "0.19.0",
