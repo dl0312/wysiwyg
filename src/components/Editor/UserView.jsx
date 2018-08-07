@@ -146,7 +146,6 @@ class UserView extends React.Component {
 
   render() {
     const { json } = this.props;
-    console.log(json);
 
     return (
       <EditorLeft
@@ -568,6 +567,16 @@ class Image extends React.Component {
   }
 }
 
+const TextContainer = styled.div`
+  color: black;
+  text-align: ${props => props.textAlign};
+  line-height: 140%;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+`;
+
 class Text extends React.Component {
   constructor(props) {
     super(props);
@@ -579,17 +588,10 @@ class Text extends React.Component {
 
   render() {
     return (
-      <div
-        className="content"
-        style={{
-          color: "black",
-          textAlign: "left",
-          lineHeight: "140%",
-          paddingTop: "10px",
-          paddingRight: "10px",
-          paddingLeft: "10px",
-          paddingBottom: "10px"
-        }}
+      <TextContainer
+        textAlign={
+          this.props.item.textAlign ? this.props.item.textAlign : "left"
+        }
       >
         <Editor
           autoFocus
@@ -600,7 +602,7 @@ class Text extends React.Component {
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
         />
-      </div>
+      </TextContainer>
     );
   }
 }

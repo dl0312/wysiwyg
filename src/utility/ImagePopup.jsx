@@ -19,23 +19,18 @@ const PopupImage = styled.img``;
 
 class ImagePopup extends React.Component {
   render() {
-    console.log(this.props.json);
-    console.log(JSON.parse(this.props.json));
+    const {
+      json,
+      pos: { x, y },
+      onImage
+    } = this.props;
     return this.props.follow === undefined ? (
-      <PopupContainer
-        hover={this.props.json ? true : false}
-        left={this.props.pos.x}
-        top={this.props.pos.y}
-      >
-        {this.props.json ? (
-          <UserView json={JSON.parse(this.props.json)} />
-        ) : null}
+      <PopupContainer hover={onImage ? true : false} left={x} top={y}>
+        {onImage ? <UserView json={JSON.parse(this.props.json)} /> : null}
       </PopupContainer>
     ) : (
       <StaticContainer>
-        {this.props.json ? (
-          <UserView json={JSON.parse(this.props.json)} />
-        ) : null}
+        {onImage ? <UserView json={JSON.parse(this.props.json)} /> : null}
       </StaticContainer>
     );
   }

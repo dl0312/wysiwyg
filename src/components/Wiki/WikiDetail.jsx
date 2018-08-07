@@ -22,6 +22,7 @@ const WikiDetailContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 `;
 
 const CurrentCategoryContainer = styled.div`
@@ -106,17 +107,18 @@ class WikiDetail extends React.Component {
     super(props);
     this.state = {
       hoverImgJson: null,
-      pos: new Pos(0, 0)
+      pos: new Pos(0, 0),
+      onImage: false
     };
   }
 
   getPos = e => {
     const pos = new Pos(e.clientX, e.clientY - 100);
-    console.log(pos);
     this.setState({ pos });
   };
 
   render() {
+    const { pos, hoverImgJson, onImage } = this.state;
     return (
       <React.Fragment>
         <Query
@@ -132,7 +134,29 @@ class WikiDetail extends React.Component {
                 <Helmet>
                   <title>Wiki Detail: {category.name}</title>
                 </Helmet>
+
                 <PageContainer>
+                  <Subtitle
+                    style={{
+                      right: "50px",
+                      top: "120px",
+                      position: "absolute"
+                    }}
+                  >
+                    <Link
+                      to={`/category/edit/${category.id}`}
+                      style={{
+                        textDecoration: "none"
+                      }}
+                      onClick={() =>
+                        this.setState({
+                          onImage: false
+                        })
+                      }
+                    >
+                      EDIT
+                    </Link>
+                  </Subtitle>
                   <WikiDetailContainer>
                     <CurrentCategoryContainer>
                       {category.wikiImages[0] ? (
@@ -141,14 +165,13 @@ class WikiDetail extends React.Component {
                           alt={category.name}
                           onMouseOver={() =>
                             this.setState({
-                              hoverImgJson: category.wikiImages[0].hoverImage
+                              hoverImgJson: category.wikiImages[0].hoverImage,
+                              onImage: true
                             })
                           }
                           onMouseMove={this.getPos}
                           onMouseOut={() => {
-                            this.setState({
-                              hoverImgJson: null
-                            });
+                            this.setState({ onImage: false });
                           }}
                         />
                       ) : (
@@ -168,10 +191,10 @@ class WikiDetail extends React.Component {
                             <Link
                               onClick={() =>
                                 this.setState({
-                                  hoverImgJson: null
+                                  onImage: false
                                 })
                               }
-                              to={`/category/${category.parent.id}`}
+                              to={`/category/read/${category.parent.id}`}
                               style={{
                                 textDecoration: "none",
                                 display: "flex",
@@ -189,13 +212,15 @@ class WikiDetail extends React.Component {
                                   onMouseOver={() =>
                                     this.setState({
                                       hoverImgJson:
-                                        category.parent.wikiImages[0].hoverImage
+                                        category.parent.wikiImages[0]
+                                          .hoverImage,
+                                      onImage: true
                                     })
                                   }
                                   onMouseMove={this.getPos}
                                   onMouseOut={() => {
                                     this.setState({
-                                      hoverImgJson: null
+                                      onImage: false
                                     });
                                   }}
                                 />
@@ -213,57 +238,55 @@ class WikiDetail extends React.Component {
                       </ParentContainer>
                       <Subtitle>CHILDREN</Subtitle>
                       <ChildrenContainer>
-                        {category.children.map(
-                          child => (
-                            console.log(child),
-                            (
-                              <Link
-                                onClick={() =>
-                                  this.setState({
-                                    hoverImgJson: null
-                                  })
-                                }
-                                to={`/category/${child.id}`}
-                                style={{ textDecoration: "none" }}
-                              >
-                                <ChildContainer>
-                                  {child.wikiImages[0] ? (
-                                    <ChildImg
-                                      src={child.wikiImages[0].shownImage.url}
-                                      alt={child.name}
-                                      onMouseOver={() =>
-                                        this.setState({
-                                          hoverImgJson:
-                                            child.wikiImages[0].hoverImage.url
-                                        })
-                                      }
-                                      onMouseMove={this.getPos}
-                                      onMouseOut={() => {
-                                        this.setState({
-                                          hoverImgJson: null
-                                        });
-                                      }}
-                                    />
-                                  ) : (
-                                    <ChildImg
-                                      src={
-                                        "https://image.freepik.com/free-icon/question-mark-inside-a-box-outline_318-51427.jpg"
-                                      }
-                                    />
-                                  )}
-                                  <ChildName>{child.name}</ChildName>
-                                </ChildContainer>
-                              </Link>
-                            )
-                          )
-                        )}
+                        {category.children.map(child => (
+                          <Link
+                            onClick={() =>
+                              this.setState({
+                                onImage: false
+                              })
+                            }
+                            to={`/category/read/${child.id}`}
+                            style={{ textDecoration: "none" }}
+                          >
+                            <ChildContainer>
+                              {child.wikiImages[0] ? (
+                                <ChildImg
+                                  src={child.wikiImages[0].shownImage.url}
+                                  alt={child.name}
+                                  onMouseOver={() =>
+                                    this.setState({
+                                      hoverImgJson:
+                                        child.wikiImages[0].hoverImage,
+                                      onImage: true
+                                    })
+                                  }
+                                  onMouseMove={this.getPos}
+                                  onMouseOut={() => {
+                                    this.setState({
+                                      onImage: false
+                                    });
+                                  }}
+                                />
+                              ) : (
+                                <ChildImg
+                                  src={
+                                    "https://image.freepik.com/free-icon/question-mark-inside-a-box-outline_318-51427.jpg"
+                                  }
+                                />
+                              )}
+                              <ChildName>{child.name}</ChildName>
+                            </ChildContainer>
+                          </Link>
+                        ))}
                       </ChildrenContainer>
                     </ParentChildrenContainer>
                   </WikiDetailContainer>
                   {category.wikiImages[0] !== undefined ? (
                     <ImagePopup
+                      pos={pos}
                       follow={false}
                       json={category.wikiImages[0].hoverImage.slice(1, -1)}
+                      onImage={true}
                     />
                   ) : (
                     <div>no hover image</div>
@@ -274,12 +297,9 @@ class WikiDetail extends React.Component {
           }}
         </Query>
         <ImagePopup
-          pos={this.state.pos}
-          json={
-            this.state.hoverImgJson
-              ? this.state.hoverImgJson.slice(1, -1)
-              : null
-          }
+          pos={pos}
+          json={hoverImgJson ? hoverImgJson.slice(1, -1) : null}
+          onImage={onImage}
         />
       </React.Fragment>
     );

@@ -126,6 +126,7 @@ class Editor extends Component {
       hoveredIndex: null,
       selectedContent: null,
       hoverImgJson: null,
+      onImage: false,
       pos: new Pos(0, 0),
       title: db.Posts[DEFAULT_POST].title,
       cards: db.Posts[DEFAULT_POST].cards
@@ -631,7 +632,10 @@ class Editor extends Component {
       selectedIndex,
       hoveredIndex,
       contentWidth,
-      view
+      view,
+      pos,
+      hoverImgJson,
+      onImage
     } = this.state;
 
     return (
@@ -766,12 +770,9 @@ class Editor extends Component {
           </EditorRightContainer>
         </EditorContainer>
         <ImagePopup
-          pos={this.state.pos}
-          json={
-            this.state.hoverImgJson
-              ? this.state.hoverImgJson.slice(1, -1)
-              : null
-          }
+          pos={pos}
+          json={hoverImgJson ? hoverImgJson.slice(1, -1) : null}
+          onImage={onImage}
         />
       </Fragment>
     );
@@ -891,12 +892,13 @@ class Editor extends Component {
                 <ClapImageContainer
                   onMouseOver={() =>
                     this.setState({
-                      hoverImgJson: hover_src
+                      hoverImgJson: hover_src,
+                      onImage: true
                     })
                   }
                   onMouseMove={this.getPos}
                   onMouseOut={() => {
-                    this.setState({ hoverImgJson: null });
+                    this.setState({ onImage: false });
                   }}
                   small={true}
                 >
@@ -908,12 +910,13 @@ class Editor extends Component {
                 <ClapImageContainer
                   onMouseOver={() =>
                     this.setState({
-                      hoverImgJson: hover_src
+                      hoverImgJson: hover_src,
+                      onImage: true
                     })
                   }
                   onMouseMove={this.getPos}
                   onMouseOut={() => {
-                    this.setState({ hoverImgJson: null });
+                    this.setState({ onImage: false });
                   }}
                   small={true}
                 >
@@ -935,12 +938,13 @@ class Editor extends Component {
                   selected={isFocused}
                   onMouseOver={() =>
                     this.setState({
-                      hoverImgJson: hover_src
+                      hoverImgJson: hover_src,
+                      onImage: true
                     })
                   }
                   onMouseMove={this.getPos}
                   onMouseOut={() => {
-                    this.setState({ hoverImgJson: null });
+                    this.setState({ onImage: false });
                   }}
                   {...attributes}
                 />

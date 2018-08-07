@@ -581,7 +581,10 @@ class Image extends Component {
 }
 
 const TextContainer = styled.div`
-  color: black;
+  color: ${props =>
+    `rgba(${props.textColor.r}, ${props.textColor.g}, ${props.textColor.b}, ${
+      props.textColor.a
+    })`};
   text-align: ${props => props.textAlign};
   line-height: 140%;
   padding-top: 10px;
@@ -605,6 +608,7 @@ class Text extends Component {
   render() {
     return (
       <TextContainer
+        textColor={this.props.item.textColor}
         textAlign={
           this.props.item.textAlign ? this.props.item.textAlign : "left"
         }
@@ -614,8 +618,6 @@ class Text extends Component {
           value={this.props.value}
           readOnly={false}
           onChange={this.onChange}
-          // onDrop={this.props.onDropOrPaste}
-          // onPaste={this.props.onDropOrPaste}
           renderNode={this.props.renderNode}
           renderMark={this.props.renderMark}
           autoCorrect={false}

@@ -12,7 +12,12 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
 - [ ] **Guide**
   - [ ] Styling
 - [ ] **Wiki**
-- [ ] _CSS_
+  - [ ] _Wiki_
+    - [ ] Add Category
+    - [ ] CSS
+  - [ ] _WikiDatail_
+    - [ ] Edit Category
+    - [ ] CSS
 - [ ] **Store**
 - [ ] **Editor**
   - [ ] _Editor Left_
@@ -53,6 +58,7 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
 - [ ] 갑자기 다른 위치로 스크롤바이동
 - [ ] container, card 위에 놨을 때에도 drop 가능하게
 - [ ] text 에서 클릭하면 element 넣어지기
-- [ ] category 추가하기
 - [ ] wikiImage 추가하기
-- [ ] hoverImage 가 image 로? html 로? 어떤게 경제적
+- [ ] Add Category
+- [ ] Edit Category
+- [ ] ImagePopup 안보이는거 없게

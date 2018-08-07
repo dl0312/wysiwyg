@@ -417,8 +417,9 @@ class BlockOptions extends Component {
                   <FunctionColumn>
                     <FunctionTitle>Text Color</FunctionTitle>
                     <SketchExample
-                      masterCallback={this.props.masterCallback}
-                      type="Text"
+                      OnChangeCards={OnChangeCards}
+                      selectedIndex={selectedIndex}
+                      type="textColor"
                       color={selectedContent.textColor}
                     />
                   </FunctionColumn>

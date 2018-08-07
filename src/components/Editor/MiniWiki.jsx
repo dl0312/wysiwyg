@@ -95,6 +95,7 @@ class MiniWiki extends React.Component {
     keyword: "",
     hoverImgJson: null,
     pos: new Pos(0, 0),
+    onImage: false,
     inputType: "MINI_IMG"
   };
 
@@ -105,7 +106,7 @@ class MiniWiki extends React.Component {
   };
 
   render() {
-    const { inputType } = this.state;
+    const { inputType, pos, hoverImgJson, onImage } = this.state;
     return (
       <React.Fragment>
         <WikiContainer>
@@ -168,13 +169,14 @@ class MiniWiki extends React.Component {
                                 onMouseOver={() =>
                                   this.setState({
                                     hoverImgJson:
-                                      category.wikiImages[0].hoverImage
+                                      category.wikiImages[0].hoverImage,
+                                    onImage: true
                                   })
                                 }
                                 onMouseMove={this.getPos}
                                 onMouseOut={() => {
                                   this.setState({
-                                    hoverImgJson: null
+                                    onImage: false
                                   });
                                 }}
                                 onClick={() => {
@@ -220,12 +222,9 @@ class MiniWiki extends React.Component {
             }}
           </Query>
           <ImagePopup
-            pos={this.state.pos}
-            json={
-              this.state.hoverImgJson
-                ? this.state.hoverImgJson.slice(1, -1)
-                : null
-            }
+            pos={pos}
+            json={hoverImgJson ? hoverImgJson.slice(1, -1) : null}
+            onImage={onImage}
           />
         </WikiContainer>
       </React.Fragment>

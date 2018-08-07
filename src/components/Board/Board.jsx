@@ -200,7 +200,7 @@ class Board extends Component {
                             onMouseOver={() =>
                               this.setState({
                                 hoverImgJson:
-                                  post.category.wikiImages[0].hoverImage.url
+                                  post.category.wikiImages[0].hoverImage
                               })
                             }
                             onMouseMove={this.getPos}
@@ -214,7 +214,7 @@ class Board extends Component {
                         <TitleRow>
                           <Title>
                             <Link
-                              to={`/read/${post.id}`}
+                              to={`/post/read/${post.id}`}
                               style={{ textDecoration: "none" }}
                             >
                               {post.title}
@@ -238,7 +238,14 @@ class Board extends Component {
                   </Table>
                 </BoardBox>
               </BoardContainer>
-              <ImagePopup pos={this.state.pos} json={this.state.hoverImgJson} />
+              <ImagePopup
+                pos={this.state.pos}
+                json={
+                  this.state.hoverImgJson
+                    ? this.state.hoverImgJson.slice(1, -1)
+                    : null
+                }
+              />
             </React.Fragment>
           );
         }}

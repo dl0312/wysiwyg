@@ -50,16 +50,17 @@ class Wiki extends React.Component {
   state = {
     keyword: "",
     hoverImgJson: null,
+    onImage: false,
     pos: new Pos(0, 0)
   };
 
   getPos = e => {
     const pos = new Pos(e.clientX, e.clientY - 100);
-    console.log(pos);
-    this.setState({ pos });
+    this.setState({ pos, onImage: true });
   };
 
   render() {
+    const { pos, hoverImgJson, onImage } = this.state;
     return (
       <React.Fragment>
         <WikiContainer>
@@ -83,7 +84,7 @@ class Wiki extends React.Component {
                       (category, index) => (
                         <React.Fragment>
                           <Link
-                            to={`/category/${category.id}`}
+                            to={`/category/read/${category.id}`}
                             style={{ textDecoration: "none" }}
                           >
                             <DataContainer>
@@ -94,13 +95,14 @@ class Wiki extends React.Component {
                                   onMouseOver={() =>
                                     this.setState({
                                       hoverImgJson:
-                                        category.wikiImages[0].hoverImage
+                                        category.wikiImages[0].hoverImage,
+                                      onImage: true
                                     })
                                   }
                                   onMouseMove={this.getPos}
                                   onMouseOut={() => {
                                     this.setState({
-                                      hoverImgJson: null
+                                      onImage: false
                                     });
                                   }}
                                 />
@@ -123,12 +125,9 @@ class Wiki extends React.Component {
             }}
           </Query>
           <ImagePopup
-            pos={this.state.pos}
-            json={
-              this.state.hoverImgJson
-                ? this.state.hoverImgJson.slice(1, -1)
-                : null
-            }
+            pos={pos}
+            json={hoverImgJson ? hoverImgJson.slice(1, -1) : null}
+            onImage={onImage}
           />
         </WikiContainer>
       </React.Fragment>

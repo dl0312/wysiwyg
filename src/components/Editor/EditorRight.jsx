@@ -421,7 +421,7 @@ class Body extends Component {
 
   handleOperatorOnClick = operator => {
     if (operator === "-") {
-      if (this.state.contentWidth > 400) {
+      if (this.state.contentWidth > 200) {
         this.setState(
           {
             contentWidth: this.state.contentWidth - 50
