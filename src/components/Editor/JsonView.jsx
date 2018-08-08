@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 const JsonViewContainer = styled.div`
   padding: 30px;
+  overflow-y: auto;
 `;
 
 class JsonView extends React.Component {

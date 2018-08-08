@@ -62,3 +62,4 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
 - [ ] Add Category
 - [ ] Edit Category
 - [ ] ImagePopup 안보이는거 없게
+- [ ] card 도 container 처럼 builder 수정

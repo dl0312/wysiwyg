@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { findDOMNode } from "react-dom";
 import { LAST_CHILD_TYPE_INVALID } from "slate-schema-violations";
 import flow from "lodash.flow";
+import EditorDefaults from "./EditorDefaults";
 
 const Handle = styled.div`
   background-color: #9c88ff;
@@ -60,17 +61,28 @@ const Tool = styled.div`
 `;
 
 const Builder = styled.div`
-  display: ${props => (props.display ? "block" : "none")};
+  /* display: ${props => (props.display ? "block" : "none")}; */
   position: absolute;
-  top: ${props => (props.position === "over" ? "-9px" : null)};
-  bottom: ${props => (props.position === "under" ? "-7px" : null)};
+  z-index:${props => (props.state === "ISOVER" ? "999" : null)};
+  top: ${props => (props.position === "over" ? "-4px" : null)};
+  bottom: ${props => (props.position === "under" ? "-4px" : null)};
   text-align: center;
   color: white;
-  background-color: darkblue;
+  background-color: ${props => {
+    switch (props.state) {
+      case "ONDRAG":
+        return EditorDefaults.BUILDER_ONDRAG_COLOR;
+      case "ISOVER":
+        return EditorDefaults.BUILDER_ISOVER_COLOR;
+      default:
+        return "transparent";
+    }
+  }};
   border-radius: 5px;
   font-size: 12px;
   padding: 2px 10px;
-  opacity: ${props => props.opacity};
+  transition:  background-color 0.5s ease;
+  width: 100%;
 `;
 
 const cardSource = {
@@ -173,7 +185,7 @@ const cardTarget = {
     if (type === ItemTypes.CARD) {
       const index = props.index;
       if (dropPosition === "over") {
-        index[2] -= 1;
+        // index[2] -= 1;
         props.moveCard(monitor.getItem().index, index);
       } else if (dropPosition === "under") {
         index[2] += 1;
@@ -183,7 +195,7 @@ const cardTarget = {
       const index = props.index;
       console.log(index);
       if (dropPosition === "over") {
-        index[2] -= 1;
+        // index[2] -= 1;
         console.log(index);
         props.handleDrop(monitor.getItem(), index);
       } else if (dropPosition === "under") {
@@ -195,19 +207,21 @@ const cardTarget = {
   }
 };
 
-// const schema = {
-//   document: {
-//     last: { type: "paragraph" },
-//     normalize: (change, reason, { node, child }) => {
-//       switch (reason) {
-//         case LAST_CHILD_TYPE_INVALID: {
-//           const paragraph = Block.create("paragraph");
-//           return change.insertNodeByKey(node.key, node.nodes.size, paragraph);
-//         }
-//       }
-//     }
-//   }
-// };
+const schema = {
+  document: {
+    last: { type: "paragraph" },
+    normalize: (change, reason, { node, child }) => {
+      switch (reason) {
+        case LAST_CHILD_TYPE_INVALID: {
+          const paragraph = Block.create("paragraph");
+          return change.insertNodeByKey(node.key, node.nodes.size, paragraph);
+        }
+        default:
+          return;
+      }
+    }
+  }
+};
 
 class Container extends Component {
   static propTypes = {
@@ -304,7 +318,7 @@ class Container extends Component {
           return (
             <Text
               value={value}
-              // schema={schema}
+              schema={schema}
               index={this.props.index}
               item={this.props.item}
               active={active}
@@ -402,49 +416,56 @@ class Container extends Component {
               active ? "blockActive" : null
             )}
             item={this.props.item}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              position: "relative",
-              padding: "10px",
-              width: "100%",
-              justifyContent:
-                this.props.item.content === "TEXT" ||
-                this.props.item.content === "BUTTON" ||
-                this.props.item.content === "HTML" ||
-                this.props.item.content === "IMAGE" ||
-                this.props.item.content === "VIDEO"
-                  ? this.props.item.align
+            style={
+              {
+                display: "flex",
+                alignItems: "center",
+                position: "relative",
+                padding: "10px",
+                width: "100%",
+                justifyContent:
+                  this.props.item.content === "TEXT" ||
+                  this.props.item.content === "BUTTON" ||
+                  this.props.item.content === "HTML" ||
+                  this.props.item.content === "IMAGE" ||
+                  this.props.item.content === "VIDEO"
                     ? this.props.item.align
-                    : "center"
-                  : "center",
-              opacity,
-              border: hover ? "2px solid grey" : "2px solid transparent",
-              borderTop:
-                this.state.hoverPosition === "over" && isOver
-                  ? "2px solid darkblue"
-                  : "2px solid transparent",
-              borderBottom:
-                this.state.hoverPosition === "under" && isOver
-                  ? "2px solid darkblue"
-                  : "2px solid transparent"
-            }}
+                      ? this.props.item.align
+                      : "center"
+                    : "center",
+                opacity,
+                transition: "border 0.5s ease, opacity 0.5s ease",
+                border: active
+                  ? "2px solid black"
+                  : hover
+                    ? "2px solid grey"
+                    : "2px solid transparent"
+              }
+              // borderTop:
+              //   this.state.hoverPosition === "over" && isOver
+              //     ? "2px solid darkblue"
+              //     : "2px solid transparent",
+              // borderBottom:
+              //   this.state.hoverPosition === "under" && isOver
+              //     ? "2px solid darkblue"
+              //     : "2px solid transparent"
+            }
             onMouseOver={this.handleOnMouseOver}
             onMouseDown={this.handleOnMouseDown}
             onMouseLeave={this.handleOnMouseLeave}
           >
             <Builder
               display={this.props.OnDrag === "content"}
-              opacity={
+              state={
                 this.props.OnDrag === "content"
                   ? this.state.hoverPosition === "over" && isOver
-                    ? "1"
-                    : "0.5"
-                  : "0"
+                    ? "ISOVER"
+                    : "ONDRAG"
+                  : "INVISIBLE"
               }
               position="over"
             >
-              BLOCK HERE
+              {/* BLOCK HERE */}
             </Builder>
             {hover || active ? (
               <div>
@@ -497,16 +518,16 @@ class Container extends Component {
             {this.showInner(active)}
             <Builder
               display={this.props.OnDrag === "content"}
-              opacity={
+              state={
                 this.props.OnDrag === "content"
-                  ? this.state.hoverPosition === "under"
-                    ? "1"
-                    : "0.5"
-                  : "0"
+                  ? this.state.hoverPosition === "under" && isOver
+                    ? "ISOVER"
+                    : "ONDRAG"
+                  : "INVISIBLE"
               }
               position="under"
             >
-              BLOCK HERE
+              {/* BLOCK HERE */}
             </Builder>
           </div>
         )
@@ -662,12 +683,13 @@ class Image extends Component {
           borderTop: "0 solid transparent",
           borderRight: "0 solid transparent",
           borderLeft: "0 solid transparent",
-          borderBottom: "0 solid transparent"
+          borderBottom: "0 solid transparent",
+          width: this.props.fullWidth ? "100%" : null
         }}
       >
         <img
           style={{
-            width: this.props.fullWidth ? this.props.contentWidth : "100%"
+            width: "100%"
           }}
           src={this.props.src}
           alt="logo"

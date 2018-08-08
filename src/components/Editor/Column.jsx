@@ -11,7 +11,7 @@ export default class Column extends Component {
     const columnListStyle = {
       width: this.props.contentWidth,
       display: "grid",
-      gridGap: "10px",
+      gridGap: "5px",
       gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
     };
     return (

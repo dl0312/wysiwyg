@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Builder from "./BlockBuilder";
 import Container from "./Container";
 import styled from "styled-components";
+import EmptyContainer from "./EmptyContainer";
 
 const Column = styled.div`
   text-align: center;
@@ -13,19 +13,6 @@ const Column = styled.div`
   outline: ${props =>
     props.hasBlock ? "0px solid black" : "0.5px dashed #2f3542"};
   background-color: ${props => props.bgc};
-`;
-
-const InsertText = styled.div`
-  height: 100px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: -10px;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: "Open Sans", sans-serif;
-  color: #2f3542;
 `;
 
 class ColumnItem extends Component {
@@ -47,52 +34,40 @@ class ColumnItem extends Component {
 
   render() {
     // 기본상태의 에디터화면 id=container, id=body
-    const { contentWidth, cards } = this.props;
+    const { contentWidth, cards, connectDropTarget } = this.props;
     let backgroundColor = cards.length === 1 ? "transparent" : "transparent";
 
     return (
-      <Column hasBlock={cards.length !== 1} bgc={backgroundColor}>
+      <Column hasBlock={cards.length !== 0} bgc={backgroundColor}>
         {cards.map((item, index) => {
-          if (item.type === "builder") {
-            return (
-              // <Builder
-              //   id={item.id}
-              //   index={this.props.index.concat(index)}
-              //   moveCard={this.props.moveCard}
-              //   handleDrop={this.props.handleDrop}
-              //   OnDrag={this.props.OnDrag}
-              //   masterCallback={this.props.masterCallback}
-              // />
-              null
-            );
-          } else if (item.type === "content") {
-            return (
-              <Container
-                item={item}
-                callbackfromparent={this.props.callbackfromparent}
-                selectedIndex={this.props.selectedIndex}
-                hoveredIndex={this.props.hoveredIndex}
-                index={this.props.index.concat(index)}
-                key={index}
-                contentWidth={contentWidth}
-                handleOnChange={this.props.handleOnChange.bind(this)}
-                renderNode={this.props.renderNode}
-                renderMark={this.props.renderMark}
-                masterCallback={this.props.masterCallback}
-                moveCard={this.props.moveCard}
-                handleDrop={this.props.handleDrop}
-                OnDrag={this.props.OnDrag}
-                onDropOrPaste={this.props.onDropOrPaste}
-              />
-            );
-          } else {
-            return null;
-          }
+          return (
+            <Container
+              item={item}
+              callbackfromparent={this.props.callbackfromparent}
+              selectedIndex={this.props.selectedIndex}
+              hoveredIndex={this.props.hoveredIndex}
+              index={this.props.index.concat(index)}
+              key={index}
+              contentWidth={contentWidth}
+              handleOnChange={this.props.handleOnChange.bind(this)}
+              renderNode={this.props.renderNode}
+              renderMark={this.props.renderMark}
+              masterCallback={this.props.masterCallback}
+              moveCard={this.props.moveCard}
+              handleDrop={this.props.handleDrop}
+              OnDrag={this.props.OnDrag}
+              onDropOrPaste={this.props.onDropOrPaste}
+            />
+          );
         })}
-        {cards.length !== 1 ? null : (
-          <InsertText>
-            INSERT<br />CONTENT
-          </InsertText>
+        {cards.length !== 0 ? null : (
+          <EmptyContainer
+            index={this.props.index}
+            masterCallback={this.props.masterCallback}
+            moveCard={this.props.moveCard}
+            handleDrop={this.props.handleDrop}
+            OnDrag={this.props.OnDrag}
+          />
         )}
       </Column>
     );

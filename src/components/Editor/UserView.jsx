@@ -152,6 +152,7 @@ class UserView extends React.Component {
         color={json.color}
         contentWidth={json.contentWidth}
         font={json.font}
+        view="USER"
       >
         {json.cards.map((item, index) => {
           if (item.type === "columnList") {

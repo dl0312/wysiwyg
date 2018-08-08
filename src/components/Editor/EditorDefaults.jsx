@@ -1,6 +1,6 @@
 export default {
   // Content
-  IMG: "https://media.giphy.com/media/A6aHBCFqlE0Rq/giphy.gif",
+  IMG: "https://media.giphy.com/media/d2Z9QYzA2aidiWn6/giphy.gif",
   VIDEO: "TRmdXDH9b1s",
   BUTTON: "CLICK ME!",
   BUTTON_TEXT_COLOR: { r: "255", g: "255", b: "255", a: "1" },
@@ -15,5 +15,7 @@ export default {
   VIEW: "EDIT",
   BACKGROUND_COLOR: { r: "255", g: "255", b: "255", a: "1" },
   WIDTH: 600,
-  FONT: "Open Sans"
+  FONT: "Open Sans",
+  BUILDER_ONDRAG_COLOR: "#c9abd8",
+  BUILDER_ISOVER_COLOR: "#7158e2"
 };

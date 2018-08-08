@@ -4,7 +4,6 @@ import EditorLeft from "./EditorLeft";
 import EditorRight from "./EditorRight";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend, { NativeTypes } from "react-dnd-html5-backend";
-import MasterBuilder from "./MasterBuilder";
 import Card from "./Card";
 import Column from "./Column";
 import { Button, Icon } from "./Components";
@@ -23,6 +22,7 @@ import isUrl from "is-url";
 import { resetKeyGenerator } from "slate";
 import { getEventRange, getEventTransfer } from "slate-react";
 import _ from "lodash";
+import EmptyCard from "./EmptyCard";
 
 const update = require("immutability-helper");
 const DEFAULT_NODE = "paragraph";
@@ -43,7 +43,7 @@ const EditorContainer = styled.div`
 const EditorLeftContainer = styled.div`
   position: relative;
   width: 75%;
-  overflow-y: hidden;
+  overflow-y: ${props => (props.view === "JSON" ? "auto" : "hidden")};
   overflow-x: hidden;
   background-color: ${props =>
     `rgba(${props.color.r}, ${props.color.g}, ${props.color.b}, ${
@@ -192,7 +192,7 @@ class Editor extends Component {
                 [dataFromChild[0]]: {
                   columnListArray: {
                     [dataFromChild[1]]: {
-                      $splice: [[dataFromChild[2] - 1, 2]]
+                      $splice: [[dataFromChild[2], 1]]
                     }
                   }
                 }
@@ -208,7 +208,7 @@ class Editor extends Component {
         this.setState(
           update(this.state, {
             cards: {
-              $splice: [[dataFromChild - 1, 2]]
+              $splice: [[dataFromChild, 1]]
             }
           })
         );
@@ -216,14 +216,10 @@ class Editor extends Component {
     } else if (type === "duplicate") {
       if (!Array.isArray(dataFromChild)) {
         let targetCard = JSON.parse(JSON.stringify(cards[dataFromChild]));
-        const masterBuilder = { type: "builder" };
         this.setState(
           update(this.state, {
             cards: {
-              $splice: [
-                [dataFromChild, 0, masterBuilder],
-                [dataFromChild, 0, targetCard]
-              ]
+              $splice: [[dataFromChild, 0, targetCard]]
             }
           })
         );
@@ -235,18 +231,15 @@ class Editor extends Component {
             ]
           )
         );
-        targetCard.value = Value.fromJSON(targetCard.value);
-        const blockBuilder = { type: "builder" };
+        if (targetCard.content === "BUTTON" || targetCard.content === "TEXT")
+          targetCard.value = Value.fromJSON(targetCard.value);
         this.setState(
           update(this.state, {
             cards: {
               [dataFromChild[0]]: {
                 columnListArray: {
                   [dataFromChild[1]]: {
-                    $splice: [
-                      [dataFromChild[2], 0, blockBuilder],
-                      [dataFromChild[2], 0, targetCard]
-                    ]
+                    $splice: [[dataFromChild[2], 0, targetCard]]
                   }
                 }
               }
@@ -275,6 +268,9 @@ class Editor extends Component {
     // on column
     if (hoverIndex.length === 3) {
       if (!!hoverItem) {
+        if (hoverIndex[2] === -1) {
+          hoverIndex[2] = 0;
+        }
         this.setState(
           update(this.state, {
             cards: {
@@ -289,14 +285,29 @@ class Editor extends Component {
           })
         );
       }
-    } else {
-      // on frame
+    } else if (hoverIndex.length === 2) {
       if (!!hoverItem) {
-        const builder = { type: "builder" };
         this.setState(
           update(this.state, {
             cards: {
-              $splice: [[hoverIndex, 0, hoverItem], [hoverIndex, 0, builder]]
+              [hoverIndex[0]]: {
+                columnListArray: {
+                  [hoverIndex[1]]: {
+                    $splice: [[0, 0, hoverItem]]
+                  }
+                }
+              }
+            }
+          })
+        );
+      }
+    } else {
+      // on frame
+      if (!!hoverItem) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              $splice: [[hoverIndex, 0, hoverItem]]
             }
           })
         );
@@ -320,12 +331,9 @@ class Editor extends Component {
         selectedContent: null
       });
       if (
-        (dragIndex[0] === hoverIndex[0] &&
-          dragIndex[1] === hoverIndex[1] &&
-          dragIndex[2] === hoverIndex[2] + 1) ||
-        (dragIndex[0] === hoverIndex[0] &&
-          dragIndex[1] === hoverIndex[1] &&
-          dragIndex[2] === hoverIndex[2] - 1)
+        dragIndex[0] === hoverIndex[0] &&
+        dragIndex[1] === hoverIndex[1] &&
+        dragIndex[2] === hoverIndex[2]
       ) {
       } else {
         if (dragIndex[2] < hoverIndex[2]) {
@@ -384,20 +392,57 @@ class Editor extends Component {
           );
         }
       }
+    } else if (dragIndex.length === 3 && hoverIndex.length === 2) {
+      // block => block
+      const { cards } = this.state;
+      const dragCard =
+        cards[dragIndex[0]].columnListArray[dragIndex[1]][dragIndex[2]];
+      console.log(dragIndex);
+      console.log(hoverIndex);
+      this.setState({
+        selectedIndex: null,
+        selectedContent: null
+      });
+      if (!!dragCard) {
+        this.setState(
+          update(this.state, {
+            cards: {
+              [dragIndex[0]]: {
+                columnListArray: {
+                  [dragIndex[1]]: {
+                    $splice: [[dragIndex[2], 1]]
+                  }
+                }
+              }
+            }
+          })
+        );
+        this.setState(
+          update(this.state, {
+            cards: {
+              [hoverIndex[0]]: {
+                columnListArray: {
+                  [hoverIndex[1]]: {
+                    $splice: [[0, 0, dragCard]]
+                  }
+                }
+              }
+            }
+          })
+        );
+      }
     } else if (!Array.isArray(dragIndex) && !Array.isArray(hoverIndex)) {
       // frame => frame
       const { cards } = this.state;
       const dragCard = cards[dragIndex];
-      const dragBuilder = { type: "builder" };
+      console.log(dragIndex);
+      console.log(hoverIndex);
+      this.setState({ selectedIndex: null, selectedContent: null });
       if (dragIndex < hoverIndex) {
         this.setState(
           update(this.state, {
             cards: {
-              $splice: [
-                [dragIndex - 1, 2],
-                [hoverIndex - 2, 0, dragCard],
-                [hoverIndex - 2, 0, dragBuilder]
-              ]
+              $splice: [[dragIndex, 1], [hoverIndex, 0, dragCard]]
             }
           })
         );
@@ -405,11 +450,7 @@ class Editor extends Component {
         this.setState(
           update(this.state, {
             cards: {
-              $splice: [
-                [dragIndex - 1, 2],
-                [hoverIndex, 0, dragCard],
-                [hoverIndex, 0, dragBuilder]
-              ]
+              $splice: [[dragIndex, 1], [hoverIndex + 1, 0, dragCard]]
             }
           })
         );
@@ -660,7 +701,7 @@ class Editor extends Component {
     return (
       <Fragment>
         <EditorContainer>
-          <EditorLeftContainer color={this.state.color}>
+          <EditorLeftContainer view={view} color={this.state.color}>
             {view === "EDIT" ? (
               <React.Fragment>
                 <TextEditor
@@ -709,21 +750,10 @@ class Editor extends Component {
                   color={this.state.color}
                   contentWidth={this.state.contentWidth}
                   font={this.state.font}
+                  view="EDIT"
                 >
                   {cards.map((item, index) => {
-                    if (item.type === "builder") {
-                      return (
-                        <MasterBuilder
-                          key={index}
-                          index={index}
-                          moveCard={this.moveCard}
-                          handleDrop={this.handleDrop}
-                          contentWidth={contentWidth}
-                          OnDrag={this.state.OnDrag}
-                          masterCallback={this.masterCallback}
-                        />
-                      );
-                    } else if (item.type === "columnList") {
+                    if (item.type === "columnList") {
                       return (
                         <Card
                           inColumn={false}
@@ -731,6 +761,8 @@ class Editor extends Component {
                           key={index}
                           index={index}
                           moveCard={this.moveCard}
+                          handleDrop={this.handleDrop}
+                          OnDrag={this.state.OnDrag}
                           callbackfromparent={this.buttonCallback}
                           selectedIndex={selectedIndex}
                           hoveredIndex={hoveredIndex}
@@ -759,6 +791,15 @@ class Editor extends Component {
                       return null;
                     }
                   })}
+                  {cards.length !== 0 ? null : (
+                    <EmptyCard
+                      index={0}
+                      masterCallback={this.masterCallback}
+                      moveCard={this.moveCard}
+                      handleDrop={this.handleDrop}
+                      OnDrag={this.state.OnDrag}
+                    />
+                  )}
                 </EditorLeft>
               </React.Fragment>
             ) : view === "USER" ? (

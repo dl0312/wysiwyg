@@ -2,7 +2,12 @@ import React, { Component } from "react";
 import styled from "styled-components";
 
 const EditorLeftContainer = styled.div`
-  height: 800px;
+  height: ${props =>
+    props.view === "EDIT"
+      ? "585px"
+      : props.view === "USER"
+        ? "637px"
+        : "585px"};
   overflow-y: auto;
 `;
 
@@ -14,6 +19,7 @@ const RealEditorContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 10px;
 `;
 
 class EditorLeft extends Component {
@@ -24,7 +30,7 @@ class EditorLeft extends Component {
   render() {
     // 기본상태의 에디터화면 id=container
     return (
-      <EditorLeftContainer>
+      <EditorLeftContainer view={this.props.view}>
         <RealEditorContainer
           backgroundColor={this.props.color}
           fontFamily={this.props.font}

@@ -11,7 +11,7 @@ const itemSource = {
     props.masterCallback("OnDrag", "columnList");
     const columnListArray = [];
     component.props.array.map(element => {
-      columnListArray.push([{ type: "builder" }]);
+      return columnListArray.push([]);
     });
     return {
       type: "columnList",
@@ -24,7 +24,7 @@ const itemSource = {
     const columnListArray = [];
     props.masterCallback("OnDrag", null);
     component.props.array.map(element => {
-      columnListArray.push([]);
+      return columnListArray.push([]);
     });
     return {
       type: "columnList",

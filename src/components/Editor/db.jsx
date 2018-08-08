@@ -108,26 +108,20 @@ export default {
       title: "?????",
       cards: [
         {
-          type: "builder"
-        },
-        {
           type: "columnList",
           OnDrag: "columnList",
           content: [1],
           columnListArray: [
             [
               {
-                type: "builder"
-              },
-              {
                 type: "content",
                 OnDrag: "content",
                 content: "TEXT",
                 textColor: {
-                  r: "255",
-                  g: "255",
-                  b: "255",
-                  a: "1"
+                  r: 0,
+                  g: 0,
+                  b: 0,
+                  a: 1
                 },
                 backgroundColor: {
                   r: "255",
@@ -162,15 +156,9 @@ export default {
                     ]
                   }
                 }
-              },
-              {
-                type: "builder"
               }
             ]
           ]
-        },
-        {
-          type: "builder"
         }
       ]
     },
