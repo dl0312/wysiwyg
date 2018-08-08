@@ -86,7 +86,7 @@ const Builder = styled.div`
   border-radius: 5px;
   font-size: 12px;
   padding: 2px 10px;
-  transition: opacity 0.5s ease;
+  transition:  background-color 0.5s ease;
   width: 100%;
 `;
 

@@ -84,17 +84,39 @@ const itemSource = {
         item.textColor = EditorDefaults.TEXT_TEXT_COLOR;
         item.backgroundColor = EditorDefaults.TEXT_BACKGROUND_COLOR;
         item.value = Value.fromJSON({
+          object: "value",
           document: {
+            object: "document",
+            data: {},
             nodes: [
               {
                 object: "block",
                 type: "paragraph",
+                isVoid: false,
+                data: {},
                 nodes: [
                   {
                     object: "text",
                     leaves: [
                       {
-                        text: EditorDefaults.TEXT
+                        object: "leaf",
+                        text: "A line of text in a paragraph.",
+                        marks: [
+                          {
+                            object: "mark",
+                            type: "font-size",
+                            data: {
+                              fontSize: 16
+                            }
+                          },
+                          {
+                            object: "mark",
+                            type: "font-family",
+                            data: {
+                              fontFamily: "Nanum Gothic"
+                            }
+                          }
+                        ]
                       }
                     ]
                   }

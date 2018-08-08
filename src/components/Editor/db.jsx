@@ -147,7 +147,22 @@ export default {
                               {
                                 object: "leaf",
                                 text: "A line of text in a paragraph.",
-                                marks: []
+                                marks: [
+                                  {
+                                    object: "mark",
+                                    type: "font-size",
+                                    data: {
+                                      fontSize: 16
+                                    }
+                                  },
+                                  {
+                                    object: "mark",
+                                    type: "font-family",
+                                    data: {
+                                      fontFamily: "Nanum Gothic"
+                                    }
+                                  }
+                                ]
                               }
                             ]
                           }

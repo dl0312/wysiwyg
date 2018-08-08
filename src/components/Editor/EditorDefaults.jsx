@@ -17,5 +17,6 @@ export default {
   WIDTH: 600,
   FONT: "Open Sans",
   BUILDER_ONDRAG_COLOR: "#c9abd8",
-  BUILDER_ISOVER_COLOR: "#7158e2"
+  BUILDER_ISOVER_COLOR: "#7158e2",
+  CLAP_IMG_TEXT_COLOR: "GoldenRod"
 };

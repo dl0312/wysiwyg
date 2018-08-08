@@ -2,13 +2,21 @@ import React, { Component } from "react";
 import styled from "styled-components";
 
 const EditorLeftContainer = styled.div`
-  height: ${props =>
-    props.view === "EDIT"
-      ? "585px"
-      : props.view === "USER"
-        ? "637px"
-        : "585px"};
   overflow-y: auto;
+  position: ${props => (props.view === "USER" ? "block" : "absolute")};
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  top: ${props => {
+    switch (props.view) {
+      case "EDIT":
+        return "51px";
+      case "USER":
+        return "0px";
+      default:
+        break;
+    }
+  }};
 `;
 
 const RealEditorContainer = styled.div`
@@ -19,7 +27,7 @@ const RealEditorContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
+  margin-top: ${props => (props.view === "USER" ? null : "10px")};
 `;
 
 class EditorLeft extends Component {
@@ -35,6 +43,7 @@ class EditorLeft extends Component {
           backgroundColor={this.props.color}
           fontFamily={this.props.font}
           id="container"
+          view={this.props.view}
         >
           {this.props.children}
         </RealEditorContainer>

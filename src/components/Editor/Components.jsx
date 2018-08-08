@@ -12,7 +12,8 @@ export const Button = styled("span")`
       : props.active
         ? "black"
         : "#ccc"};
-  margin: 0 20px;
+  padding: 12px 15px;
+  width: ${props => (props.type === "font-family" ? "150px" : null)};
   transition: margin 0.5s ease;
   ${media.desktop`margin: 0 10px;`};
   ${media.tablet`margin: 0 15px;`};
@@ -37,7 +38,6 @@ export const Menu = styled("div")`
 
 export const Toolbar = styled(Menu)`
   position: relative;
-  padding: 15px 15px;
   margin: 0 -20px;
   border-bottom: 2px solid #eee;
   margin-bottom: 20px;

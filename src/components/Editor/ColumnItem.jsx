@@ -9,7 +9,7 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: ${props => (props.hasBlock ? "flex-start" : "center")};
   outline: ${props =>
     props.hasBlock ? "0px solid black" : "0.5px dashed #2f3542"};
   background-color: ${props => props.bgc};
