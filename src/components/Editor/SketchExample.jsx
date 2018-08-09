@@ -11,10 +11,11 @@ export default class SketchExample extends React.Component {
     };
   }
 
+  componentWillReceiveProps = nextprops => {
+    this.setState({ color: nextprops.color });
+  };
+
   handleOnClick = () => {
-    console.log(this.state.color);
-    console.log(this.props.selectedIndex);
-    console.log(this.props.type);
     this.setState({ displayColorPicker: !this.state.displayColorPicker });
     if (this.props.type === "BodyBackgroundColor") {
       this.props.masterCallback(this.props.type, this.state.color);
@@ -25,6 +26,11 @@ export default class SketchExample extends React.Component {
         this.state.color
       );
     }
+  };
+
+  handleFontOnClick = event => {
+    event.preventDefault();
+    this.setState({ displayColorPicker: !this.state.displayColorPicker });
   };
 
   handleClose = () => {
@@ -47,9 +53,21 @@ export default class SketchExample extends React.Component {
     }
   };
 
+  handleFontChange = (color, event) => {
+    this.setState({ color: color.rgb }, () =>
+      this.props.onChange(event, this.props.type, color)
+    );
+  };
+
   render() {
     const styles = reactCSS({
       default: {
+        fontColor: {
+          padding: "13px 10px",
+          color: `rgba(${this.state.color.r}, ${this.state.color.g}, ${
+            this.state.color.b
+          }, ${this.state.color.a})`
+        },
         color: {
           width: "36px",
           height: "14px",
@@ -81,7 +99,26 @@ export default class SketchExample extends React.Component {
         }
       }
     });
-
+    if (this.props.type === "font-color") {
+      return (
+        <div>
+          <i
+            className="fas fa-font"
+            style={styles.fontColor}
+            onMouseDown={this.handleFontOnClick}
+          />
+          {this.state.displayColorPicker ? (
+            <div style={styles.popover}>
+              <div style={styles.cover} onMouseDown={this.handleClose} />
+              <SketchPicker
+                color={this.state.color}
+                onChange={this.handleFontChange}
+              />
+            </div>
+          ) : null}
+        </div>
+      );
+    }
     return (
       <div>
         <div style={styles.swatch} onClick={this.handleOnClick}>

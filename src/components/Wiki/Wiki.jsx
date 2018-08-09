@@ -8,7 +8,7 @@ import Pos from "../../utility/Pos";
 import { CATEGORIES } from "../../queries";
 
 const WikiContainer = styled.div`
-  padding: 30px;
+  padding: 50px 30px;
   width: 100%;
   display: flex;
   flex-direction: column;

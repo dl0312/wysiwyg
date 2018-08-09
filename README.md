@@ -50,7 +50,7 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
     - [ ] Menu Option
       - [ ] CSS
 
-### 고쳐야할 것
+### 고쳐야할 것, 해야할 것
 
 - [ ] 복사했을 때 복사한 text 수정불가 + 원본 수정시 이상 ( editor 의 key 때문 )
 - [x] default 로 만들었을 때 Text 수정 ( 아래 버그 수정시 해결 )
@@ -63,3 +63,4 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
 - [ ] Edit Category
 - [ ] ImagePopup 안보이는거 없게
 - [ ] card 도 container 처럼 builder 수정
+- [ ] font-color text-editor 에서 수정하게

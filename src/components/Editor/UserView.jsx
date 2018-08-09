@@ -129,8 +129,34 @@ class UserView extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props;
+    console.log(mark.data.get("fontSize"));
 
     switch (mark.type) {
+      case "font-family":
+        return (
+          <span style={{ fontFamily: mark.data.get("fontFamily") }}>
+            {children}
+          </span>
+        );
+      case "font-size":
+        return (
+          <span style={{ fontSize: mark.data.get("fontSize") }}>
+            {children}
+          </span>
+        );
+      case "font-color":
+        return (
+          <span
+            style={{
+              color: `rgba(${mark.data.get("fontColor").rgb.r},
+              ${mark.data.get("fontColor").rgb.g},
+              ${mark.data.get("fontColor").rgb.b},
+              ${mark.data.get("fontColor").rgb.a})`
+            }}
+          >
+            {children}
+          </span>
+        );
       case "bold":
         return <strong {...attributes}>{children}</strong>;
       case "code":
@@ -146,7 +172,7 @@ class UserView extends React.Component {
 
   render() {
     const { json } = this.props;
-
+    // console.log(json);
     return (
       <EditorLeft
         color={json.color}
@@ -497,7 +523,7 @@ class Divider extends React.Component {
   render() {
     return (
       <div className="content" style={{ width: "100%", padding: "20px" }}>
-        <divs
+        <div
           style={{
             width: "100%",
             borderBottom: "1px solid black"

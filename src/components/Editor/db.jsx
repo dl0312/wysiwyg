@@ -161,6 +161,35 @@ export default {
                                     data: {
                                       fontFamily: "Nanum Gothic"
                                     }
+                                  },
+                                  {
+                                    object: "mark",
+                                    type: "font-color",
+                                    data: {
+                                      fontColor: {
+                                        hsl: {
+                                          h: 209.99999999999997,
+                                          s: 0,
+                                          l: 0,
+                                          a: 1
+                                        },
+                                        hex: "#000000",
+                                        rgb: {
+                                          r: 0,
+                                          g: 0,
+                                          b: 0,
+                                          a: 1
+                                        },
+                                        hsv: {
+                                          h: 209.99999999999997,
+                                          s: 0,
+                                          v: 0,
+                                          a: 1
+                                        },
+                                        oldHue: 209.99999999999997,
+                                        source: "rgb"
+                                      }
+                                    }
                                   }
                                 ]
                               }

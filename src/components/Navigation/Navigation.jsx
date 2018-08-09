@@ -4,7 +4,6 @@ import styled from "styled-components";
 
 const NavContainer = styled.div`
   width: 100%;
-  height: 100px;
   z-index: 200;
   border-bottom: 0.1px solid darkgrey;
 `;
@@ -34,44 +33,103 @@ const MenuItem = styled.div`
   font-family: Raleway;
 `;
 
+const ProfileContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 50px;
+`;
+
+const ProfileItemContainer = styled.div`
+  padding: 5px 10px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SocialIcon = styled.img`
+  width: ${props => props.size};
+  margin: 0 2px;
+  border-radius: 2px;
+`;
+
 class Navigation extends Component {
   state = {
+    login: false,
     search: false
   };
 
   render() {
+    const { login } = this.state;
     return (
       <NavContainer>
         <Header>
           <div style={{ width: "100%" }}>
-            <NavLink
-              to="/"
-              style={{
-                fontSize: "50px",
-                textDecoration: "none"
-              }}
-            >
-              <MenuItem
+            <ProfileContainer>
+              {login ? null : (
+                <ProfileItemContainer>LOG IN</ProfileItemContainer>
+              )}
+              {login ? null : (
+                <ProfileItemContainer>JOIN US</ProfileItemContainer>
+              )}
+              {login ? null : (
+                <React.Fragment>
+                  <ProfileItemContainer>SOCIAL LOGIN </ProfileItemContainer>
+                  <SocialIcon
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Facebook_logo_%28square%29.png/600px-Facebook_logo_%28square%29.png"
+                    size="18px"
+                  />
+                  <SocialIcon
+                    src="https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png"
+                    size="18px"
+                  />
+                  <SocialIcon
+                    src="http://pluspng.com/img-png/naver-logo-png-naver-300.png"
+                    size="18px"
+                  />
+                  <SocialIcon
+                    src="https://cdn.iconscout.com/public/images/icon/free/png-512/kakaotalk-logo-social-media-3790821a3904b250-512x512.png"
+                    size="18px"
+                  />
+                </React.Fragment>
+              )}
+              {login ? (
+                <ProfileItemContainer>PROFILE</ProfileItemContainer>
+              ) : null}
+            </ProfileContainer>
+            <MenuList>
+              <NavLink
+                to="/"
                 style={{
-                  color: "purple",
-                  fontFamily: "Hanalei Fill, cursive",
-                  textShadow: "3px 3px #ff0000"
+                  fontSize: "30px",
+                  marginRight: "150px",
+                  textDecoration: "none"
                 }}
               >
-                CLAP
-              </MenuItem>
-              {/* <MenuList>
-                  <MenuItem style={{ fontSize: "20px" }}>
-                    <i className="fas fa-bell" />
-                  </MenuItem>
-                  <NavLink to="/profile" style={{ textDecoration: "none" }}>
-                    <MenuItem style={{ fontSize: "20px" }}>
-                      <i className="fas fa-user-circle" />
-                    </MenuItem>
-                  </NavLink>
-                </MenuList> */}
-            </NavLink>
-            <MenuList>
+                <MenuItem
+                  style={
+                    {
+                      fontWeight: "100",
+                      fontFamily: "Roboto",
+                      letterSpacing: "10px",
+                      width: "250px"
+                    }
+                    // textShadow: "3px 3px #ff0000"
+                  }
+                >
+                  CLAP
+                  <div
+                    style={{
+                      fontFamily: "Open Sans",
+                      fontSize: "7px",
+                      letterSpacing: "2px"
+                    }}
+                  >
+                    🕹️POWERED BY GAMERS🕹️
+                  </div>
+                </MenuItem>
+              </NavLink>
               <NavLink to="/guide" style={{ textDecoration: "none" }}>
                 <MenuItem>GUIDE</MenuItem>
               </NavLink>
@@ -85,6 +143,16 @@ class Navigation extends Component {
                 <MenuItem>EDITOR</MenuItem>
               </NavLink>
             </MenuList>
+            {/* <MenuList>
+                <MenuItem style={{ fontSize: "20px" }}>
+                  <i className="fas fa-bell" />
+                </MenuItem>
+                <NavLink to="/profile" style={{ textDecoration: "none" }}>
+                  <MenuItem style={{ fontSize: "20px" }}>
+                    <i className="fas fa-user-circle" />
+                  </MenuItem>
+                </NavLink>
+              </MenuList> */}
           </div>
         </Header>
       </NavContainer>

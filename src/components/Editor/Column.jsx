@@ -8,11 +8,20 @@ export default class Column extends Component {
   }
 
   render() {
+    let totalRatio = 0;
+    this.props.columnArray.map(column => (totalRatio += column));
     const columnListStyle = {
       width: this.props.contentWidth,
       display: "grid",
-      gridGap: "5px",
-      gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
+      gridGap: "0px",
+      // gridTemplateColumns: this.props.columnArray.join("fr ") + "fr"
+      gridTemplateColumns:
+        this.props.columnArray
+          .map(
+            (columnRatio, index) =>
+              (this.props.contentWidth * columnRatio) / totalRatio
+          )
+          .join("px ") + "px"
     };
     return (
       <div className="columnList" style={columnListStyle}>

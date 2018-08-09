@@ -12,19 +12,11 @@ export const Button = styled("span")`
       : props.active
         ? "black"
         : "#ccc"};
-  padding: 12px 15px;
-  width: ${props => (props.type === "font-family" ? "150px" : null)};
-  transition: margin 0.5s ease;
-  ${media.desktop`margin: 0 10px;`};
-  ${media.tablet`margin: 0 15px;`};
+  padding: 13px 10px;
+  transition: padding 0.5s ease;
+  ${media.desktop`padding: 10px 5px; font-size: 10px;`};
+  ${media.tablet`padding: 13px 10px;`};
   ${media.phone`display: none;`};
-`;
-
-export const Icon = styled(({ className, ...rest }) => {
-  return <span className={`material-icons ${className}`} {...rest} />;
-})`
-  font-size: 18px;
-  vertical-align: text-bottom;
 `;
 
 export const Menu = styled("div")`

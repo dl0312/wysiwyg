@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 const EditorLeftContainer = styled.div`
   overflow-y: auto;
+  overflow-x: hidden;
   position: ${props => (props.view === "USER" ? "block" : "absolute")};
   bottom: 0px;
   right: 0px;
@@ -27,6 +28,7 @@ const RealEditorContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: ${props => (props.view === "USER" ? null : "150px")};
   margin-top: ${props => (props.view === "USER" ? null : "10px")};
 `;
 

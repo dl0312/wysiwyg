@@ -6,7 +6,7 @@ import { DragDropContext } from "react-dnd";
 import HTML5Backend, { NativeTypes } from "react-dnd-html5-backend";
 import Card from "./Card";
 import Column from "./Column";
-import { Button, Icon } from "./Components";
+import { Button } from "./Components";
 import db from "./db";
 import styled from "styled-components";
 import EditorDefaults from "./EditorDefaults";
@@ -23,6 +23,7 @@ import { resetKeyGenerator } from "slate";
 import { getEventRange, getEventTransfer } from "slate-react";
 import _ from "lodash";
 import EmptyCard from "./EmptyCard";
+import SketchExample from "./SketchExample";
 
 const update = require("immutability-helper");
 const DEFAULT_NODE = "paragraph";
@@ -38,6 +39,8 @@ const EditorContainer = styled.div`
   bottom: 0px;
   right: 0;
   left: 0;
+
+  border-top: 2px solid #eee;
 `;
 
 const EditorLeftContainer = styled.div`
@@ -109,22 +112,30 @@ const MarkListContainer = styled.ul`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  top: 44px;
+  top: 42.5px;
   background-color: white;
-  margin-left: ${props => (props.type === "font-size" ? "-20px" : "0px")};
+  margin-left: ${props => (props.type === "font-size" ? "-25px" : "-10px")};
   border: ${props =>
     props.isActive ? "1px solid #eee" : "1px solid transparent"};
   overflow: hidden;
   transition: height 0.5s ease, border 0.5s ease;
   height: ${props =>
-    props.isActive ? (props.type === "font-size" ? "150px" : "50px") : "0px"};
+    props.isActive ? (props.type === "font-size" ? "150px" : "80px") : "0px"};
   color: black;
+`;
+
+const Icon = styled.div`
+  font-size: 15px;
+  letter-spacing: -1px;
+  width: ${props => (props.type === "font-family" ? "90px" : null)};
+  vertical-align: text-bottom;
 `;
 
 const MarkListItem = styled.li`
   list-style: none;
   padding: 5px 10px;
   color: ${props => (props.active ? "black" : null)};
+  letter-spacing: -1px;
 `;
 
 class Editor extends Component {
@@ -568,7 +579,6 @@ class Editor extends Component {
   };
 
   handleOnChange = (value, index, content, type) => {
-    console.log(index);
     if (type === "TEXT_CHANGE") {
       if (index.length === 2) {
         this.setState(
@@ -749,9 +759,9 @@ class Editor extends Component {
                     "font-size",
                     this.getMarkData("font-size")
                   )}
-                  {this.renderMarkButton(
+                  {this.renderMarkList(
                     "font-color",
-                    <i className="fas fa-font" />
+                    this.getMarkData("font-color")
                   )}
                   {this.renderMarkButton("bold", <i className="fas fa-bold" />)}
                   {this.renderMarkButton(
@@ -899,12 +909,6 @@ class Editor extends Component {
       ) {
         const { value } = this.showSelected(this.state.selectedIndex);
         if (value.marks.filter(mark => mark.type === "font-size").first()) {
-          console.log(
-            value.marks
-              .filter(mark => mark.type === "font-size")
-              .first()
-              .data.get("fontSize")
-          );
           const fontSize = value.marks
             .filter(mark => mark.type === "font-size")
             .first()
@@ -938,12 +942,6 @@ class Editor extends Component {
       ) {
         const { value } = this.showSelected(this.state.selectedIndex);
         if (value.marks.filter(mark => mark.type === "font-family").first()) {
-          console.log(
-            value.marks
-              .filter(mark => mark.type === "font-family")
-              .first()
-              .data.get("fontFamily")
-          );
           const fontFamily = value.marks
             .filter(mark => mark.type === "font-family")
             .first()
@@ -951,8 +949,10 @@ class Editor extends Component {
           switch (fontFamily) {
             case "Nanum Gothic":
               return "Nanum Gothic";
-            case "Eczar":
-              return "Eczar";
+            case "Roboto":
+              return "Roboto";
+            case "Open Sans":
+              return "Open Sans";
             default:
               return "Nanum Gothic";
           }
@@ -961,6 +961,22 @@ class Editor extends Component {
         }
       } else {
         return "Nanum Gothic";
+      }
+    } else if (type === "font-color") {
+      if (
+        this.state.selectedIndex !== null &&
+        (this.state.selectedContent.content === "TEXT" ||
+          this.state.selectedContent.content === "BUTTON" ||
+          this.state.selectedContent.content === "HTML")
+      ) {
+        const { value } = this.showSelected(this.state.selectedIndex);
+        if (value.marks.filter(mark => mark.type === "font-color").first()) {
+          const fontColor = value.marks
+            .filter(mark => mark.type === "font-color")
+            .first()
+            .data.get("fontColor");
+          return fontColor;
+        }
       }
     }
   };
@@ -986,6 +1002,35 @@ class Editor extends Component {
    */
 
   renderMarkList = (type, icon) => {
+    if (type === "font-color") {
+      return (
+        <React.Fragment>
+          {icon ? (
+            <SketchExample
+              type={type}
+              color={{
+                r: icon.rgb.r,
+                g: icon.rgb.g,
+                b: icon.rgb.b,
+                a: icon.rgb.a
+              }}
+              onChange={this.onClickMarkFont}
+            />
+          ) : (
+            <SketchExample
+              type={type}
+              color={{
+                r: 1,
+                g: 0,
+                b: 0,
+                a: 1
+              }}
+              onChange={this.onClickMarkFont}
+            />
+          )}
+        </React.Fragment>
+      );
+    }
     return (
       <Button type={type}>
         <Icon
@@ -997,6 +1042,7 @@ class Editor extends Component {
                 })
               : this.setState({ fontStylePopUp: type });
           }}
+          type={type}
           style={{ color: "black" }}
         >
           {icon}
@@ -1051,10 +1097,18 @@ class Editor extends Component {
               Nanum Gothic
             </MarkListItem>
             <MarkListItem
-              style={{ fontFamily: "Eczar" }}
-              onMouseDown={event => this.onClickMarkFont(event, type, "Eczar")}
+              style={{ fontFamily: "Roboto" }}
+              onMouseDown={event => this.onClickMarkFont(event, type, "Roboto")}
             >
-              Eczar
+              Roboto
+            </MarkListItem>
+            <MarkListItem
+              style={{ fontFamily: "Open Sans" }}
+              onMouseDown={event =>
+                this.onClickMarkFont(event, type, "Open Sans")
+              }
+            >
+              Open Sans
             </MarkListItem>
           </MarkListContainer>
         ) : null}
@@ -1220,8 +1274,6 @@ class Editor extends Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props;
-    console.log(mark.data.get("fontSize"));
-
     switch (mark.type) {
       case "font-family":
         return (
@@ -1236,7 +1288,18 @@ class Editor extends Component {
           </span>
         );
       case "font-color":
-        return <span style={{ color: attributes.data }}>{children}</span>;
+        return (
+          <span
+            style={{
+              color: `rgba(${mark.data.get("fontColor").rgb.r},
+              ${mark.data.get("fontColor").rgb.g},
+              ${mark.data.get("fontColor").rgb.b},
+              ${mark.data.get("fontColor").rgb.a})`
+            }}
+          >
+            {children}
+          </span>
+        );
       case "bold":
         return <strong {...attributes}>{children}</strong>;
       case "code":
@@ -1292,7 +1355,6 @@ class Editor extends Component {
 
   onClickMarkFont = (event, type, prop) => {
     event.preventDefault();
-    console.log(prop);
     if (type === "font-size") {
       if (
         this.state.selectedIndex !== null &&
@@ -1302,26 +1364,17 @@ class Editor extends Component {
       ) {
         const { value } = this.showSelected(this.state.selectedIndex);
         let change;
-        console.log(value.document.getMarksByType("font-size"));
 
         if (
-          !value.document
-            .getMarksByType("font-size")
-            .some(mark => mark.type === type)
+          !value.document.getMarksByType(type).some(mark => mark.type === type)
         ) {
-          change = value
-            .change()
-            .addMark({ type: "font-size", data: { fontSize: prop } });
+          change = value.change().addMark({ type, data: { fontSize: prop } });
         } else {
           change = value
             .change()
-            .removeMark(
-              value.marks.filter(mark => mark.type === "font-size").first()
-            )
-            .removeMark(
-              value.marks.filter(mark => mark.type === "font-size").last()
-            )
-            .addMark({ type: "font-size", data: { fontSize: prop } });
+            .removeMark(value.marks.filter(mark => mark.type === type).first())
+            .removeMark(value.marks.filter(mark => mark.type === type).last())
+            .addMark({ type, data: { fontSize: prop } });
         }
         this.handleOnChange(
           change,
@@ -1339,30 +1392,56 @@ class Editor extends Component {
       ) {
         const { value } = this.showSelected(this.state.selectedIndex);
         let change;
-        console.log(value.document.getMarksByType("font-family"));
+        console.log(value.document.getMarksByType(type));
 
         if (
-          !value.document
-            .getMarksByType("font-family")
-            .some(mark => mark.type === type)
+          !value.document.getMarksByType(type).some(mark => mark.type === type)
         ) {
           change = value.change().addMark({
-            type: "font-family",
+            type,
             data: { fontFamily: prop }
           });
         } else {
           change = value
             .change()
-            .removeMark(
-              value.marks.filter(mark => mark.type === "font-family").first()
-            )
-            .removeMark(
-              value.marks.filter(mark => mark.type === "font-family").last()
-            )
+            .removeMark(value.marks.filter(mark => mark.type === type).first())
+            .removeMark(value.marks.filter(mark => mark.type === type).last())
             .addMark({
-              type: "font-family",
+              type,
               data: { fontFamily: prop }
             });
+        }
+        this.handleOnChange(
+          change,
+          this.state.selectedIndex,
+          "TEXT",
+          "TEXT_CHANGE"
+        );
+      }
+    } else if (type === "font-color") {
+      if (
+        this.state.selectedIndex !== null &&
+        (this.state.selectedContent.content === "TEXT" ||
+          this.state.selectedContent.content === "BUTTON" ||
+          this.state.selectedContent.content === "HTML")
+      ) {
+        const { value } = this.showSelected(this.state.selectedIndex);
+        let change;
+        console.log(
+          value.document.getMarksByType(type).some(mark => mark.type === type)
+        );
+        console.log(value.marks.filter(mark => mark.type === type).size);
+        if (value.marks.filter(mark => mark.type === type).size === 0) {
+          change = value.change().addMark({
+            type,
+            data: { fontColor: prop }
+          });
+        } else {
+          change = value
+            .change()
+            .removeMark(value.marks.filter(mark => mark.type === type).first())
+            .removeMark(value.marks.filter(mark => mark.type === type).last())
+            .addMark({ type, data: { fontColor: prop } });
         }
         this.handleOnChange(
           change,

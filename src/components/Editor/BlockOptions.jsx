@@ -273,7 +273,7 @@ class BlockOptions extends Component {
                       />
                     </UrlColumn>
                   </FunctionColumn>
-                  <FunctionColumn>
+                  {/* <FunctionColumn>
                     <FunctionTitle>Text Color</FunctionTitle>
                     <SketchExample
                       OnChangeCards={OnChangeCards}
@@ -281,7 +281,7 @@ class BlockOptions extends Component {
                       type="textColor"
                       color={selectedContent.textColor}
                     />
-                  </FunctionColumn>
+                  </FunctionColumn> */}
                   <FunctionColumn>
                     <FunctionTitle>Background Color</FunctionTitle>
                     <SketchExample
@@ -414,7 +414,7 @@ class BlockOptions extends Component {
                   </MinimizeButton>
                 </OptionHeader>
                 <FeatureColumn>
-                  <FunctionColumn>
+                  {/* <FunctionColumn>
                     <FunctionTitle>Text Color</FunctionTitle>
                     <SketchExample
                       OnChangeCards={OnChangeCards}
@@ -422,7 +422,7 @@ class BlockOptions extends Component {
                       type="textColor"
                       color={selectedContent.textColor}
                     />
-                  </FunctionColumn>
+                  </FunctionColumn> */}
                   {/* <FunctionColumn>
                     <FunctionTitle>Background Color</FunctionTitle>
                     <SketchExample

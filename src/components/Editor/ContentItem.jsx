@@ -60,17 +60,54 @@ const itemSource = {
         item.hoverColor = EditorDefaults.BUTTON_HOVER_COLOR;
         item.link = "http://localhost:3000";
         item.value = Value.fromJSON({
+          object: "value",
           document: {
+            object: "document",
+            data: {},
             nodes: [
               {
                 object: "block",
                 type: "paragraph",
+                isVoid: false,
+                data: {},
                 nodes: [
                   {
                     object: "text",
                     leaves: [
                       {
-                        text: EditorDefaults.BUTTON
+                        object: "leaf",
+                        text: "CLICK ME!",
+                        marks: [
+                          {
+                            object: "mark",
+                            type: "font-color",
+                            data: {
+                              fontColor: {
+                                hsl: {
+                                  h: 0,
+                                  s: 0,
+                                  l: 1,
+                                  a: 1
+                                },
+                                hex: "#ffffff",
+                                rgb: {
+                                  r: 255,
+                                  g: 255,
+                                  b: 255,
+                                  a: 1
+                                },
+                                hsv: {
+                                  h: 0,
+                                  s: 0,
+                                  v: 1,
+                                  a: 1
+                                },
+                                oldHue: 0,
+                                source: "rgb"
+                              }
+                            }
+                          }
+                        ]
                       }
                     ]
                   }
@@ -114,6 +151,35 @@ const itemSource = {
                             type: "font-family",
                             data: {
                               fontFamily: "Nanum Gothic"
+                            }
+                          },
+                          {
+                            object: "mark",
+                            type: "font-color",
+                            data: {
+                              fontColor: {
+                                hsl: {
+                                  h: 209.99999999999997,
+                                  s: 0,
+                                  l: 0,
+                                  a: 1
+                                },
+                                hex: "#000000",
+                                rgb: {
+                                  r: 0,
+                                  g: 0,
+                                  b: 0,
+                                  a: 1
+                                },
+                                hsv: {
+                                  h: 209.99999999999997,
+                                  s: 0,
+                                  v: 0,
+                                  a: 1
+                                },
+                                oldHue: 209.99999999999997,
+                                source: "rgb"
+                              }
                             }
                           }
                         ]

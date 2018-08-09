@@ -348,7 +348,6 @@ class Container extends Component {
   handleOnMouseOver = event => {
     event.stopPropagation();
     this.props.callbackfromparent("mouseover", this.props.index);
-    console.log(`Hover true`);
   };
 
   handleOnMouseOverTool = event => {
@@ -356,7 +355,6 @@ class Container extends Component {
     this.setState({
       toolHover: true
     });
-    console.log(`tool in toolHover true`);
   };
 
   handleOnMouseLeaveTool = event => {
@@ -371,7 +369,6 @@ class Container extends Component {
   handleOnMouseDown = event => {
     event.stopPropagation();
     this.props.callbackfromparent("select", this.props.index);
-    console.log(`tool in toolHover true`);
   };
 
   handleOnMouseLeave = event => {
@@ -720,7 +717,6 @@ class Text extends Component {
 
   onChange = change => {
     const operation = change.operations.toJS();
-    console.log(operation);
     this.props.handleOnChange(change, this.props.index, "TEXT", "TEXT_CHANGE");
   };
 
@@ -733,6 +729,11 @@ class Text extends Component {
         }
       >
         <Editor
+          style={{
+            color: "rgba(0,0,0,1)",
+            fontFamily: "Nanum Gotic",
+            fontSize: "16px"
+          }}
           schema={this.props.schema}
           value={this.props.value}
           readOnly={false}
