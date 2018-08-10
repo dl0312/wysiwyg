@@ -165,6 +165,7 @@ class Board extends Component {
     super(props);
     this.state = {
       hoverImgJson: null,
+      onImage: null,
       pos: new Pos(0, 0)
     };
   }
@@ -178,6 +179,7 @@ class Board extends Component {
   };
 
   render() {
+    const { pos, hoverImgJson, onImage } = this.state;
     return (
       <Query query={POSTS}>
         {({ loading, data, error }) => {
@@ -200,13 +202,14 @@ class Board extends Component {
                             onMouseOver={() =>
                               this.setState({
                                 hoverImgJson:
-                                  post.category.wikiImages[0].hoverImage
+                                  post.category.wikiImages[0].hoverImage,
+                                onImage: true
                               })
                             }
                             onMouseMove={this.getPos}
                             onMouseOut={() => {
                               this.setState({
-                                hoverImgJson: null
+                                onImage: false
                               });
                             }}
                           />
@@ -239,12 +242,9 @@ class Board extends Component {
                 </BoardBox>
               </BoardContainer>
               <ImagePopup
-                pos={this.state.pos}
-                json={
-                  this.state.hoverImgJson
-                    ? this.state.hoverImgJson.slice(1, -1)
-                    : null
-                }
+                pos={pos}
+                json={hoverImgJson ? hoverImgJson.slice(1, -1) : null}
+                onImage={onImage}
               />
             </React.Fragment>
           );

@@ -11,8 +11,10 @@ import Store from "./components/Store/Store";
 import Editor from "./components/Editor/Editor";
 import Profile from "./components/Profile/Profile";
 import Detail from "./components/Board/Detail";
-import WikiDetail from "./components/Wiki/WikiDetail";
-import WikiEdit from "./components/Wiki/WikiEdit";
+import CategoryDetail from "./components/Wiki/CategoryDetail";
+import CategoryEdit from "./components/Wiki/CategoryEdit";
+import WikiImageDetail from "./components/Wiki/WikiImageDetail";
+import WikiImageEdit from "./components/Wiki/WikiImageEdit";
 import "./App.css";
 
 const App = () => {
@@ -32,12 +34,22 @@ const App = () => {
             <Route
               exact
               path="/category/read/:categoryId"
-              component={WikiDetail}
+              component={CategoryDetail}
             />
             <Route
               exact
               path="/category/edit/:categoryId"
-              component={WikiEdit}
+              component={CategoryEdit}
+            />
+            <Route
+              exact
+              path="/category/:categoryId/read/:wikiImageId"
+              component={WikiImageDetail}
+            />
+            <Route
+              exact
+              path="/category/:categoryId/edit/:wikiImageId"
+              component={WikiImageEdit}
             />
             <Route exact path="/profile" component={Profile} />
           </div>

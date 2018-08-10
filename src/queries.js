@@ -82,6 +82,8 @@ export const CATEGORIES = gql`
             url
           }
           hoverImage
+          clapsCount
+          postsCount
         }
       }
     }

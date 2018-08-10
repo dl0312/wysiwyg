@@ -64,5 +64,6 @@ Client for the CLAP, react-dnd, ReactJS, slate-react, styled-components
 - [x] ImagePopup 안보이는거 없게
 - [x] card 도 container 처럼 builder 수정
 - [x] font-color text-editor 에서 수정하게
+- [ ] grid text overflow
 - [ ] only image or video hover
 - [ ] table 생성

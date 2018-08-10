@@ -732,7 +732,8 @@ class Text extends Component {
           style={{
             color: "rgba(0,0,0,1)",
             fontFamily: "Nanum Gotic",
-            fontSize: "16px"
+            fontSize: "16px",
+            wordBreak: "break-word"
           }}
           schema={this.props.schema}
           value={this.props.value}
