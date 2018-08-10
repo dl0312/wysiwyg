@@ -1,5 +1,5 @@
 import React from "react";
-import EditorLeft from "./EditorLeft";
+import EditorLeft from "../components/Editor/EditorLeft";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { Editor } from "slate-react";
@@ -27,7 +27,12 @@ const ClapImageText = styled.span`
   color: #dbb74c;
 `;
 
-class UserView extends React.Component {
+const HoverBorder = styled.div`
+  border: 4px solid rgba(0, 0, 0, 0.5);
+  outline: 0.5px solid black;
+`;
+
+class HoverView extends React.Component {
   renderNode = props => {
     const { attributes, children, node, isFocused } = props;
 
@@ -129,7 +134,6 @@ class UserView extends React.Component {
 
   renderMark = props => {
     const { children, mark, attributes } = props;
-    console.log(mark.data.get("fontSize"));
 
     switch (mark.type) {
       case "font-family":
@@ -172,43 +176,81 @@ class UserView extends React.Component {
 
   render() {
     const { json } = this.props;
-    console.log(json);
+
+    if (json.cards.length === 1) {
+      if (json.cards[0].columnListArray[0].length === 1) {
+        if (
+          json.cards[0].columnListArray[0][0].content === "IMAGE" ||
+          json.cards[0].columnListArray[0][0].content === "VIDEO"
+        ) {
+          return (
+            <React.Fragment>
+              {json.cards.map((item, index) => {
+                if (item.type === "columnList") {
+                  return (
+                    <UserCard
+                      inColumn={false}
+                      cards={json.cards.length}
+                      key={index}
+                      hoveredIndex={json.hoveredIndex}
+                    >
+                      <UserColumn
+                        columnArray={item.content}
+                        columnListArray={item.columnListArray}
+                        index={[index, 0, 0]}
+                        renderNode={this.renderNode}
+                        renderMark={this.renderMark}
+                        contentWidth={json.contentWidth}
+                      />
+                    </UserCard>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </React.Fragment>
+          );
+        }
+      }
+    }
     return (
-      <EditorLeft
-        color={json.color}
-        contentWidth={json.contentWidth}
-        font={json.font}
-        view="USER"
-      >
-        {json.cards.map((item, index) => {
-          if (item.type === "columnList") {
-            return (
-              <UserCard
-                inColumn={false}
-                cards={json.cards.length}
-                key={index}
-                hoveredIndex={json.hoveredIndex}
-              >
-                <UserColumn
-                  columnArray={item.content}
-                  columnListArray={item.columnListArray}
-                  index={[index, 0, 0]}
-                  renderNode={this.renderNode}
-                  renderMark={this.renderMark}
-                  contentWidth={json.contentWidth}
-                />
-              </UserCard>
-            );
-          } else {
-            return null;
-          }
-        })}
-      </EditorLeft>
+      <HoverBorder>
+        <EditorLeft
+          color={json.color}
+          contentWidth={json.contentWidth}
+          font={json.font}
+          view="USER"
+        >
+          {json.cards.map((item, index) => {
+            if (item.type === "columnList") {
+              return (
+                <UserCard
+                  inColumn={false}
+                  cards={json.cards.length}
+                  key={index}
+                  hoveredIndex={json.hoveredIndex}
+                >
+                  <UserColumn
+                    columnArray={item.content}
+                    columnListArray={item.columnListArray}
+                    index={[index, 0, 0]}
+                    renderNode={this.renderNode}
+                    renderMark={this.renderMark}
+                    contentWidth={json.contentWidth}
+                  />
+                </UserCard>
+              );
+            } else {
+              return null;
+            }
+          })}
+        </EditorLeft>
+      </HoverBorder>
     );
   }
 }
 
-export default UserView;
+export default HoverView;
 
 const style = {
   backgroundColor: "transparent",
@@ -664,7 +706,9 @@ class Video extends React.Component {
           }}
           width="560"
           height="315"
-          src={`https://www.youtube.com/embed/${this.props.src}?ecver=1
+          src={`https://www.youtube.com/embed/${
+            this.props.src
+          }?autoplay=1&showinfo=0&controls=0&modestbranding=1
 `}
           frameBorder="0"
           allow="autoplay; encrypted-media"

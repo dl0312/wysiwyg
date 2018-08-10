@@ -21,7 +21,9 @@ export default class Column extends Component {
             (columnRatio, index) =>
               (this.props.contentWidth * columnRatio) / totalRatio
           )
-          .join("px ") + "px"
+          .join("px ") + "px",
+      minHeight: "0" /* NEW */,
+      minWidth: "0" /* NEW; needed for Firefox */
     };
     return (
       <div className="columnList" style={columnListStyle}>

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import UserView from "../components/Editor/UserView";
+import HoverView from "./HoverView";
 
 const PopupContainer = styled.div`
   display: ${props => (props.hover ? null : "none")};
@@ -8,13 +8,12 @@ const PopupContainer = styled.div`
   z-index: 999;
   left: ${props => props.left + 50}px;
   top: ${props => props.top}px;
-  border: 4px solid rgba(0, 0, 0, 0.5);
-  outline: 1px solid black;
+
   /* border-radius: 10px; */
 `;
 
 const StaticContainer = styled.div`
-  border: 2px solid rgba(0, 0, 0, 0.5);
+  /* border: 2px solid rgba(0, 0, 0, 0.5); */
 `;
 
 const PopupImage = styled.img``;
@@ -28,11 +27,11 @@ class ImagePopup extends React.Component {
     } = this.props;
     return this.props.follow === undefined ? (
       <PopupContainer hover={onImage ? true : false} left={x} top={y}>
-        {onImage ? <UserView json={JSON.parse(this.props.json)} /> : null}
+        {onImage ? <HoverView json={JSON.parse(this.props.json)} /> : null}
       </PopupContainer>
     ) : (
       <StaticContainer>
-        {onImage ? <UserView json={JSON.parse(this.props.json)} /> : null}
+        {onImage ? <HoverView json={JSON.parse(this.props.json)} /> : null}
       </StaticContainer>
     );
   }

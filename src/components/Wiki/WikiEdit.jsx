@@ -1,5 +1,5 @@
 import React from "react";
-import { graphql, Mutation } from "react-apollo";
+import { graphql, Mutation, Query } from "react-apollo";
 import { CATEGORY } from "../../queries";
 import { Helmet } from "react-helmet";
 import ImagePopup from "../../utility/ImagePopup";
@@ -30,7 +30,7 @@ const WikiEditContainer = styled.div`
   width: 100%;
   padding: 20px;
   display: grid;
-  grid-template-columns: 1fr 4fr 1fr;
+  grid-template-columns: 1fr 2fr 1fr;
 `;
 
 const CurrentContainer = styled.div`
@@ -42,6 +42,14 @@ const CurrentContainer = styled.div`
 
 const CurrentHoverContainer = styled.div``;
 
+const ParentOrChildrenListContainer = styled.div`
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: ${props =>
+    props.section === "parent" ? "1fr" : "repeat(4, 1fr)"};
+  grid-gap: 2px;
+`;
+
 const ParentOrChildrenContainer = styled.div`
   display: flex;
   align-items: center;
@@ -50,6 +58,25 @@ const ParentOrChildrenContainer = styled.div`
   padding: 15px;
   border: 0.5px solid rgba(0, 0, 0, 0.5);
   border-radius: 10px;
+`;
+
+const ItemCard = styled.div`
+  border: 0.5px solid rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 0 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  &:focus {
+    outline: none;
+  }
 `;
 
 class WikiEdit extends React.Component {
@@ -80,7 +107,15 @@ class WikiEdit extends React.Component {
     } = nextProps;
     if (category) {
       if (ok) {
-        this.setState({ category });
+        this.setState({ category }, () =>
+          this.setState({
+            name: this.state.category.name,
+            parentId: this.state.category.parent.id,
+            childrenIds: this.state.category.children.map(child => child),
+            shownImgUrl: this.state.category.wikiImages[0].shownImage.url,
+            hoverImgJson: this.state.category.wikiImages[0].hoverImage
+          })
+        );
       }
     }
   };
@@ -104,28 +139,49 @@ class WikiEdit extends React.Component {
     return category ? (
       <React.Fragment>
         <Helmet>
-          <title>{`Wiki Edit: ${category.name}`}</title>
+          <title>{`Wiki Edit: ${name}`}</title>
         </Helmet>
         <WikiEditContainer>
           <ParentOrChildrenContainer>
             <Subtitle>PARENT</Subtitle>
+            <ParentOrChildrenListContainer section="parent">
+              {/* <Query query={CATEGORY} variables={{ categoryId: parentId }}>
+                {({ loading, data, error }) => {
+                  if (loading) return "loading";
+                  if (error) return `${error.message}`;
+                  return;
+                }}
+              </Query> */}
+              <ItemCard>{category.parent.name}</ItemCard>
+            </ParentOrChildrenListContainer>
           </ParentOrChildrenContainer>
           <CurrentContainer>
-            {category.wikiImages ? (
-              <CurrentImg
-                src={category.wikiImages[0].shownImage.url}
-                alt={category.name}
-                onMouseOver={() =>
-                  this.setState({
-                    hoverImgJson: category.wikiImages[0].hoverImage,
-                    onImage: true
-                  })
-                }
-                onMouseMove={this.getPos}
-                onMouseOut={() => {
-                  this.setState({ onImage: false });
-                }}
-              />
+            {category.wikiImages[0] ? (
+              <React.Fragment>
+                <CurrentImg
+                  src={category.wikiImages[0].shownImage.url}
+                  alt={category.name}
+                  onMouseOver={() =>
+                    this.setState({
+                      hoverImgJson: category.wikiImages[0].hoverImage,
+                      onImage: true
+                    })
+                  }
+                  onMouseMove={this.getPos}
+                  onMouseOut={() => {
+                    this.setState({ onImage: false });
+                  }}
+                />
+                <Input
+                  type="text"
+                  value={category.wikiImages[0].shownImage.url}
+                  onChange={e =>
+                    this.setState({
+                      category: { shownImage: { url: e.target.value } }
+                    })
+                  }
+                />
+              </React.Fragment>
             ) : (
               <CurrentImg
                 src={
@@ -135,7 +191,7 @@ class WikiEdit extends React.Component {
             )}
             <CurrentName>{category.name}</CurrentName>
             <CurrentHoverContainer>
-              {category.wikiImages[0].hoverImage !== null ? (
+              {category.wikiImages[0] !== undefined ? (
                 <ImagePopup
                   pos={pos}
                   follow={false}
@@ -154,6 +210,11 @@ class WikiEdit extends React.Component {
           </CurrentContainer>
           <ParentOrChildrenContainer>
             <Subtitle>CHILDREN</Subtitle>
+            <ParentOrChildrenListContainer section="children">
+              {category.children.map(child => (
+                <ItemCard>{child.name}</ItemCard>
+              ))}
+            </ParentOrChildrenListContainer>
           </ParentOrChildrenContainer>
           {/* <WikiEditor style={{ gridColumnStart: "1", gridColumnEnd: "3" }} /> */}
         </WikiEditContainer>
