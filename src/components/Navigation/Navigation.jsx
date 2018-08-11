@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
+import { AUTH_TOKEN } from "../../constants";
 
 const NavContainer = styled.div`
   width: 100%;
@@ -61,19 +62,34 @@ class Navigation extends Component {
   };
 
   render() {
+    const authToken = localStorage.getItem(AUTH_TOKEN);
     const { login } = this.state;
     return (
       <NavContainer>
         <Header>
           <div style={{ width: "100%" }}>
             <ProfileContainer>
-              {login ? null : (
-                <ProfileItemContainer>LOG IN</ProfileItemContainer>
+              {authToken ? (
+                <NavLink to="/" style={{ textDecoration: "none" }}>
+                  <ProfileItemContainer
+                    onClick={() => {
+                      localStorage.removeItem(AUTH_TOKEN);
+                    }}
+                  >
+                    LOG OUT
+                  </ProfileItemContainer>
+                </NavLink>
+              ) : (
+                <NavLink to="/login" style={{ textDecoration: "none" }}>
+                  <ProfileItemContainer>LOG IN</ProfileItemContainer>
+                </NavLink>
               )}
-              {login ? null : (
-                <ProfileItemContainer>JOIN US</ProfileItemContainer>
+              {!authToken && (
+                <NavLink to="/signin" style={{ textDecoration: "none" }}>
+                  <ProfileItemContainer>JOIN US</ProfileItemContainer>
+                </NavLink>
               )}
-              {login ? null : (
+              {!authToken && (
                 <React.Fragment>
                   <ProfileItemContainer>SOCIAL LOGIN </ProfileItemContainer>
                   <SocialIcon
@@ -94,9 +110,9 @@ class Navigation extends Component {
                   />
                 </React.Fragment>
               )}
-              {login ? (
+              {authToken && (
                 <ProfileItemContainer>PROFILE</ProfileItemContainer>
-              ) : null}
+              )}
             </ProfileContainer>
             <MenuList>
               <NavLink

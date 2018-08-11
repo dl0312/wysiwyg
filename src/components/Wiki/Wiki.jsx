@@ -7,6 +7,12 @@ import ImagePopup from "../../utility/ImagePopup";
 import Pos from "../../utility/Pos";
 import { CATEGORIES } from "../../queries";
 
+const FlexBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const WikiContainer = styled.div`
   padding: 20px 100px;
   width: 100%;
@@ -42,9 +48,9 @@ const WikiImage = styled.img`
 
 const DataContainer = styled.div`
   display: grid;
-  grid-template-columns: 150px repeat(8, 1fr);
+  grid-template-columns: 150px repeat(8, 100px);
   grid-gap: 5px;
-  height: 70px;
+  height: 100px;
   margin: 2px 0;
 `;
 
@@ -77,6 +83,42 @@ const CategoryName = styled.div`
   letter-spacing: -0.5px;
 `;
 
+const WikiImageContainer = FlexBox.extend`
+  flex-direction: column;
+`;
+
+const WikiImageCountContainer = FlexBox.extend`
+  justify-content: space-between;
+  width: 70px;
+  margin-top: 5px;
+`;
+
+const WikiImageCount = FlexBox.extend`
+  padding: 2px 5px;
+  border-radius: 5px;
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
+`;
+
+const WikiImageCountIcon = styled.i`
+  font-size: 10px;
+  margin-right: 5px;
+`;
+
+const NoWikiImageContainer = FlexBox.extend`
+  flex-direction: column;
+`;
+
+const NoWikiImageIcon = styled.i`
+  font-size: 20px;
+`;
+
+const NoWikiImageText = styled.div`
+  margin-top: 5px;
+  text-transform: uppercase;
+  text-align: center;
+`;
+
 class Wiki extends React.Component {
   state = {
     keyword: "",
@@ -96,8 +138,12 @@ class Wiki extends React.Component {
       <React.Fragment>
         <WikiContainer>
           <Buttons>
-            <Button>add category</Button>
-            <Button>add wikiimage</Button>
+            <Link to={`/category/add`} style={{ textDecoration: "none" }}>
+              <Button>add category</Button>
+            </Link>
+            <Link to={`/wikiImage/add`} style={{ textDecoration: "none" }}>
+              <Button>add wikiimage</Button>
+            </Link>
           </Buttons>
           <SearchInput
             type="text"
@@ -127,31 +173,49 @@ class Wiki extends React.Component {
                                 <CategoryName>{category.name}</CategoryName>
                               </CategoryContainer>
                             </Link>
-                            {category.wikiImages.map(wikiImage => {
-                              console.log(wikiImage);
-                              return (
-                                <React.Fragment>
-                                  <WikiImage
-                                    src={wikiImage.shownImage.url}
-                                    alt={category.name}
-                                    onMouseOver={() =>
-                                      this.setState({
-                                        hoverImgJson: wikiImage.hoverImage,
-                                        onImage: true
-                                      })
-                                    }
-                                    onMouseMove={this.getPos}
-                                    onMouseOut={() => {
-                                      this.setState({
-                                        onImage: false
-                                      });
-                                    }}
-                                  />
-                                  <div>{wikiImage.clapsCount}</div>
-                                  <div>{wikiImage.postsCount}</div>
-                                </React.Fragment>
-                              );
-                            })}
+                            {category.wikiImages.length !== 0 ? (
+                              category.wikiImages.map(wikiImage => {
+                                return (
+                                  <React.Fragment>
+                                    <WikiImageContainer>
+                                      <WikiImage
+                                        src={wikiImage.shownImage.url}
+                                        alt={category.name}
+                                        onMouseOver={() =>
+                                          this.setState({
+                                            hoverImgJson: wikiImage.hoverImage,
+                                            onImage: true
+                                          })
+                                        }
+                                        onMouseMove={this.getPos}
+                                        onMouseOut={() => {
+                                          this.setState({
+                                            onImage: false
+                                          });
+                                        }}
+                                      />
+                                      <WikiImageCountContainer>
+                                        <WikiImageCount>
+                                          <WikiImageCountIcon className="fas fa-heart" />
+                                          {wikiImage.clapsCount}
+                                        </WikiImageCount>
+                                        <WikiImageCount>
+                                          <WikiImageCountIcon className="fas fa-pencil-alt" />
+                                          {wikiImage.postsCount}
+                                        </WikiImageCount>
+                                      </WikiImageCountContainer>
+                                    </WikiImageContainer>
+                                  </React.Fragment>
+                                );
+                              })
+                            ) : (
+                              <NoWikiImageContainer>
+                                <NoWikiImageIcon className="fas fa-plus-circle" />
+                                <NoWikiImageText>
+                                  please edit wikiimage
+                                </NoWikiImageText>
+                              </NoWikiImageContainer>
+                            )}
                           </DataContainer>
                         </React.Fragment>
                       )

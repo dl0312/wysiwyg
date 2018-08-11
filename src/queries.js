@@ -128,3 +128,41 @@ export const CATEGORY = gql`
     }
   }
 `;
+
+export const ADD_CATEGORY = gql`
+  mutation AddCategory($name: String!, $parentIds: [Int], $childrenIds: [Int]) {
+    AddCategory(name: $name, parentIds: $parentIds, childrenIds: $childrenIds) {
+      ok
+      error
+    }
+  }
+`;
+
+export const LOGIN_MUTATION = gql`
+  mutation EmailSignIn($email: String!, $password: String!) {
+    EmailSignIn(email: $email, password: $password) {
+      ok
+      error
+      token
+    }
+  }
+`;
+
+export const SIGNUP_MUTATION = gql`
+  mutation EmailSignUp(
+    $nickName: String!
+    $email: String!
+    $password: String!
+    $phoneNumber: String!
+  ) {
+    EmailSignUp(
+      nickName: $nickName
+      email: $email
+      password: $password
+      phoneNumber: $phoneNumber
+    ) {
+      ok
+      error
+    }
+  }
+`;
