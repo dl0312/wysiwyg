@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Helmet } from "react-helmet";
 import { Query } from "react-apollo";
 import ImagePopup from "../../utility/ImagePopup";
-import { CATEGORIES } from "../../queries";
+import { CATEGORIES_KEYWORD } from "../../queries";
 import Pos from "../../utility/Pos";
 
 const WikiContainer = styled.div`
@@ -148,7 +148,10 @@ class MiniWiki extends React.Component {
               />
             </InputTypeContainer>
           </InputContainer>
-          <Query query={CATEGORIES} variables={{ keyword: this.state.keyword }}>
+          <Query
+            query={CATEGORIES_KEYWORD}
+            variables={{ keyword: this.state.keyword }}
+          >
             {({ loading, data, error }) => {
               if (loading) return "loading";
               if (error) return "something happened";

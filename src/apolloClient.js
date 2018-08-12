@@ -10,7 +10,7 @@ import { onError } from "apollo-link-error";
 import { toast } from "react-toastify";
 
 const getToken = () => {
-  const token = localStorage.getItem("auth-token");
+  const token = localStorage.getItem("jwt");
   if (token) {
     return token;
   } else {
@@ -18,96 +18,106 @@ const getToken = () => {
   }
 };
 
+const authLink = setContext((_, { headers }) => {
+  const token = getToken();
+  return { headers: { ...headers, "X-JWT": getToken() } };
+});
+
 const cache = new InMemoryCache();
 
-const authMiddleware = new ApolloLink((operation, forward) => {
-  operation.setContext({
-    headers: {
-      "X-JWT": getToken()
-    }
-  });
-  return forward(operation);
-});
+// const authMiddleware = new ApolloLink((operation, forward) => {
+//   operation.setContext({
+//     headers: {
+//       "X-JWT": getToken()
+//     }
+//   });
+//   return forward(operation);
+// });
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000/graphql"
 });
 
-const wsLink = new WebSocketLink({
-  uri: "ws://localhost:4000/subscriptions",
-  options: {
-    reconnect: true,
-    connectionParams: {
-      "X-JWT": getToken()
-    }
-  }
-});
+// const wsLink = new WebSocketLink({
+//   uri: "ws://localhost:4000/subscriptions",
+//   options: {
+//     reconnect: true,
+//     connectionParams: {
+//       "X-JWT": getToken()
+//     }
+//   }
+// });
 
-const combinedLinks = split(
-  ({ query }) => {
-    const { kind, operation } = getMainDefinition(query);
-    return kind === "OperationDefinition" && operation === "subscription";
-  },
-  wsLink,
-  httpLink
-);
+// const combinedLinks = split(
+//   ({ query }) => {
+//     const { kind, operation } = getMainDefinition(query);
+//     return kind === "OperationDefinition" && operation === "subscription";
+//   },
+//   // wsLink,
+//   httpLink
+// );
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.map(({ message, locations, path }) => {
-      toast.error(`Unexpected error: ${message}`);
-    });
-  }
-  if (networkError) {
-    toast.error(`Network error: ${networkError}`);
-  }
-});
+// const errorLink = onError(({ graphQLErrors, networkError }) => {
+//   if (graphQLErrors) {
+//     graphQLErrors.map(({ message, locations, path }) => {
+//       toast.error(`Unexpected error: ${message}`);
+//     });
+//   }
+//   if (networkError) {
+//     toast.error(`Network error: ${networkError}`);
+//   }
+// });
 
-const localStateLink = withClientState({
-  defaults: {
-    auth: {
-      __typename: "Auth",
-      isLoggedIn: Boolean(localStorage.getItem("jwt")) || false
-    }
-  },
-  resolvers: {
-    Mutation: {
-      logUserOut: (_, __, { cache: localCache }) => {
-        localStorage.removeItem("jwt");
-        localCache.writeData({
-          data: {
-            auth: {
-              __typename: "Auth",
-              isLoggedIn: false
-            }
-          }
-        });
-        return null;
-      },
-      logUserIn: (_, { token }, { cache: localCache }) => {
-        localStorage.setItem("jwt", token);
-        localCache.writeData({
-          data: {
-            auth: {
-              __typename: "Auth",
-              isLoggedIn: true
-            }
-          }
-        });
-        return null;
-      }
-    }
-  },
-  cache
-});
+// const localStateLink = withClientState({
+//   defaults: {
+//     auth: {
+//       __typename: "Auth",
+//       isLoggedIn: Boolean(localStorage.getItem("jwt")) || false
+//     }
+//   },
+//   resolvers: {
+//     Mutation: {
+//       logUserOut: (_, __, { cache: localCache }) => {
+//         localStorage.removeItem("jwt");
+//         localCache.writeData({
+//           data: {
+//             auth: {
+//               __typename: "Auth",
+//               isLoggedIn: false
+//             }
+//           }
+//         });
+//         return null;
+//       },
+//       logUserIn: (_, { token }, { cache: localCache }) => {
+//         localStorage.setItem("jwt", token);
+//         localCache.writeData({
+//           data: {
+//             auth: {
+//               __typename: "Auth",
+//               isLoggedIn: true
+//             }
+//           }
+//         });
+//         return null;
+//       }
+//     }
+//   },
+//   cache
+// });
+
+// const client = new ApolloClient({
+//   link: ApolloLink.from([
+//     errorLink,
+//     localStateLink,
+//     concat(authMiddleware, combinedLinks)
+//   ]),
+//   cache
+// });
 
 const client = new ApolloClient({
-  link: ApolloLink.from([
-    errorLink,
-    localStateLink,
-    concat(authMiddleware, combinedLinks)
-  ]),
-  cache
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache()
 });
 
 export default client;

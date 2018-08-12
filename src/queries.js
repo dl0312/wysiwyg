@@ -68,7 +68,43 @@ export const POSTS = gql`
   }
 `;
 
-export const CATEGORIES = gql`
+export const CATEGORY_SELECTION = gql`
+  query categorySelection($keyword: String!, $categoriesIds: [Int]) {
+    GetCategoriesByKeyword(keyword: $keyword) {
+      ok
+      error
+      categories {
+        id
+        name
+        wikiImages {
+          id
+          shownImage {
+            url
+          }
+          hoverImage
+          clapsCount
+          postsCount
+        }
+      }
+    }
+    GetCategoriesByIds(categoriesIds: $categoriesIds) {
+      ok
+      error
+      categories {
+        id
+        name
+        wikiImages {
+          shownImage {
+            url
+          }
+          hoverImage
+        }
+      }
+    }
+  }
+`;
+
+export const CATEGORIES_KEYWORD = gql`
   query GetCategoriesByKeyword($keyword: String!) {
     GetCategoriesByKeyword(keyword: $keyword) {
       ok
@@ -123,6 +159,25 @@ export const CATEGORY = gql`
             }
             hoverImage
           }
+        }
+      }
+    }
+  }
+`;
+
+export const CATEGORIES_IDS = gql`
+  query GetCategoriesByIds($categoriesIds: [Int]) {
+    GetCategoriesByIds(categoriesIds: $categoriesIds) {
+      ok
+      error
+      categories {
+        id
+        name
+        wikiImages {
+          shownImage {
+            url
+          }
+          hoverImage
         }
       }
     }

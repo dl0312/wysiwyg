@@ -2,20 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Query } from "react-apollo";
-import { CATEGORIES } from "../../queries";
+import { compose, graphql, Query } from "react-apollo";
+import { CATEGORY_SELECTION } from "../../queries";
 
 const ListContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-gap: 5px;
+  margin: 5px 0;
 `;
 
 const CategorySelectionContainer = styled.div`
   border: 1px solid black;
   border-radius: 5px;
-  width: 700px;
-  height: 500px;
+  width: 400px;
   margin: 10px 10px;
   display: flex;
   align-items: center;
@@ -115,49 +115,45 @@ class CategorySelection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedCategories: []
+      keyword: "",
+      selectedCategories: this.props.selectedCategories
     };
   }
 
+  componentWillReceiveProps = nextProps => {
+    console.log(nextProps);
+    this.setState({ selectedCategories: nextProps.selectedCategories });
+  };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log(
+      "shouldComponentUpdate: " +
+        JSON.stringify(nextProps) +
+        " " +
+        JSON.stringify(nextState)
+    );
+    return true;
+  }
+
   handleonClick = category => {
-    const { type, addIdToState } = this.props;
     const { selectedCategories } = this.state;
+    const { type, addIdToState } = this.props;
     const found = selectedCategories.find(({ id }) => {
       return id === category.id;
     });
     if (!found) {
-      this.setState({
-        selectedCategories: selectedCategories.concat({
-          id: category.id,
-          name: category.name,
-          shownImageUrl:
-            category.wikiImages[0] !== undefined
-              ? category.wikiImages[0].shownImage.url
-              : "https://image.freepik.com/free-icon/question-mark-inside-a-box-outline_318-51427.jpg"
-        })
-      });
       addIdToState(type, category.id);
     }
   };
 
   deleteSelected = category => {
-    const { type, addIdToState, deleteIdToState } = this.props;
-    let { selectedCategories } = this.state;
-    const index = selectedCategories.findIndex(({ id }) => {
-      return id === category.id;
-    });
-    console.log(index);
-    selectedCategories.splice(index, 1);
-    console.log();
-    this.setState({
-      selectedCategories
-    });
+    const { type, deleteIdToState } = this.props;
     deleteIdToState(type, category.id);
   };
 
   render() {
-    const { type, addIdToState } = this.props;
-    const { selectedCategories } = this.state;
+    const { type } = this.props;
+    const { selectedCategories, keyword } = this.state;
     return (
       <CategorySelectionContainer>
         <Helmet>
@@ -168,23 +164,31 @@ class CategorySelection extends React.Component {
           <SearchInput
             type="text"
             onChange={e => {
+              e.preventDefault();
               this.setState({ keyword: e.target.value });
             }}
           />
-          <Query query={CATEGORIES} variables={{ keyword: this.state.keyword }}>
+          <Query
+            query={CATEGORY_SELECTION}
+            variables={{
+              keyword,
+              categoriesIds: selectedCategories
+            }}
+            key={type}
+          >
             {({ loading, data, error }) => {
               if (loading) return "loading";
-              if (error) return "something happened";
+              if (error) return `${error.message}`;
+              console.log(data);
               return (
                 <React.Fragment>
-                  <Helmet>
-                    <title>Wiki</title>
-                  </Helmet>
                   <ListContainer>
                     {data.GetCategoriesByKeyword.categories.map(
                       (category, index) => (
-                        <React.Fragment>
-                          <DataContainer>
+                        <React.Fragment key={index}>
+                          <DataContainer
+                            onClick={() => this.handleonClick(category)}
+                          >
                             {category.wikiImages[0] ? (
                               <WikiImage
                                 src={category.wikiImages[0].shownImage.url}
@@ -202,14 +206,12 @@ class CategorySelection extends React.Component {
                                     onImage: false
                                   });
                                 }}
-                                onClick={() => this.handleonClick(category)}
                               />
                             ) : (
                               <WikiImage
                                 src={
                                   "https://image.freepik.com/free-icon/question-mark-inside-a-box-outline_318-51427.jpg"
                                 }
-                                onClick={() => this.handleonClick(category)}
                               />
                             )}
                             <CategoryName>{category.name}</CategoryName>
@@ -218,28 +220,30 @@ class CategorySelection extends React.Component {
                       )
                     )}
                   </ListContainer>
+                  <SelectedListContainer>
+                    {data.GetCategoriesByIds.categories.map(
+                      (category, index) => {
+                        return (
+                          <SelectedContainer key={index}>
+                            {/* <SelectedImg
+                                  src={category.wikiImages[0].shownImage.url}
+                                  alt={category.name}
+                                /> */}
+                            <SelectedTitle>{category.name}</SelectedTitle>
+                            <SelectedIcon
+                              className="fas fa-times"
+                              onClick={() => this.deleteSelected(category)}
+                            />
+                          </SelectedContainer>
+                        );
+                      }
+                    )}
+                  </SelectedListContainer>
                 </React.Fragment>
               );
             }}
           </Query>
         </UpperContainer>
-        <SelectedListContainer>
-          {selectedCategories.map(selectedCategory => {
-            return (
-              <SelectedContainer>
-                <SelectedImg
-                  src={selectedCategory.shownImageUrl}
-                  alt={selectedCategory.name}
-                />
-                <SelectedTitle>{selectedCategory.name}</SelectedTitle>
-                <SelectedIcon
-                  className="fas fa-times"
-                  onClick={() => this.deleteSelected(selectedCategory)}
-                />
-              </SelectedContainer>
-            );
-          })}
-        </SelectedListContainer>
       </CategorySelectionContainer>
     );
   }

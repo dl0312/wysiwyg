@@ -190,54 +190,56 @@ class Board extends Component {
               <BoardContainer>
                 <BoardBox>
                   <Table>
-                    <Helmet>
-                      <title>Board</title>
-                    </Helmet>
-                    {data.GetAllPosts.posts.map((post, index) => (
-                      <TableRow>
-                        <CategoryData>
-                          <CategoryImg
-                            src={post.category.wikiImages[0].shownImage.url}
-                            alt={post.category.name}
-                            onMouseOver={() =>
-                              this.setState({
-                                hoverImgJson:
-                                  post.category.wikiImages[0].hoverImage,
-                                onImage: true
-                              })
-                            }
-                            onMouseMove={this.getPos}
-                            onMouseOut={() => {
-                              this.setState({
-                                onImage: false
-                              });
-                            }}
-                          />
-                        </CategoryData>
-                        <TitleRow>
-                          <Title>
-                            <Link
-                              to={`/post/read/${post.id}`}
-                              style={{ textDecoration: "none" }}
-                            >
-                              {post.title}
-                            </Link>
-                            <Comment>[{post.commentsCount}]</Comment>
-                          </Title>
-                          <SubTitle>
-                            Guide by {post.user.fullName} updated{" "}
-                            {post.createdAt}
-                          </SubTitle>
-                        </TitleRow>
-                        <CountRow>
-                          <FlexBox>
-                            <CountTitle>CLAPS: {post.clapsCount}</CountTitle>
-                            <Indicator />
-                            <CountTitle>VIEWS: {post.view}</CountTitle>
-                          </FlexBox>
-                        </CountRow>
-                      </TableRow>
-                    ))}
+                    <tbody>
+                      <Helmet>
+                        <title>Board</title>
+                      </Helmet>
+                      {data.GetAllPosts.posts.map((post, index) => (
+                        <TableRow>
+                          <CategoryData>
+                            <CategoryImg
+                              src={post.category.wikiImages[0].shownImage.url}
+                              alt={post.category.name}
+                              onMouseOver={() =>
+                                this.setState({
+                                  hoverImgJson:
+                                    post.category.wikiImages[0].hoverImage,
+                                  onImage: true
+                                })
+                              }
+                              onMouseMove={this.getPos}
+                              onMouseOut={() => {
+                                this.setState({
+                                  onImage: false
+                                });
+                              }}
+                            />
+                          </CategoryData>
+                          <TitleRow>
+                            <Title>
+                              <Link
+                                to={`/post/read/${post.id}`}
+                                style={{ textDecoration: "none" }}
+                              >
+                                {post.title}
+                              </Link>
+                              <Comment>[{post.commentsCount}]</Comment>
+                            </Title>
+                            <SubTitle>
+                              Guide by {post.user.fullName} updated{" "}
+                              {post.createdAt}
+                            </SubTitle>
+                          </TitleRow>
+                          <CountRow>
+                            <FlexBox>
+                              <CountTitle>CLAPS: {post.clapsCount}</CountTitle>
+                              <Indicator />
+                              <CountTitle>VIEWS: {post.view}</CountTitle>
+                            </FlexBox>
+                          </CountRow>
+                        </TableRow>
+                      ))}
+                    </tbody>
                   </Table>
                 </BoardBox>
               </BoardContainer>

@@ -71,13 +71,21 @@ class CategoryAdd extends React.Component {
     }
   };
 
+  _confirm = async data => {
+    console.log(data);
+    this.props.history.push(`/wiki`);
+  };
+
   render() {
     const { name, parentIds, childrenIds } = this.state;
     console.log(name);
     console.log(parentIds);
     console.log(childrenIds);
     return (
-      <Mutation mutation={ADD_CATEGORY}>
+      <Mutation
+        mutation={ADD_CATEGORY}
+        onCompleted={data => this._confirm(data)}
+      >
         {(AddCategory, { data }) => (
           <CategoryAddContainer>
             <SearchInput
@@ -90,12 +98,16 @@ class CategoryAdd extends React.Component {
               <CategorySelection
                 addIdToState={this.addIdToState}
                 deleteIdToState={this.deleteIdToState}
+                selectedCategories={parentIds}
                 type="parent"
+                key="parent"
               />
               <CategorySelection
                 addIdToState={this.addIdToState}
                 deleteIdToState={this.deleteIdToState}
+                selectedCategories={childrenIds}
                 type="children"
+                key="children"
               />
             </CategorySelectionsContainer>
             {/* <Link to="/wiki"> */}
@@ -134,7 +146,6 @@ class CategoryAdd extends React.Component {
             >
               Send
             </SendIcon>
-            {/* </Link> */}
           </CategoryAddContainer>
         )}
       </Mutation>

@@ -5,7 +5,7 @@ import { Helmet } from "react-helmet";
 import { Query } from "react-apollo";
 import ImagePopup from "../../utility/ImagePopup";
 import Pos from "../../utility/Pos";
-import { CATEGORIES } from "../../queries";
+import { CATEGORIES_KEYWORD } from "../../queries";
 
 const FlexBox = styled.div`
   display: flex;
@@ -151,7 +151,10 @@ class Wiki extends React.Component {
               this.setState({ keyword: e.target.value });
             }}
           />
-          <Query query={CATEGORIES} variables={{ keyword: this.state.keyword }}>
+          <Query
+            query={CATEGORIES_KEYWORD}
+            variables={{ keyword: this.state.keyword }}
+          >
             {({ loading, data, error }) => {
               if (loading) return "loading";
               if (error) return `${error.message}`;
@@ -163,7 +166,7 @@ class Wiki extends React.Component {
                   <ListContainer>
                     {data.GetCategoriesByKeyword.categories.map(
                       (category, index) => (
-                        <React.Fragment>
+                        <React.Fragment key={index}>
                           <DataContainer>
                             <Link
                               to={`/category/read/${category.id}`}

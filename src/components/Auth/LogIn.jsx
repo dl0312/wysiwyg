@@ -56,6 +56,7 @@ class LogIn extends React.Component {
     console.log(data);
     const { token } = this.state.login ? data.EmailSignIn : data.EmailSignUp;
     this._saveUserData(token);
+    this.props.history.push(`/`);
   };
 
   _saveUserData = token => {
@@ -137,12 +138,19 @@ class LogIn extends React.Component {
               onCompleted={data => this._confirm(data)}
             >
               {mutation => (
-                <Button onClick={() => mutation}>
-                  {login ? "login" : "create account"}
-                </Button>
+                <React.Fragment>
+                  <Button onClick={mutation}>
+                    {login ? "login" : "create account"}
+                  </Button>
+                </React.Fragment>
               )}
             </Mutation>
-            <Button onClick={() => this.setState({ login: !login })}>
+            <Button
+              onClick={e => {
+                e.preventDefault();
+                this.setState({ login: !login });
+              }}
+            >
               {login
                 ? "need to create an account?"
                 : "already have an account?"}
